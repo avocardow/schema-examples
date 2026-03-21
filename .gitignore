@@ -9,18 +9,6 @@ Desktop.ini
 *.swp
 *.swo
 *~
-.editorconfig
-
-# Node (in case anyone runs schema validation locally)
-node_modules/
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
-bun.lockb
-
-# Environment / secrets
-.env
-.env.*
 
 # Research and working notes (local reference only)
 RESEARCH.md
@@ -28,16 +16,6 @@ RESEARCH.md
 **/NOTES.md
 **/TODO.md
 **/SCRATCH.md
-
-# Build / generated
-dist/
-build/
-out/
-*.tsbuildinfo
-
-# Logs
-*.log
-npm-debug.log*
 
 # Temporary files
 tmp/
