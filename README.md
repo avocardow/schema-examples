@@ -20,7 +20,7 @@ Each domain includes schemas in all of the following formats:
 
 ## How Dependencies Work
 
-Domains reference tables from other domains rather than duplicating them. For example, most domains depend on [Auth / RBAC](./schemas/auth-rbac) for user and role tables.
+Domains reference tables from other domains rather than duplicating them. For example, most domains depend on [Auth / RBAC](./schemas/auth-rbac) for user identity and authorization.
 
 - **Within a domain** — Full foreign keys/references between all tables
 - **Across domains** — Each domain's README lists its dependencies with links
@@ -34,145 +34,145 @@ See each domain's **Dependencies** section for details.
 
 | Domain                                                       | Tables | Status |
 | ------------------------------------------------------------ | ------ | ------ |
-| [Auth / RBAC](./schemas/auth-rbac)                           | 65     | 🔲     |
-| [Notifications System](./schemas/notifications-system)       | 85     | 🔲     |
-| [File Management / Document Storage](./schemas/file-management-document-storage) | 90 | 🔲 |
-| [Multi-language / i18n](./schemas/multi-language-i18n)       | 107    | 🔲     |
-| [Analytics / Metrics](./schemas/analytics-metrics)           | 187    | 🔲     |
-| [Content Moderation](./schemas/content-moderation)           | 111    | 🔲     |
+| [Auth / RBAC](./schemas/auth-rbac)                           | 26     | ✅     |
+| [Notifications System](./schemas/notifications-system)       | —      | 🔲     |
+| [File Management / Document Storage](./schemas/file-management-document-storage) | — | 🔲 |
+| [Multi-language / i18n](./schemas/multi-language-i18n)       | —      | 🔲     |
+| [Analytics / Metrics](./schemas/analytics-metrics)           | —      | 🔲     |
+| [Content Moderation](./schemas/content-moderation)           | —      | 🔲     |
 
 ### Commerce & Marketplace
 
 | Domain                                                       | Tables | Status |
 | ------------------------------------------------------------ | ------ | ------ |
-| [E-commerce](./schemas/e-commerce)                           | 59     | 🔲     |
-| [Marketplace (Multi-vendor)](./schemas/marketplace)          | 160    | 🔲     |
-| [Auction](./schemas/auction)                                 | 92     | 🔲     |
-| [Subscription / Membership](./schemas/subscription-membership) | 90   | 🔲     |
-| [Affiliate / Referral Program](./schemas/affiliate-referral-program) | 116 | 🔲 |
-| [Loyalty / Rewards Program](./schemas/loyalty-rewards-program) | 118  | 🔲     |
+| [E-commerce](./schemas/e-commerce)                           | —      | 🔲     |
+| [Marketplace (Multi-vendor)](./schemas/marketplace)          | —      | 🔲     |
+| [Auction](./schemas/auction)                                 | —      | 🔲     |
+| [Subscription / Membership](./schemas/subscription-membership) | —    | 🔲     |
+| [Affiliate / Referral Program](./schemas/affiliate-referral-program) | — | 🔲 |
+| [Loyalty / Rewards Program](./schemas/loyalty-rewards-program) | —    | 🔲     |
 
 ### Social & Communication
 
 | Domain                                                       | Tables | Status |
 | ------------------------------------------------------------ | ------ | ------ |
-| [Social Media](./schemas/social-media)                       | 65     | 🔲     |
-| [Messaging / Chat](./schemas/messaging-chat)                 | 52     | 🔲     |
-| [Video Conferencing](./schemas/video-conferencing)           | 102    | 🔲     |
-| [Email / Campaign Marketing](./schemas/email-campaign-marketing) | 110 | 🔲 |
+| [Social Media](./schemas/social-media)                       | —      | 🔲     |
+| [Messaging / Chat](./schemas/messaging-chat)                 | —      | 🔲     |
+| [Video Conferencing](./schemas/video-conferencing)           | —      | 🔲     |
+| [Email / Campaign Marketing](./schemas/email-campaign-marketing) | —  | 🔲     |
 
 ### Content & Media
 
 | Domain                                                       | Tables | Status |
 | ------------------------------------------------------------ | ------ | ------ |
-| [CMS / Blog](./schemas/cms-blog)                             | 155    | 🔲     |
-| [Media Streaming](./schemas/media-streaming)                 | 115    | 🔲     |
-| [Podcast Platform](./schemas/podcast-platform)               | 97     | 🔲     |
-| [Digital Asset Management (DAM)](./schemas/digital-asset-management) | 122 | 🔲 |
-| [Recipe / Cooking](./schemas/recipe-cooking)                 | 91     | 🔲     |
+| [CMS / Blog](./schemas/cms-blog)                             | —      | 🔲     |
+| [Media Streaming](./schemas/media-streaming)                 | —      | 🔲     |
+| [Podcast Platform](./schemas/podcast-platform)               | —      | 🔲     |
+| [Digital Asset Management (DAM)](./schemas/digital-asset-management) | — | 🔲 |
+| [Recipe / Cooking](./schemas/recipe-cooking)                 | —      | 🔲     |
 
 ### Business & Enterprise
 
 | Domain                                                       | Tables | Status |
 | ------------------------------------------------------------ | ------ | ------ |
-| [SaaS / Multi-tenant](./schemas/saas-multi-tenant)           | 53     | 🔲     |
-| [CRM](./schemas/crm)                                         | 105    | 🔲     |
-| [Project Management](./schemas/project-management)           | 185    | 🔲     |
-| [HR / Payroll](./schemas/hr-payroll)                         | 117    | 🔲     |
-| [Helpdesk / Customer Support](./schemas/helpdesk-customer-support) | 147 | 🔲 |
-| [Compliance / GRC](./schemas/compliance-grc)                 | 130    | 🔲     |
+| [SaaS / Multi-tenant](./schemas/saas-multi-tenant)           | —      | 🔲     |
+| [CRM](./schemas/crm)                                         | —      | 🔲     |
+| [Project Management](./schemas/project-management)           | —      | 🔲     |
+| [HR / Payroll](./schemas/hr-payroll)                         | —      | 🔲     |
+| [Helpdesk / Customer Support](./schemas/helpdesk-customer-support) | — | 🔲   |
+| [Compliance / GRC](./schemas/compliance-grc)                 | —      | 🔲     |
 
 ### Booking & Scheduling
 
 | Domain                                                       | Tables | Status |
 | ------------------------------------------------------------ | ------ | ------ |
-| [Booking / Scheduling](./schemas/booking-scheduling)         | 101    | 🔲     |
-| [Event Management / Ticketing](./schemas/event-management-ticketing) | 99 | 🔲 |
+| [Booking / Scheduling](./schemas/booking-scheduling)         | —      | 🔲     |
+| [Event Management / Ticketing](./schemas/event-management-ticketing) | — | 🔲 |
 
 ### Healthcare & Wellness
 
 | Domain                                                       | Tables | Status |
 | ------------------------------------------------------------ | ------ | ------ |
-| [Healthcare / Medical](./schemas/healthcare-medical)         | 126    | 🔲     |
-| [Fitness / Wellness](./schemas/fitness-wellness)             | 86     | 🔲     |
-| [Pet / Veterinary](./schemas/pet-veterinary)                 | 105    | 🔲     |
+| [Healthcare / Medical](./schemas/healthcare-medical)         | —      | 🔲     |
+| [Fitness / Wellness](./schemas/fitness-wellness)             | —      | 🔲     |
+| [Pet / Veterinary](./schemas/pet-veterinary)                 | —      | 🔲     |
 
 ### Finance & Legal
 
 | Domain                                                       | Tables | Status |
 | ------------------------------------------------------------ | ------ | ------ |
-| [Finance / Banking](./schemas/finance-banking)               | 92     | 🔲     |
-| [Insurance](./schemas/insurance)                             | 97     | 🔲     |
-| [Legal / Law Firm](./schemas/legal-law-firm)                 | 104    | 🔲     |
-| [Fundraising / Crowdfunding](./schemas/fundraising-crowdfunding) | 98 | 🔲     |
-| [Nonprofit Management](./schemas/nonprofit-management)       | 123    | 🔲     |
+| [Finance / Banking](./schemas/finance-banking)               | —      | 🔲     |
+| [Insurance](./schemas/insurance)                             | —      | 🔲     |
+| [Legal / Law Firm](./schemas/legal-law-firm)                 | —      | 🔲     |
+| [Fundraising / Crowdfunding](./schemas/fundraising-crowdfunding) | —  | 🔲     |
+| [Nonprofit Management](./schemas/nonprofit-management)       | —      | 🔲     |
 
 ### Real Estate & Property
 
 | Domain                                                       | Tables | Status |
 | ------------------------------------------------------------ | ------ | ------ |
-| [Real Estate](./schemas/real-estate)                         | 180    | 🔲     |
-| [Space / Facility Reservation](./schemas/space-facility-reservation) | 101 | 🔲 |
+| [Real Estate](./schemas/real-estate)                         | —      | 🔲     |
+| [Space / Facility Reservation](./schemas/space-facility-reservation) | — | 🔲 |
 
 ### Education & Research
 
 | Domain                                                       | Tables | Status |
 | ------------------------------------------------------------ | ------ | ------ |
-| [Education / LMS](./schemas/education-lms)                   | 93     | 🔲     |
-| [Library Management](./schemas/library-management)           | 114    | 🔲     |
-| [Academic Research Management](./schemas/academic-research)  | 125    | 🔲     |
+| [Education / LMS](./schemas/education-lms)                   | —      | 🔲     |
+| [Library Management](./schemas/library-management)           | —      | 🔲     |
+| [Academic Research Management](./schemas/academic-research)  | —      | 🔲     |
 
 ### Food & Hospitality
 
 | Domain                                                       | Tables | Status |
 | ------------------------------------------------------------ | ------ | ------ |
-| [Restaurant / Food Delivery](./schemas/restaurant-food-delivery) | 192 | 🔲   |
-| [Travel / Airlines / Hotels](./schemas/travel-airlines-hotels) | 102  | 🔲     |
+| [Restaurant / Food Delivery](./schemas/restaurant-food-delivery) | —  | 🔲     |
+| [Travel / Airlines / Hotels](./schemas/travel-airlines-hotels) | —    | 🔲     |
 
 ### Employment
 
 | Domain                                                       | Tables | Status |
 | ------------------------------------------------------------ | ------ | ------ |
-| [Job Board / Recruitment](./schemas/job-board-recruitment)   | 90     | 🔲     |
+| [Job Board / Recruitment](./schemas/job-board-recruitment)   | —      | 🔲     |
 
 ### Logistics & Supply Chain
 
 | Domain                                                       | Tables | Status |
 | ------------------------------------------------------------ | ------ | ------ |
-| [Inventory / Warehouse Management](./schemas/inventory-warehouse) | 144 | 🔲  |
-| [Logistics / Shipping](./schemas/logistics-shipping)         | 188    | 🔲     |
-| [Supply Chain Management](./schemas/supply-chain)            | 125    | 🔲     |
-| [Manufacturing / MES](./schemas/manufacturing-mes)           | 126    | 🔲     |
+| [Inventory / Warehouse Management](./schemas/inventory-warehouse) | — | 🔲     |
+| [Logistics / Shipping](./schemas/logistics-shipping)         | —      | 🔲     |
+| [Supply Chain Management](./schemas/supply-chain)            | —      | 🔲     |
+| [Manufacturing / MES](./schemas/manufacturing-mes)           | —      | 🔲     |
 
 ### IoT & Technology
 
 | Domain                                                       | Tables | Status |
 | ------------------------------------------------------------ | ------ | ------ |
-| [IoT / Device Management](./schemas/iot-device-management)   | 99     | 🔲     |
-| [Gaming / Leaderboards](./schemas/gaming-leaderboards)       | 107    | 🔲     |
+| [IoT / Device Management](./schemas/iot-device-management)   | —      | 🔲     |
+| [Gaming / Leaderboards](./schemas/gaming-leaderboards)       | —      | 🔲     |
 
 ### Government & Utilities
 
 | Domain                                                       | Tables | Status |
 | ------------------------------------------------------------ | ------ | ------ |
-| [Government / Civic Services](./schemas/government-civic)    | 122    | 🔲     |
-| [Energy / Utilities](./schemas/energy-utilities)             | 104    | 🔲     |
+| [Government / Civic Services](./schemas/government-civic)    | —      | 🔲     |
+| [Energy / Utilities](./schemas/energy-utilities)             | —      | 🔲     |
 
 ### Agriculture & Environment
 
 | Domain                                                       | Tables | Status |
 | ------------------------------------------------------------ | ------ | ------ |
-| [Agriculture / Farm Management](./schemas/agriculture-farm-management) | 116 | 🔲 |
+| [Agriculture / Farm Management](./schemas/agriculture-farm-management) | — | 🔲 |
 
 ### Events & Lifestyle
 
 | Domain                                                       | Tables | Status |
 | ------------------------------------------------------------ | ------ | ------ |
-| [League / Competition Management](./schemas/league-competition-management) | 121 | 🔲 |
-| [Event Planning](./schemas/event-planning)                   | 129    | 🔲     |
-| [Voting / Polling / Surveys](./schemas/voting-polling-surveys) | 97   | 🔲     |
+| [League / Competition Management](./schemas/league-competition-management) | — | 🔲 |
+| [Event Planning](./schemas/event-planning)                   | —      | 🔲     |
+| [Voting / Polling / Surveys](./schemas/voting-polling-surveys) | —    | 🔲     |
 
-**Total: 57 domains, 6,432 tables across 7 formats**
+**57 domains — 1 complete, 56 in progress**
 
 ## How to Use
 
@@ -187,34 +187,49 @@ See each domain's **Dependencies** section for details.
 ```
 schemas/
 ├── {domain}/
-│   ├── README.md              # Conceptual model, tables, relationships, best practices
+│   ├── README.md              # Pseudo code (source of truth), relationships, best practices
+│   ├── RESEARCH.md            # Local research notes (gitignored)
 │   ├── convex/
-│   │   └── schema.ts
+│   │   ├── users.ts
+│   │   ├── sessions.ts
+│   │   └── ...
 │   ├── sql/
-│   │   └── schema.sql
+│   │   ├── users.sql
+│   │   ├── sessions.sql
+│   │   └── ...
 │   ├── prisma/
-│   │   └── schema.prisma
+│   │   ├── users.prisma
+│   │   ├── sessions.prisma
+│   │   └── ...
 │   ├── mongodb/
-│   │   └── schema.js
+│   │   ├── users.js
+│   │   ├── sessions.js
+│   │   └── ...
 │   ├── drizzle/
-│   │   └── schema.ts
+│   │   ├── users.ts
+│   │   ├── sessions.ts
+│   │   └── ...
 │   ├── spacetimedb/
-│   │   └── lib.rs
+│   │   ├── users.rs
+│   │   ├── sessions.rs
+│   │   └── ...
 │   └── firebase/
-│       └── schema.js
+│       ├── users.js
+│       ├── sessions.js
+│       └── ...
 └── ...
 ```
 
+**One file per table.** This makes it easy to copy exactly what you need and supports a future CLI tool.
+
 ## Contributing
 
-We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
+We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for the full process, format conventions, and guidelines.
 
-Ways to contribute:
-
-- Implement a schema in a format that's missing (pick any 🔲 and make it ✅)
-- Add a new domain
-- Improve existing schemas with better indexes, constraints, or documentation
-- Fix bugs or inconsistencies
+The short version:
+- The domain README's pseudo code is the **source of truth** for all format implementations
+- Follow the workflow: research → pseudo code → implement → audit
+- Each format has specific conventions — check CONTRIBUTING.md before implementing
 
 ## License
 

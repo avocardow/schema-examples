@@ -986,10 +986,10 @@ Each table is a separate file within each format folder:
 
 | Format         | Directory                            | Status  |
 | -------------- | ------------------------------------ | ------- |
-| Convex         | [`convex/`](./convex/)               | 🔲 Todo |
+| Convex         | [`convex/`](./convex/)               | ✅ Done |
 | SQL            | [`sql/`](./sql/)                     | ✅ Done |
-| Prisma         | [`prisma/`](./prisma/)               | 🔲 Todo |
-| MongoDB        | [`mongodb/`](./mongodb/)             | 🔲 Todo |
-| Drizzle        | [`drizzle/`](./drizzle/)             | 🔲 Todo |
-| SpacetimeDB    | [`spacetimedb/`](./spacetimedb/)     | 🔲 Todo |
-| Firebase       | [`firebase/`](./firebase/)           | 🔲 Todo |
+| Prisma         | [`prisma/`](./prisma/)               | ✅ Done |
+| MongoDB        | [`mongodb/`](./mongodb/)             | ✅ Done |
+| Drizzle        | [`drizzle/`](./drizzle/)             | ✅ Done |
+| SpacetimeDB    | [`spacetimedb/`](./spacetimedb/)     | ✅ Done |
+| Firebase       | [`firebase/`](./firebase/)           | ✅ Done |
