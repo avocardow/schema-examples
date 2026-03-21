@@ -1,0 +1,34 @@
+// organizations: Tenant / workspace / company. Top-level grouping for multi-tenant apps.
+// See README.md for full design rationale and field documentation.
+
+model Organization {
+  id                 String    @id @default(uuid())
+  name               String // Display name (e.g., "Acme Corporation").
+  slug               String    @unique // URL-safe identifier (e.g., "acme-corp"). Used in URLs.
+  logoUrl            String?   @map("logo_url")
+
+  externalId         String?   @unique @map("external_id") // Cross-system reference.
+  stripeCustomerId   String?   @unique @map("stripe_customer_id") // Direct Stripe link.
+
+  maxMembers         Int?      @map("max_members") // Plan-based member limit. Null = unlimited.
+  publicMetadata     Json?     @default("{}") @map("public_metadata") // Client-readable, server-writable.
+  privateMetadata    Json?     @default("{}") @map("private_metadata") // Server-only. Never expose to client.
+
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+
+  // Soft delete. Same GDPR considerations as users.
+  deletedAt          DateTime? @map("deleted_at")
+
+  members            OrganizationMember[]
+  invitations        OrganizationInvitation[]
+  domains            OrganizationDomain[]
+  teams              Team[]
+  sessions           Session[]
+  oauthProviders     OauthProvider[]
+  oauthClients       OauthClient[]
+  auditLogs          AuditLog[]
+  apiKeys            ApiKey[]
+
+  @@map("organizations")
+}

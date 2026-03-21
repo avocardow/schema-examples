@@ -1,0 +1,26 @@
+// refresh_tokens: Long-lived tokens for obtaining new access tokens without re-authentication.
+// Uses parent_id self-reference for rotation chain and reuse detection.
+// See README.md for full design rationale and field documentation.
+
+model RefreshToken {
+  id          BigInt    @id @default(autoincrement())
+  sessionId   String    @map("session_id")
+  tokenHash   String    @unique @map("token_hash") // Hashed token. The raw token is sent to the client.
+
+  // Rotation chain: each new token points to the token it replaced.
+  // If a revoked token is presented, revoke all tokens in the chain (reuse detection).
+  parentId    BigInt?   @map("parent_id")
+
+  revoked     Boolean   @default(false)
+  revokedAt   DateTime? @map("revoked_at") // When this token was revoked (by rotation or explicit logout).
+  expiresAt   DateTime  @map("expires_at") // Typically 7-30 days.
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  session     Session       @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  parent      RefreshToken? @relation("RefreshTokenChain", fields: [parentId], references: [id], onDelete: SetNull)
+  children    RefreshToken[] @relation("RefreshTokenChain")
+
+  @@index([sessionId])
+  @@index([parentId])
+  @@map("refresh_tokens")
+}

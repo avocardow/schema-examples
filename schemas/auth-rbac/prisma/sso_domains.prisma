@@ -1,0 +1,16 @@
+// sso_domains: Maps email domains to SSO providers for automatic login routing.
+// See README.md for full design rationale and field documentation.
+
+model SsoDomain {
+  id              String    @id @default(uuid())
+  oauthProviderId String    @map("oauth_provider_id")
+  domain          String    @unique // e.g., "acme.com". One domain can only map to one provider.
+  verified        Boolean   @default(false) // Has the org proven they own this domain (via DNS TXT record or email)?
+  verifiedAt      DateTime? @map("verified_at") // When verification succeeded.
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  oauthProvider   OauthProvider @relation(fields: [oauthProviderId], references: [id], onDelete: Cascade)
+
+  @@index([oauthProviderId])
+  @@map("sso_domains")
+}

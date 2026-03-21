@@ -987,7 +987,7 @@ Each table is a separate file within each format folder:
 | Format         | Directory                            | Status  |
 | -------------- | ------------------------------------ | ------- |
 | Convex         | [`convex/`](./convex/)               | 🔲 Todo |
-| SQL            | [`sql/`](./sql/)                     | 🔲 Todo |
+| SQL            | [`sql/`](./sql/)                     | ✅ Done |
 | Prisma         | [`prisma/`](./prisma/)               | 🔲 Todo |
 | MongoDB        | [`mongodb/`](./mongodb/)             | 🔲 Todo |
 | Drizzle        | [`drizzle/`](./drizzle/)             | 🔲 Todo |

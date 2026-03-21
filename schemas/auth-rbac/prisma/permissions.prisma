@@ -1,0 +1,17 @@
+// permissions: Granular capabilities using "resource:action" naming convention.
+// Assigned to roles (not directly to users) to keep the model manageable.
+// See README.md for full design rationale and field documentation.
+
+model Permission {
+  id            String   @id @default(uuid())
+  slug          String   @unique // Structured key: "resource:action" (e.g., "posts:create", "billing:read").
+  name          String // Display name (e.g., "Create Posts").
+  description   String?
+  resourceType  String?  @map("resource_type") // Groups permissions by resource (e.g., "posts", "users", "billing").
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  rolePermissions RolePermission[]
+
+  @@index([resourceType])
+  @@map("permissions")
+}

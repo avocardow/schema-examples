@@ -1,0 +1,31 @@
+// oauth_providers: Configuration for external OAuth/SSO providers your app authenticates against.
+// This is the "consuming" side -- your app is the relying party.
+// See README.md for full design rationale and field documentation.
+
+model OauthProvider {
+  id               String    @id @default(uuid())
+  name             String // Display name shown in your UI (e.g., "Google", "Acme Corp SSO").
+  slug             String    @unique // URL-safe identifier (e.g., "google", "github"). Used in code and callback URLs.
+  strategy         String // "oauth2", "oidc", or "saml". Determines which flow to use.
+  clientId         String    @map("client_id") // OAuth client ID from the provider's developer console.
+  clientSecret     String?   @map("client_secret") // Must be encrypted at rest. Nullable for public clients (PKCE without a secret).
+  authorizationUrl String?   @map("authorization_url") // Override for custom/self-hosted providers.
+  tokenUrl         String?   @map("token_url") // Override for custom providers.
+  userinfoUrl      String?   @map("userinfo_url") // Override for custom providers.
+  scopes           String[]  @default([]) // Default scopes to request (e.g., ["openid", "profile", "email"]).
+  enabled          Boolean   @default(true) // Toggle a provider on/off without deleting its configuration.
+
+  organizationId   String?   @map("organization_id") // If set, only available to members of this org. Null = available to all users.
+
+  metadata         Json?     @map("metadata") // Provider-specific config that doesn't fit in standard fields.
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+
+  organization     Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  samlProviders    SamlProvider[]
+  ssoDomains       SsoDomain[]
+
+  @@index([organizationId])
+  @@index([enabled])
+  @@map("oauth_providers")
+}

@@ -1,0 +1,64 @@
+// users: Central identity record. One row per human (or anonymous) user.
+// See README.md for full design rationale and field documentation.
+
+model User {
+  id                 String    @id @default(uuid())
+  email              String?   @unique // Always store lowercase. Nullable for anonymous or phone-only users.
+  emailVerifiedAt    DateTime? @map("email_verified_at")
+  phone              String?   @unique // E.164 format (e.g., "+15551234567").
+  phoneVerifiedAt    DateTime? @map("phone_verified_at")
+  name               String? // Display name. Not used for auth.
+  firstName          String?   @map("first_name")
+  lastName           String?   @map("last_name")
+  username           String?   @unique
+  imageUrl           String?   @map("image_url")
+
+  isAnonymous        Boolean   @default(false) @map("is_anonymous") // Guest users that can upgrade to full accounts.
+
+  // Ban = admin decision (ToS violation). Lock = automated (brute-force protection).
+  banned             Boolean   @default(false)
+  bannedReason       String?   @map("banned_reason")
+  bannedUntil        DateTime? @map("banned_until") // NULL = permanent ban.
+  locked             Boolean   @default(false)
+  lockedUntil        DateTime? @map("locked_until") // Auto-unlock after this time.
+  failedLoginAttempts Int      @default(0) @map("failed_login_attempts") // Reset to 0 on successful login. Lock when threshold hit.
+  lastFailedLoginAt  DateTime? @map("last_failed_login_at")
+
+  // Two-tier metadata prevents privilege escalation via client-side manipulation.
+  // public: client-readable, server-writable (preferences, theme).
+  // private: server-only (internal notes, feature flags). Never expose to client.
+  publicMetadata     Json?     @default("{}") @map("public_metadata")
+  privateMetadata    Json?     @default("{}") @map("private_metadata")
+
+  externalId         String?   @unique @map("external_id") // Link to external system (legacy DB, CRM).
+  lastSignInAt       DateTime? @map("last_sign_in_at")
+  lastSignInIp       String?   @map("last_sign_in_ip") // Consider privacy regulations before storing.
+  signInCount        Int       @default(0) @map("sign_in_count")
+
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+
+  // Soft delete: keeps row for audit trails, but may conflict with GDPR/CCPA
+  // hard-delete requirements. See README for trade-off discussion.
+  deletedAt          DateTime? @map("deleted_at")
+
+  sessions               Session[]             @relation("UserSessions")
+  impersonatedSessions   Session[]             @relation("ImpersonatorSessions")
+  accounts               Account[]
+  verificationTokens     VerificationToken[]
+  passwordHistory        PasswordHistory[]
+  mfaFactors             MfaFactor[]
+  mfaRecoveryCodes       MfaRecoveryCode[]
+  userRoles              UserRole[]            @relation("UserRoleUser")
+  assignedRoles          UserRole[]            @relation("UserRoleAssigner")
+  organizationMembers    OrganizationMember[]  @relation("OrgMemberUser")
+  invitedMembers         OrganizationMember[]  @relation("OrgMemberInviter")
+  orgInvitations         OrganizationInvitation[] @relation("OrgInvitationInviter")
+  teamMembers            TeamMember[]
+  apiKeys                ApiKey[]
+  oauthAuthorizationCodes OauthAuthorizationCode[]
+
+  @@index([externalId])
+  @@index([createdAt])
+  @@map("users")
+}

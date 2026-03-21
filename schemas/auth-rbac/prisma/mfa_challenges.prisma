@@ -1,0 +1,20 @@
+// mfa_challenges: In-progress MFA verification attempts.
+// Tracks whether the user passed, failed, or timed out. Enables rate limiting and replay prevention.
+// See README.md for full design rationale and field documentation.
+
+model MfaChallenge {
+  id                 String    @id @default(uuid())
+  factorId           String    @map("factor_id")
+  otpCode            String?   @map("otp_code") // Hashed server-generated code (SMS/email factors only).
+  webauthnSessionData Json?    @map("webauthn_session_data") // WebAuthn challenge session data.
+  verifiedAt         DateTime? @map("verified_at") // Null = pending. Set when the user successfully verifies.
+  expiresAt          DateTime  @map("expires_at") // Short-lived: 5-10 minutes.
+  ipAddress          String?   @map("ip_address") // Where the challenge was initiated.
+  createdAt          DateTime  @default(now()) @map("created_at")
+
+  factor             MfaFactor @relation(fields: [factorId], references: [id], onDelete: Cascade)
+
+  @@index([factorId])
+  @@index([expiresAt])
+  @@map("mfa_challenges")
+}

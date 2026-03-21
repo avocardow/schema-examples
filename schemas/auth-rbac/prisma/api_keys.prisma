@@ -1,0 +1,27 @@
+// api_keys: Long-lived API keys for programmatic access (scripts, CI/CD, integrations).
+// The key itself is shown once at creation -- after that, only the hash is stored.
+// See README.md for full design rationale and field documentation.
+
+model ApiKey {
+  id              String    @id @default(uuid())
+  userId          String?   @map("user_id") // Null for org-level keys (not tied to a specific user).
+  organizationId  String?   @map("organization_id") // Null for personal keys.
+  name            String // User-assigned label (e.g., "CI/CD Pipeline", "Zapier Integration").
+  keyPrefix       String    @map("key_prefix") // First 8 chars for identification (e.g., "sk_live_Ab"). Shown in the UI.
+  keyHash         String    @unique @map("key_hash") // SHA-256 hash of the full key. Used for lookup on every API request.
+  scopes          String[]? // e.g., ["read:users", "write:posts"]. Null semantics are app-defined.
+
+  lastUsedAt      DateTime? @map("last_used_at") // Track usage for stale key detection.
+  lastUsedIp      String?   @map("last_used_ip")
+  expiresAt       DateTime? @map("expires_at") // Null = never expires.
+  revokedAt       DateTime? @map("revoked_at") // Null = active. Set to revoke without deleting (preserves audit trail).
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  user            User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization    Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([organizationId])
+  @@map("api_keys")
+}

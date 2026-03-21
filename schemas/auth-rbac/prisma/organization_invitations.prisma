@@ -1,0 +1,31 @@
+// organization_invitations: Pending invitations to join an organization.
+// Separate from organization_members because an invitation can exist before the invitee has an account.
+// See README.md for full design rationale and field documentation.
+
+enum OrgInvitationStatus {
+  pending
+  accepted
+  expired
+  revoked
+}
+
+model OrganizationInvitation {
+  id              String              @id @default(uuid())
+  organizationId  String              @map("organization_id")
+  email           String // Invitee's email. They may or may not have an account yet.
+  roleId          String              @map("role_id") // The role they'll get upon acceptance.
+  status          OrgInvitationStatus @default(pending)
+  tokenHash       String              @unique @map("token_hash") // Hashed invitation token. The raw token is sent in the invite email.
+  inviterId       String?             @map("inviter_id") // Who sent the invitation. Null if system-generated.
+  expiresAt       DateTime            @map("expires_at") // Typically 7 days.
+  acceptedAt      DateTime?           @map("accepted_at") // When the invitee accepted.
+  createdAt       DateTime            @default(now()) @map("created_at")
+
+  organization    Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  role            Role                @relation(fields: [roleId], references: [id], onDelete: Restrict)
+  inviter         User?               @relation("OrgInvitationInviter", fields: [inviterId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, status])
+  @@index([email])
+  @@map("organization_invitations")
+}

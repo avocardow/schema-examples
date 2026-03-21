@@ -1,0 +1,19 @@
+// team_members: Links users to teams within an organization.
+// Simpler than organization_members -- just a role string for basic team-level permissions.
+// See README.md for full design rationale and field documentation.
+
+model TeamMember {
+  id        String   @id @default(uuid())
+  teamId    String   @map("team_id")
+  userId    String   @map("user_id")
+  role      String? // Simple team role (e.g., "lead", "member"). Not a FK -- intentionally lightweight.
+  createdAt DateTime @default(now()) @map("created_at")
+
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, userId])
+  @@index([teamId])
+  @@index([userId])
+  @@map("team_members")
+}

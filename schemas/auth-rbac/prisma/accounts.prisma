@@ -1,0 +1,43 @@
+// accounts: Unified authentication methods. One row per way a user can sign in.
+// Combines OAuth, email+password, magic link, and passkey logins in one table.
+// See README.md for full design rationale and field documentation.
+
+enum AccountType {
+  oauth
+  oidc
+  email
+  credential
+  webauthn
+}
+
+model Account {
+  id                String      @id @default(uuid())
+  userId            String      @map("user_id")
+  provider          String // e.g., "google", "github", "credential".
+  providerAccountId String      @map("provider_account_id") // User's ID at the provider. For "credential", use their email.
+
+  // "credential" = email+password. "email" = passwordless (magic link/OTP).
+  // "webauthn" = passkey as primary login (not MFA -- see mfa_factors for that).
+  type              AccountType
+
+  // Only for credential-type accounts. Use bcrypt, scrypt, or argon2id.
+  passwordHash      String?     @map("password_hash")
+
+  // OAuth tokens for calling provider APIs on behalf of the user.
+  // Encrypt at rest -- these grant access to the user's external accounts.
+  accessToken       String?     @map("access_token")
+  refreshToken      String?     @map("refresh_token") // Provider's refresh token (not your refresh_tokens table).
+  idToken           String?     @map("id_token") // OIDC ID token.
+  tokenExpiresAt    DateTime?   @map("token_expires_at")
+  tokenType         String?     @map("token_type") // Usually "bearer".
+  scope             String? // OAuth scopes granted (e.g., "openid profile email").
+
+  createdAt         DateTime    @default(now()) @map("created_at")
+  updatedAt         DateTime    @updatedAt @map("updated_at")
+
+  user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@map("accounts")
+}

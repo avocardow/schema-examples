@@ -1,0 +1,28 @@
+// verification_tokens: Unified table for all one-time tokens (email verification,
+// password reset, magic links, phone verification, invitations).
+// See README.md for full design rationale and field documentation.
+
+enum VerificationTokenType {
+  email_verification
+  phone_verification
+  password_reset
+  magic_link
+  invitation
+}
+
+model VerificationToken {
+  id          String                @id @default(uuid())
+  userId      String?               @map("user_id") // Nullable because some tokens exist before a user record.
+  tokenHash   String                @unique @map("token_hash") // SHA-256 hash. Never store raw tokens.
+  type        VerificationTokenType
+  identifier  String // The email or phone number this token targets.
+  expiresAt   DateTime              @map("expires_at")
+  usedAt      DateTime?             @map("used_at") // Null = unused. Set when consumed to prevent replay attacks.
+  createdAt   DateTime              @default(now()) @map("created_at")
+
+  user        User?                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([identifier, type])
+  @@index([expiresAt])
+  @@map("verification_tokens")
+}

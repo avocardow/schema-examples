@@ -1,0 +1,34 @@
+// organization_members: Links users to organizations with a role.
+// Primary multi-tenancy junction table. role_id must reference a role with scope=organization.
+// See README.md for full design rationale and field documentation.
+
+enum OrgMemberStatus {
+  active
+  inactive
+}
+
+model OrganizationMember {
+  id               String          @id @default(uuid())
+  organizationId   String          @map("organization_id")
+  userId           String          @map("user_id")
+  roleId           String          @map("role_id") // Must be a role with scope=organization.
+
+  status           OrgMemberStatus @default(active) // "active" = normal, "inactive" = suspended but not removed.
+  directoryManaged Boolean         @default(false) @map("directory_managed") // If true, managed by external directory (SCIM).
+
+  customAttributes Json?           @map("custom_attributes") // Org-specific metadata for this member.
+  invitedBy        String?         @map("invited_by") // Who sent the invitation.
+  joinedAt         DateTime?       @map("joined_at") // When the user accepted the invitation.
+  createdAt        DateTime        @default(now()) @map("created_at")
+  updatedAt        DateTime        @updatedAt @map("updated_at")
+
+  organization     Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user             User            @relation("OrgMemberUser", fields: [userId], references: [id], onDelete: Cascade)
+  role             Role            @relation(fields: [roleId], references: [id], onDelete: Restrict)
+  inviter          User?           @relation("OrgMemberInviter", fields: [invitedBy], references: [id], onDelete: SetNull)
+
+  @@unique([organizationId, userId])
+  @@index([userId])
+  @@index([organizationId, status])
+  @@map("organization_members")
+}

@@ -1,0 +1,25 @@
+// oauth_authorization_codes: Short-lived authorization codes for the OAuth authorization code flow.
+// Single-use and expire in seconds to minutes.
+// See README.md for full design rationale and field documentation.
+
+model OauthAuthorizationCode {
+  id                  String   @id @default(uuid())
+  clientId            String   @map("client_id")
+  userId              String   @map("user_id")
+  codeHash            String   @unique @map("code_hash") // Hashed authorization code. Single-use.
+  redirectUri         String   @map("redirect_uri") // Must exactly match the redirect_uri from the authorization request.
+  scope               String? // Scopes granted by the user.
+
+  // PKCE (Proof Key for Code Exchange): required for public clients (SPAs, mobile apps).
+  codeChallenge       String?  @map("code_challenge") // The challenge value from the client.
+  codeChallengeMethod String?  @map("code_challenge_method") // "S256" (recommended) or "plain".
+
+  expiresAt           DateTime @map("expires_at") // Very short-lived: 30 seconds to 10 minutes.
+  createdAt           DateTime @default(now()) @map("created_at")
+
+  client              OauthClient @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  user                User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([expiresAt])
+  @@map("oauth_authorization_codes")
+}

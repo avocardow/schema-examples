@@ -1,0 +1,28 @@
+// roles: Named sets of permissions with human-readable slugs.
+// Supports two-tier scoping: environment-level (app-wide) and organization-scoped roles.
+// See README.md for full design rationale and field documentation.
+
+enum RoleScope {
+  environment
+  organization
+}
+
+model Role {
+  id          String    @id @default(uuid())
+  slug        String    @unique // Human-readable key (e.g., "admin", "org:editor", "viewer"). Used in code.
+  name        String // Display name for admin UIs (e.g., "Administrator").
+  description String? // Explain what this role is for. Shown in role management UI.
+  scope       RoleScope // "environment" = app-wide, "organization" = within an org.
+  isSystem    Boolean   @default(false) @map("is_system") // System roles cannot be deleted.
+
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  rolePermissions        RolePermission[]
+  userRoles              UserRole[]
+  organizationMembers    OrganizationMember[]
+  organizationInvitations OrganizationInvitation[]
+
+  @@index([scope])
+  @@map("roles")
+}

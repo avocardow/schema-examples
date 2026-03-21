@@ -1,0 +1,19 @@
+// organization_domains: Verified domains owned by an organization for auto-join and branding.
+// Domain verification (via DNS TXT record or email) prevents claiming unowned domains.
+// See README.md for full design rationale and field documentation.
+
+model OrganizationDomain {
+  id                  String    @id @default(uuid())
+  organizationId      String    @map("organization_id")
+  domain              String    @unique // e.g., "acme.com". Lowercase, no protocol prefix.
+  verified            Boolean   @default(false) // Only verified domains should trigger auto-join.
+  verificationMethod  String?   @map("verification_method") // "dns" (TXT record), "email" (verification email), etc.
+  verificationToken   String?   @map("verification_token") // The token/value to set in DNS or confirm via email.
+  verifiedAt          DateTime? @map("verified_at") // When verification succeeded.
+  createdAt           DateTime  @default(now()) @map("created_at")
+
+  organization        Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@map("organization_domains")
+}

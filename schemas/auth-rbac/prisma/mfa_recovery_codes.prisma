@@ -1,0 +1,16 @@
+// mfa_recovery_codes: Backup codes for when a user loses access to their MFA device.
+// Each code is a separate row so individual consumption can be tracked.
+// See README.md for full design rationale and field documentation.
+
+model MfaRecoveryCode {
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  codeHash  String    @map("code_hash") // Hashed recovery code. The plaintext is shown once at generation, never again.
+  usedAt    DateTime? @map("used_at") // Null = available. Set when consumed. A used code cannot be reused.
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("mfa_recovery_codes")
+}

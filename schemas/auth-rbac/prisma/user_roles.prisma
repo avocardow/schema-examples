@@ -1,0 +1,20 @@
+// user_roles: Assigns roles to users at the environment (app-wide) level.
+// For organization-scoped roles, see organization_members.role_id instead.
+// See README.md for full design rationale and field documentation.
+
+model UserRole {
+  id          String    @id @default(uuid())
+  userId      String    @map("user_id")
+  roleId      String    @map("role_id")
+  assignedBy  String?   @map("assigned_by") // Who granted this role. Null if system-assigned.
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  user        User      @relation("UserRoleUser", fields: [userId], references: [id], onDelete: Cascade)
+  role        Role      @relation(fields: [roleId], references: [id], onDelete: Restrict)
+  assigner    User?     @relation("UserRoleAssigner", fields: [assignedBy], references: [id], onDelete: SetNull)
+
+  @@unique([userId, roleId])
+  @@index([userId])
+  @@index([roleId])
+  @@map("user_roles")
+}

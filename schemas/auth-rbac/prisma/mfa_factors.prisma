@@ -1,0 +1,43 @@
+// mfa_factors: Enrolled MFA methods (TOTP, WebAuthn, phone, email).
+// A user can have multiple factors. Only verified factors are accepted for authentication.
+// See README.md for full design rationale and field documentation.
+
+enum MfaFactorType {
+  totp
+  webauthn
+  phone
+  email
+}
+
+enum MfaFactorStatus {
+  unverified
+  verified
+  disabled
+}
+
+model MfaFactor {
+  id                 String          @id @default(uuid())
+  userId             String          @map("user_id")
+  factorType         MfaFactorType   @map("factor_type")
+  friendlyName       String?         @map("friendly_name") // User-assigned label, e.g., "My YubiKey".
+
+  status             MfaFactorStatus @default(unverified)
+
+  // Secrets: only one is populated depending on factor_type.
+  secret             String? // Encrypted TOTP secret. Must be encrypted at rest.
+  phone              String? // E.164 phone number. Only for factor_type=phone.
+  webauthnCredential Json?           @map("webauthn_credential") // WebAuthn public key credential data.
+  webauthnAaguid     String?         @map("webauthn_aaguid") // Authenticator Attestation GUID.
+
+  lastUsedAt         DateTime?       @map("last_used_at")
+  createdAt          DateTime        @default(now()) @map("created_at")
+  updatedAt          DateTime        @updatedAt @map("updated_at")
+
+  user               User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  challenges         MfaChallenge[]
+  sessions           Session[]
+
+  @@index([userId])
+  @@index([userId, status])
+  @@map("mfa_factors")
+}

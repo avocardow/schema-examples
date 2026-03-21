@@ -1,0 +1,19 @@
+// teams: Sub-groups within an organization (e.g., "Engineering", "Marketing").
+// Lighter than nested organizations -- just a way to group members for permissions or notifications.
+// See README.md for full design rationale and field documentation.
+
+model Team {
+  id              String   @id @default(uuid())
+  organizationId  String   @map("organization_id")
+  name            String // Display name (e.g., "Engineering").
+  slug            String // URL-safe identifier, unique within the org.
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  members         TeamMember[]
+
+  @@unique([organizationId, slug])
+  @@index([organizationId])
+  @@map("teams")
+}

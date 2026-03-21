@@ -1,0 +1,24 @@
+// saml_providers: Enterprise SSO extension for SAML-based identity providers.
+// Extends oauth_providers with SAML-specific details (metadata XML, certificates, attribute mapping).
+// See README.md for full design rationale and field documentation.
+
+model SamlProvider {
+  id                String   @id @default(uuid())
+  oauthProviderId   String   @map("oauth_provider_id") // Parent provider config.
+  entityId          String   @unique @map("entity_id") // SAML EntityID from the IdP.
+  metadataXml       String?  @map("metadata_xml") // Full IdP metadata XML. Either this or metadata_url is required.
+  metadataUrl       String?  @map("metadata_url") // URL to fetch IdP metadata (auto-refreshing). Preferred over static XML.
+  certificate       String? // IdP's X.509 signing certificate. Used to verify SAML assertions.
+  nameIdFormat      String?  @map("name_id_format") // Expected NameID format.
+
+  // Attribute mapping: maps IdP-specific attribute names to your user fields.
+  attributeMapping  Json?    @map("attribute_mapping")
+
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  oauthProvider     OauthProvider @relation(fields: [oauthProviderId], references: [id], onDelete: Cascade)
+
+  @@index([oauthProviderId])
+  @@map("saml_providers")
+}
