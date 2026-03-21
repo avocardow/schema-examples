@@ -132,6 +132,8 @@ table users {
   banned_until  timestamp nullable           -- Null = permanent ban. Set a date for temporary bans.
   locked        boolean default false
   locked_until  timestamp nullable           -- Auto-unlock after this time. Your app should check this on login.
+  failed_login_attempts integer default 0    -- Reset to 0 on successful login. Lock the account when this hits your threshold (e.g., 5).
+  last_failed_login_at  timestamp nullable   -- Used with failed_login_attempts to implement time-window rate limiting.
 
   -- Two-tier metadata: prevents privilege escalation through client-side manipulation.
   -- public_metadata:  Safe to expose to the client (e.g., preferences, theme, onboarding state).
@@ -158,8 +160,7 @@ table users {
 }
 
 indexes {
-  unique(email)                              -- Fast lookup by email (login flow).
-  unique(username)                           -- Only if your app uses usernames.
+  -- unique(email) and unique(username) are already created by the field constraints above.
   index(external_id)                         -- Fast lookup when syncing with external systems.
   index(created_at)                          -- For admin dashboards, "newest users" queries.
 }
@@ -183,7 +184,7 @@ table sessions {
   -- Use this to gate sensitive actions: "changing your password requires aal2."
   aal             enum(aal1, aal2, aal3) default aal1
 
-  mfa_factor_id   uuid nullable references mfa_factors(id) -- Which MFA factor elevated this session to aal2+.
+  mfa_factor_id   uuid nullable references mfa_factors(id) on_delete set_null -- Which MFA factor elevated this session to aal2+.
   ip_address      string nullable            -- Captured at session creation. Useful for security alerts ("new login from unknown IP").
   user_agent      string nullable            -- Browser/device info. Useful for "manage your sessions" UI.
   country_code    string(2) nullable         -- ISO 3166-1 alpha-2, derived from IP. Nullable if you don't do geo-lookup.
@@ -191,12 +192,12 @@ table sessions {
   -- Organization context: tracks which org the user is "currently in."
   -- Avoids extra lookups on every request in multi-tenant apps.
   -- Null for users not in any org, or apps without multi-tenancy.
-  organization_id uuid nullable references organizations(id)
+  organization_id uuid nullable references organizations(id) on_delete set_null
 
   -- Admin impersonation: when a support agent "logs in as" a user.
   -- If this is set, the session belongs to the target user but was initiated by the impersonator.
   -- Your app should show a banner: "You are viewing as [user]. Exit impersonation."
-  impersonator_id uuid nullable references users(id)
+  impersonator_id uuid nullable references users(id) on_delete set_null
 
   tag             string nullable            -- Custom label (e.g., "mobile", "api", "admin-panel"). Free-form, for your own categorization.
   last_active_at  timestamp nullable         -- Updated periodically (not on every request — that's too expensive). Useful for "active sessions" UI.
@@ -206,7 +207,7 @@ table sessions {
 
 indexes {
   index(user_id)                             -- "Show me all sessions for this user" (session management UI).
-  index(token_hash)                          -- Fast lookup on every authenticated request.
+  unique(token_hash)                          -- Fast lookup on every authenticated request (from field constraint).
   index(expires_at)                          -- Cleanup job: DELETE FROM sessions WHERE expires_at < now().
 }
 ```
@@ -225,7 +226,8 @@ table accounts {
   provider_account_id string not_null         -- The user's ID at the provider. For "credential", use the user's email.
 
   -- Account type helps your code branch without parsing the provider string.
-  -- "credential" = email+password. "oauth"/"oidc" = external provider. "webauthn" = passkey login.
+  -- "credential" = email+password login. "email" = passwordless email (magic link / OTP).
+  -- "oauth"/"oidc" = external provider. "webauthn" = passkey as primary login (not MFA — see mfa_factors for that).
   type            enum(oauth, oidc, email, credential, webauthn)
 
   -- Password hash: only populated for credential-type accounts.
@@ -236,6 +238,7 @@ table accounts {
   -- OAuth tokens: stored so your app can make API calls on behalf of the user
   -- (e.g., posting to their GitHub, reading their Google Calendar).
   -- If you don't need to call provider APIs after login, you can skip these.
+  -- ⚠️  These tokens grant access to the user's external accounts — encrypt at rest.
   access_token    text nullable
   refresh_token   text nullable              -- Provider's refresh token (not to be confused with *your* refresh_tokens table).
   id_token        text nullable              -- OIDC ID token. Contains claims about the user. Useful for debugging.
@@ -273,6 +276,8 @@ table verification_tokens {
 
   -- The type determines what happens when the token is consumed.
   -- Your app checks type + identifier to know what action to perform.
+  -- Note: "invitation" here is for platform-level invitations (e.g., "invite a user to the app").
+  -- Organization-specific invitations have their own table: `organization_invitations`.
   type            enum(email_verification, phone_verification, password_reset, magic_link, invitation)
 
   identifier      string not_null            -- The email or phone number this token targets. Useful for lookup without user_id.
@@ -282,7 +287,7 @@ table verification_tokens {
 }
 
 indexes {
-  unique(token_hash)                         -- Fast lookup when user clicks the link.
+  -- unique(token_hash) is already created by the field constraint above.
   index(identifier, type)                    -- "Find the latest password reset token for this email."
   index(expires_at)                          -- Cleanup job: delete expired tokens periodically.
 }
@@ -406,7 +411,7 @@ table oauth_providers {
   slug            string unique not_null     -- URL-safe identifier (e.g., "google", "github", "acme-sso"). Used in code and callback URLs.
   strategy        string not_null            -- "oauth2", "oidc", or "saml". Determines which flow to use.
   client_id       string not_null            -- OAuth client ID from the provider's developer console.
-  client_secret   string not_null            -- ⚠️  Must be encrypted at rest. This is the most sensitive field in this table.
+  client_secret   string nullable             -- ⚠️  Must be encrypted at rest. Nullable for public clients (mobile/SPA using PKCE without a secret).
   authorization_url string nullable          -- Override for custom/self-hosted providers. Null = use well-known defaults.
   token_url       string nullable            -- Override for custom providers.
   userinfo_url    string nullable            -- Override for custom providers.
@@ -415,7 +420,7 @@ table oauth_providers {
 
   -- Organization-scoped SSO: if set, this provider is only available to members of this org.
   -- Null = available to all users (e.g., "Sign in with Google").
-  organization_id uuid nullable references organizations(id)
+  organization_id uuid nullable references organizations(id) on_delete cascade
 
   metadata        json nullable              -- Provider-specific config that doesn't fit in standard fields.
   created_at      timestamp default now
@@ -423,7 +428,7 @@ table oauth_providers {
 }
 
 indexes {
-  unique(slug)                               -- Lookup by slug in callback URLs (e.g., /auth/callback/google).
+  -- unique(slug) is already created by the field constraint above.
   index(organization_id)                     -- "Which SSO providers does this org have?"
   index(enabled)                             -- "List all active providers for the login page."
 }
@@ -466,6 +471,10 @@ Maps email domains to SSO providers. When a user with `@acme.com` tries to sign 
 looks up this table to route them to Acme's SSO provider automatically. This is the
 "connection-based routing" pattern from WorkOS and Supabase.
 
+> **Note:** This is different from `organization_domains`. `sso_domains` routes login traffic to
+> an SSO provider. `organization_domains` proves an organization owns a domain (for auto-join
+> and branding). An org can have verified domains without SSO, and SSO without verified domains.
+
 ```pseudo
 table sso_domains {
   id              uuid primary_key default auto_generate
@@ -477,7 +486,7 @@ table sso_domains {
 }
 
 indexes {
-  unique(domain)                             -- Fast lookup: "Which provider handles @acme.com?"
+  -- unique(domain) is already created by the field constraint above.
   index(oauth_provider_id)                   -- "Which domains are claimed by this provider?"
 }
 ```
@@ -503,7 +512,7 @@ table oauth_clients {
   -- "native" = mobile/desktop. "m2m" = machine-to-machine (no user involved).
   app_type        string nullable            -- "web", "spa", "native", or "m2m".
 
-  organization_id uuid nullable references organizations(id) -- Which org owns this client. Null = platform-level.
+  organization_id uuid nullable references organizations(id) on_delete cascade -- Which org owns this client. Null = platform-level.
   is_first_party  boolean default false      -- First-party clients skip the consent screen.
   created_at      timestamp default now
   updated_at      timestamp default now on_update
@@ -540,7 +549,7 @@ table oauth_authorization_codes {
 }
 
 indexes {
-  unique(code_hash)                          -- Fast lookup during token exchange.
+  -- unique(code_hash) is already created by the field constraint above.
   index(expires_at)                          -- Cleanup job.
 }
 ```
@@ -561,7 +570,7 @@ table refresh_tokens {
   -- Rotation chain: each new token points to the token it replaced.
   -- If parent_id is null, this is the first token in the chain (issued at login).
   -- If a token with revoked=true is presented, revoke ALL tokens in the chain (reuse detection).
-  parent_id       bigint nullable references refresh_tokens(id)
+  parent_id       bigint nullable references refresh_tokens(id) on_delete set_null
 
   revoked         boolean default false
   revoked_at      timestamp nullable         -- When this token was revoked (either by rotation or explicit logout).
@@ -570,7 +579,7 @@ table refresh_tokens {
 }
 
 indexes {
-  unique(token_hash)                         -- Fast lookup on every token refresh.
+  -- unique(token_hash) is already created by the field constraint above.
   index(session_id)                          -- "Revoke all refresh tokens for this session" (logout).
   index(parent_id)                           -- Walk the rotation chain for reuse detection.
 }
@@ -605,7 +614,7 @@ table roles {
 }
 
 indexes {
-  unique(slug)                               -- Lookup by slug in authorization checks.
+  -- unique(slug) is already created by the field constraint above.
   index(scope)                               -- "List all organization-scoped roles."
 }
 ```
@@ -628,7 +637,7 @@ table permissions {
 }
 
 indexes {
-  unique(slug)                               -- Fast lookup in authorization checks.
+  -- unique(slug) is already created by the field constraint above.
   index(resource_type)                       -- "List all permissions for the 'posts' resource."
 }
 ```
@@ -661,8 +670,8 @@ see `organization_members.role_id` instead. This table is for roles like "super 
 table user_roles {
   id              uuid primary_key default auto_generate
   user_id         uuid not_null references users(id) on_delete cascade
-  role_id         uuid not_null references roles(id) on_delete cascade
-  assigned_by     uuid nullable references users(id) -- Who granted this role. Null if system-assigned.
+  role_id         uuid not_null references roles(id) on_delete restrict -- Can't delete a role that's assigned to users. Reassign them first.
+  assigned_by     uuid nullable references users(id) on_delete set_null -- Who granted this role. Null if system-assigned.
   created_at      timestamp default now
 
   unique(user_id, role_id)                   -- A user can't have the same role twice.
@@ -701,8 +710,7 @@ table organizations {
 }
 
 indexes {
-  unique(slug)                               -- Lookup by slug in URLs.
-  index(stripe_customer_id)                  -- Webhook handling: "Which org does this Stripe customer belong to?"
+  -- unique(slug) and unique(stripe_customer_id) are already created by field constraints above.
 }
 ```
 
@@ -717,20 +725,22 @@ table organization_members {
   id              uuid primary_key default auto_generate
   organization_id uuid not_null references organizations(id) on_delete cascade
   user_id         uuid not_null references users(id) on_delete cascade
-  role_id         uuid not_null references roles(id) -- Must be a role with scope=organization. Enforced in app logic.
+  role_id         uuid not_null references roles(id) on_delete restrict -- Must be a role with scope=organization. Can't delete a role that's in use.
 
-  -- Membership lifecycle: pending → active → inactive.
-  -- "pending" = invited but hasn't accepted yet.
-  -- "inactive" = suspended but not removed (preserves history).
-  status          enum(active, inactive, pending) default pending
+  -- Membership lifecycle: active ↔ inactive.
+  -- "active" = normal member. "inactive" = suspended but not removed (preserves history).
+  -- Note: invitations are tracked in `organization_invitations`, not here.
+  -- Create the member row only when the invitation is accepted.
+  -- Exception: SCIM-provisioned members may be created directly with status=active.
+  status          enum(active, inactive) default active
 
   -- SCIM provisioning: if true, this membership is managed by an external directory (Okta, Azure AD, etc.).
   -- Directory-managed memberships shouldn't be editable through your app's UI.
   directory_managed boolean default false
 
   custom_attributes json nullable            -- Org-specific metadata for this member (e.g., department, title within the org).
-  invited_by      uuid nullable references users(id) -- Who sent the invitation.
-  joined_at       timestamp nullable         -- When status became "active". Null if still pending.
+  invited_by      uuid nullable references users(id) on_delete set_null -- Who sent the invitation.
+  joined_at       timestamp nullable         -- When the user accepted the invitation. May differ from created_at for SCIM-provisioned members.
   created_at      timestamp default now
   updated_at      timestamp default now on_update
 
@@ -754,14 +764,14 @@ table organization_invitations {
   id              uuid primary_key default auto_generate
   organization_id uuid not_null references organizations(id) on_delete cascade
   email           string not_null            -- Invitee's email. They may or may not have an account yet.
-  role_id         uuid not_null references roles(id) -- The role they'll get upon acceptance.
+  role_id         uuid not_null references roles(id) on_delete restrict -- The role they'll get upon acceptance. Can't delete a role with pending invitations.
 
   -- Invitation lifecycle: pending → accepted / expired / revoked.
   -- "revoked" = an admin cancelled it before the invitee accepted.
   status          enum(pending, accepted, expired, revoked) default pending
 
   token_hash      string unique not_null     -- Hashed invitation token. The raw token is sent in the invite email.
-  inviter_id      uuid nullable references users(id) -- Who sent the invitation. Null if system-generated.
+  inviter_id      uuid nullable references users(id) on_delete set_null -- Who sent the invitation. Null if system-generated.
   expires_at      timestamp not_null         -- Typically 7 days. After this, the invitee must request a new invitation.
   accepted_at     timestamp nullable         -- When the invitee accepted.
   created_at      timestamp default now
@@ -770,17 +780,18 @@ table organization_invitations {
 indexes {
   index(organization_id, status)             -- "List pending invitations for this org."
   index(email)                               -- "Does this email have any pending invitations?" (checked at signup).
-  unique(token_hash)                         -- Fast lookup when invitee clicks the link.
+  -- unique(token_hash) is already created by the field constraint above.
 }
 ```
 
 ### `organization_domains`
 
-Verified domains owned by an organization. Enables two powerful features:
-1. **Auto-join**: users with `@acme.com` emails are automatically added to the Acme org on signup.
-2. **SSO routing**: users with `@acme.com` are redirected to Acme's SSO provider.
+Verified domains owned by an organization. When a user with `@acme.com` signs up, your app can
+auto-add them to the Acme org. Domain verification (via DNS TXT record or email) prevents an
+org from claiming a domain they don't own.
 
-Domain verification (via DNS TXT record or email) prevents an org from claiming a domain they don't own.
+> **Note:** This is different from `sso_domains`. `organization_domains` proves ownership for
+> auto-join and branding. `sso_domains` routes login traffic to a specific SSO provider.
 
 ```pseudo
 table organization_domains {
@@ -798,7 +809,7 @@ table organization_domains {
 }
 
 indexes {
-  unique(domain)                             -- Global uniqueness: one org per domain.
+  -- unique(domain) is already created by the field constraint above.
   index(organization_id)                     -- "Which domains does this org own?"
 }
 ```
@@ -875,7 +886,9 @@ table audit_logs {
   target_type     string nullable            -- e.g., "user", "organization", "role", "session".
   target_id       string nullable            -- The entity's ID. Not a FK — same reason as actor_id.
 
-  organization_id uuid nullable references organizations(id) -- Org context. Null for environment-level events.
+  -- ⚠️  on_delete set_null (not cascade) — audit logs must survive org deletion.
+  -- If an org is deleted, we still want to know what happened while it existed.
+  organization_id uuid nullable references organizations(id) on_delete set_null
   ip_address      string nullable
   user_agent      string nullable
   metadata        json nullable              -- Event-specific details. Flexible: { "old_role": "member", "new_role": "admin" }.
@@ -908,7 +921,9 @@ table api_keys {
 
   -- Scopes as a simple string array, not a junction table.
   -- API key permissions are typically simpler than full RBAC.
-  -- Example: ["read:users", "write:posts"]. Null or empty = full access (be careful).
+  -- Example: ["read:users", "write:posts"].
+  -- ⚠️  Decide your default: null = full access (convenient but risky) or null = no access (safer).
+  -- Document your choice clearly — this is a common source of security bugs.
   scopes          string[] nullable
 
   last_used_at    timestamp nullable         -- Track usage for "stale key" detection.
@@ -916,10 +931,11 @@ table api_keys {
   expires_at      timestamp nullable         -- Null = never expires. Set an expiry for security-sensitive environments.
   revoked_at      timestamp nullable         -- Null = active. Set to revoke without deleting (preserves audit trail).
   created_at      timestamp default now
+  updated_at      timestamp default now on_update
 }
 
 indexes {
-  unique(key_hash)                           -- Fast lookup on every API request.
+  -- unique(key_hash) is already created by the field constraint above.
   index(user_id)                             -- "List my API keys."
   index(organization_id)                     -- "List all API keys for this org."
 }
@@ -958,7 +974,7 @@ indexes {
 - **Hash all tokens** — Store SHA-256 hashes of session tokens, verification tokens, and API keys. Never store raw tokens.
 - **Cascade deletes from users** — Deleting a user should cascade to sessions, accounts, MFA factors, and recovery codes.
 - **Use AAL levels on sessions** — Track authentication assurance level (aal1 = password only, aal2 = MFA verified) per session, not per user.
-- **Unified accounts table** — Store both OAuth and credential (email/password) accounts in one table, differentiated by `provider_id`.
+- **Unified accounts table** — Store both OAuth and credential (email/password) accounts in one table, differentiated by `provider`.
 - **Slug-based roles and permissions** — Use human-readable slugs (e.g., `posts:create`) not just auto-increment IDs.
 - **Two-tier roles** — Support both environment-level roles (super admin) and organization-scoped roles (org editor).
 - **Refresh token rotation** — Use parent chains to detect token reuse and revoke entire chains.
