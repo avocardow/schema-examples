@@ -65,7 +65,7 @@ export function createAutoDetectionResult(fields) {
     confidenceScore: fields.confidenceScore ?? null,
     matchedValue:    fields.matchedValue    ?? null,
     isActionable:    fields.isActionable    ?? false,
-    metadata:        fields.metadata        ?? null,
+    metadata:        fields.metadata        ?? {},
     ruleId:          fields.ruleId          ?? null,
     createdAt:       Timestamp.now(),
   };

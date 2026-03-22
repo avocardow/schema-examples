@@ -41,4 +41,5 @@ export const moderation_actions = defineTable({
   .index("by_action_type", ["actionType"])
   .index("by_target", ["targetType", "targetId"])
   .index("by_violation_category_id", ["violationCategoryId"])
-  .index("by_is_automated", ["isAutomated"]);
+  .index("by_is_automated", ["isAutomated"])
+  .index("by_creation_time", ["_creationTime"]);

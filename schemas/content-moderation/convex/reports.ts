@@ -46,4 +46,5 @@ export const reports = defineTable({
   .index("by_reporter_id", ["reporterId"])
   .index("by_content", ["contentType", "contentId"])
   .index("by_status", ["status"])
-  .index("by_category", ["category"]);
+  .index("by_category", ["category"])
+  .index("by_creation_time", ["_creationTime"]);

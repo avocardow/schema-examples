@@ -66,7 +66,7 @@ export function createModerationAction(fields) {
     violationCategoryId: fields.violationCategoryId  ?? null,
     responseTemplateId:  fields.responseTemplateId   ?? null,
     isAutomated:         fields.isAutomated          ?? false,
-    metadata:            fields.metadata             ?? null,
+    metadata:            fields.metadata             ?? {},
     createdAt:           Timestamp.now(),
   };
 }

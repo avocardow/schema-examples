@@ -25,7 +25,7 @@ model AutoDetectionResult {
   detectionMethod DetectionMethod            @map("detection_method") // Type of detection that produced this result.
   detectionSource String                     @map("detection_source") // Specific detector name (e.g., "perspective", "openai", "photodna").
   category        String?                    // Detected violation category (e.g., "toxicity", "hate_speech", "csam_hash_match").
-  confidenceScore Float?                     @map("confidence_score") // Detection confidence, 0.00 to 1.00. Nullable: some methods (keyword match) are binary, not scored.
+  confidenceScore Decimal?                   @map("confidence_score") // Detection confidence, 0.00 to 1.00. Nullable: some methods (keyword match) are binary, not scored.
   matchedValue    String?                    @map("matched_value") // What triggered the match (keyword, regex pattern, hash ID). Null for ml_classifier.
   isActionable    Boolean                    @default(false) @map("is_actionable") // Whether this result met the threshold for automated action.
   metadata        Json?                      @default("{}") // Detection-specific extra data (per-category scores, hash distances, etc.).

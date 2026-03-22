@@ -21,5 +21,4 @@ CREATE TABLE moderator_performance (
   UNIQUE (moderator_id, period_start, period_end)
 );
 
-CREATE INDEX idx_moderator_performance_moderator_id ON moderator_performance (moderator_id);
 CREATE INDEX idx_moderator_performance_period ON moderator_performance (period_start, period_end);

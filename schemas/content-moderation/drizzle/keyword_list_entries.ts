@@ -8,14 +8,13 @@ import {
   text,
   boolean,
   timestamp,
-  index,
   unique,
 } from "drizzle-orm/pg-core";
 import { keywordLists } from "./keyword_lists";
 import { users } from "../../auth-rbac/drizzle/users";
 
 export const keywordListEntryMatchTypeEnum = pgEnum(
-  "keyword_list_entry_match_type",
+  "keyword_match_type",
   ["exact", "contains", "regex"]
 );
 
@@ -44,6 +43,5 @@ export const keywordListEntries = pgTable(
       table.value,
       table.matchType
     ),
-    index("idx_keyword_list_entries_added_by").on(table.addedBy),
   ]
 );

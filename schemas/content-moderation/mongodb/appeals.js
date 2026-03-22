@@ -36,7 +36,7 @@ const appealsSchema = new mongoose.Schema(
 );
 
 // Indexes
-appealsSchema.index({ moderation_action_id: 1 }, { unique: true, sparse: true });
+appealsSchema.index({ moderation_action_id: 1 }, { unique: true });
 appealsSchema.index({ appellant_id: 1 });
 appealsSchema.index({ status: 1 });
 appealsSchema.index({ reviewer_id: 1 });

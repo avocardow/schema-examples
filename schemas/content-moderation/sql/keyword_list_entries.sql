@@ -23,5 +23,3 @@ CREATE TABLE keyword_list_entries (
 -- Forward FK: keyword_lists is defined in keyword_lists.sql (loaded after keyword_list_entries.sql).
 ALTER TABLE keyword_list_entries ADD CONSTRAINT fk_keyword_list_entries_list_id
   FOREIGN KEY (list_id) REFERENCES keyword_lists(id) ON DELETE CASCADE;
-
-CREATE INDEX idx_keyword_list_entries_added_by ON keyword_list_entries (added_by);

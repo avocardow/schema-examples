@@ -63,7 +63,5 @@ CREATE INDEX idx_moderation_queue_items_assigned_moderator_id
   ON moderation_queue_items (assigned_moderator_id);
 CREATE INDEX idx_moderation_queue_items_source
   ON moderation_queue_items (source);
-CREATE INDEX idx_moderation_queue_items_status
-  ON moderation_queue_items (status);
 CREATE INDEX idx_moderation_queue_items_resolved_at
   ON moderation_queue_items (resolved_at);

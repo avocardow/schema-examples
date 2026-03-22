@@ -13,7 +13,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { users } from "../../auth-rbac/drizzle/users";
 
-export const moderationContentTypeEnum = pgEnum("moderation_content_type", [
+export const moderationContentTypeEnum = pgEnum("moderation_queue_item_content_type", [
   "post",
   "comment",
   "message",
@@ -21,27 +21,27 @@ export const moderationContentTypeEnum = pgEnum("moderation_content_type", [
   "media",
 ]);
 
-export const moderationSourceEnum = pgEnum("moderation_source", [
+export const moderationSourceEnum = pgEnum("moderation_queue_item_source", [
   "user_report",
   "auto_detection",
   "manual",
 ]);
 
-export const moderationStatusEnum = pgEnum("moderation_status", [
+export const moderationStatusEnum = pgEnum("moderation_queue_item_status", [
   "pending",
   "in_review",
   "resolved",
   "escalated",
 ]);
 
-export const moderationPriorityEnum = pgEnum("moderation_priority", [
+export const moderationPriorityEnum = pgEnum("moderation_queue_item_priority", [
   "low",
   "medium",
   "high",
   "critical",
 ]);
 
-export const moderationResolutionEnum = pgEnum("moderation_resolution", [
+export const moderationResolutionEnum = pgEnum("moderation_queue_item_resolution", [
   "approved",
   "removed",
   "escalated",

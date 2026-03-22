@@ -35,7 +35,7 @@ export const moderatorPerformance = pgTable(
     computedAt: timestamp("computed_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
-    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
     unique("uq_moderator_performance_moderator_period").on(

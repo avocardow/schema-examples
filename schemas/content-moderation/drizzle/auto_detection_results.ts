@@ -15,7 +15,14 @@ import {
 import { sql } from "drizzle-orm";
 import { moderationQueueItems } from "./moderation_queue_items";
 import { moderationRules } from "./moderation_rules";
-import { moderationContentTypeEnum } from "./moderation_queue_items";
+
+export const detectionContentTypeEnum = pgEnum("detection_content_type", [
+  "post",
+  "comment",
+  "message",
+  "user",
+  "media",
+]);
 
 export const detectionMethodEnum = pgEnum("detection_method", [
   "ml_classifier",
@@ -29,7 +36,7 @@ export const autoDetectionResults = pgTable(
   "auto_detection_results",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    contentType: moderationContentTypeEnum("content_type").notNull(), // What type of content was analyzed.
+    contentType: detectionContentTypeEnum("content_type").notNull(), // What type of content was analyzed.
     contentId: text("content_id").notNull(), // What was analyzed.
     queueItemId: uuid("queue_item_id").references(
       () => moderationQueueItems.id,

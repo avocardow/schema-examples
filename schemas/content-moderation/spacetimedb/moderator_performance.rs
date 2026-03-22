@@ -11,7 +11,9 @@ pub struct ModeratorPerformance {
     #[index(btree)]
     pub moderator_id: String, // FK → users.id (cascade delete)
 
+    #[index(btree)]
     pub period_start: Timestamp,
+    #[index(btree)]
     pub period_end: Timestamp,
     // Composite unique: (moderator_id, period_start, period_end) — enforce in reducer logic
 

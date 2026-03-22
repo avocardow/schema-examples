@@ -34,10 +34,10 @@ export const RESPONSE_TEMPLATE_SCOPE = /** @type {const} */ ({
  * @typedef {Object} ResponseTemplateDocument
  * @property {string}         id                    - Document ID (from snapshot.id).
  * @property {string}         name                  - Internal template name (e.g., "Spam Removal — First Offense").
- * @property {string|null}    actionType            - Which moderation action this template is for. Null = any action.
+ * @property {typeof RESPONSE_TEMPLATE_ACTION_TYPE[keyof typeof RESPONSE_TEMPLATE_ACTION_TYPE]|null} actionType - Which moderation action this template is for. Null = any action.
  * @property {string}         content               - Template text with optional placeholders.
  * @property {string|null}    violationCategoryId   - FK → violation_categories. Suggested category for this template.
- * @property {string}         scope                 - "global" or "community".
+ * @property {typeof RESPONSE_TEMPLATE_SCOPE[keyof typeof RESPONSE_TEMPLATE_SCOPE]} scope - "global" or "community".
  * @property {string|null}    scopeId               - Community ID when scope = "community". Null when global.
  * @property {boolean}        isActive
  * @property {string}         createdBy             - FK → users

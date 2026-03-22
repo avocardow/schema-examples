@@ -28,5 +28,5 @@ export const response_templates = defineTable({
 })
   .index("by_scope", ["scope", "scopeId"])
   .index("by_action_type", ["actionType"])
-  .index("by_violation_category", ["violationCategoryId"])
+  .index("by_violation_category_id", ["violationCategoryId"])
   .index("by_is_active", ["isActive"]);

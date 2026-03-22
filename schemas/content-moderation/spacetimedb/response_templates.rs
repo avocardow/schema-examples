@@ -45,6 +45,7 @@ pub struct ResponseTemplate {
     #[index(btree)]
     pub scope: ResponseTemplateScope,
 
+    #[index(btree)]
     pub scope_id: Option<String>, // Community ID. None when scope = Global.
     // Composite index: (scope, scope_id) — enforce in reducer logic
 

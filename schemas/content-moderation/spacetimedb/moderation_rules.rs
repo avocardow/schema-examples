@@ -62,7 +62,6 @@ pub struct ModerationRule {
     #[index(btree)]
     pub is_enabled: bool,
 
-    #[index(btree)]
     pub created_by: String, // UUID — FK → users.id (restrict delete)
 
     pub created_at: Timestamp,

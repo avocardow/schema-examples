@@ -26,4 +26,5 @@ export const blocked_ips = defineTable({
 })
   .index("by_severity", ["severity"])
   .index("by_expires_at", ["expiresAt"])
-  .index("by_created_by", ["createdBy"]);
+  .index("by_created_by", ["createdBy"])
+  .index("by_ip_address", ["ipAddress"]);

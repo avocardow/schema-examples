@@ -28,4 +28,5 @@ export const appeals = defineTable({
   .index("by_moderation_action_id", ["moderationActionId"])
   .index("by_appellant_id", ["appellantId"])
   .index("by_status", ["status"])
-  .index("by_reviewer_id", ["reviewerId"]);
+  .index("by_reviewer_id", ["reviewerId"])
+  .index("by_creation_time", ["_creationTime"]);

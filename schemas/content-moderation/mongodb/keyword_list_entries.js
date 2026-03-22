@@ -41,6 +41,4 @@ keywordListEntriesSchema.index(
   { list_id: 1, value: 1, match_type: 1 },
   { unique: true }
 );
-keywordListEntriesSchema.index({ added_by: 1 });
-
 module.exports = mongoose.model("KeywordListEntry", keywordListEntriesSchema);

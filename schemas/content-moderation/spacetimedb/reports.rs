@@ -56,6 +56,7 @@ pub struct Report {
     #[index(btree)]
     pub queue_item_id: Option<String>, // UUID — FK → moderation_queue_items.id (set null on delete)
 
+    #[index(btree)]
     pub category: ReportCategory,
 
     pub reason_text: Option<String>,

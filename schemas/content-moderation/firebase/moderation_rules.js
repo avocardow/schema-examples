@@ -69,7 +69,7 @@ export function createModerationRule(fields) {
     triggerType:    fields.triggerType,
     triggerConfig:  fields.triggerConfig,
     actionType:     fields.actionType,
-    actionConfig:   fields.actionConfig  ?? null,
+    actionConfig:   fields.actionConfig  ?? {},
     priority:      fields.priority      ?? 0,
     isEnabled:     fields.isEnabled     ?? true,
     createdBy:     fields.createdBy,

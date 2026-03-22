@@ -18,7 +18,7 @@ const moderatorPerformanceSchema = new mongoose.Schema(
     average_review_time_seconds: { type: Number, required: true, default: 0 }, // Mean time from assignment to resolution, in seconds.
     appeals_overturned: { type: Number, required: true, default: 0 }, // Actions by this moderator that were overturned on appeal.
     accuracy_score: { type: Number, required: true, default: 1.0 }, // 1.0 - (appeals_overturned / items_actioned), clamped to 0-1.
-    computed_at: { type: Date, required: true }, // When this rollup was last computed.
+    computed_at: { type: Date, required: true, default: Date.now }, // When this rollup was last computed.
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: false },
