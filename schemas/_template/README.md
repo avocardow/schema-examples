@@ -25,7 +25,7 @@
 | 1 | `example_table` | Brief description |
 | 2 | `another_table` | Brief description |
 
-## Pseudo Code
+## Schema
 
 The pseudo code below is the **single source of truth** for all format implementations. See [CONTRIBUTING.md](../../CONTRIBUTING.md) for pseudo code conventions.
 

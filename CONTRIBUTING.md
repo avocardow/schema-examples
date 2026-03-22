@@ -26,6 +26,7 @@ table example {
   status        enum(active, inactive) not_null  -- Required enum
   category      enum(a, b, c) nullable      -- Optional enum
   score         integer default 0           -- Required, has default
+  rating        decimal nullable            -- Optional decimal (0.00-1.00)
   metadata      json nullable default {}    -- Optional, has default
   created_at    timestamp default now
   updated_at    timestamp default now on_update

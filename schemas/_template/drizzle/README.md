@@ -69,6 +69,7 @@ export const tableName = pgTable(
 | `integer` | `integer("col")` | `integer` |
 | `bigint` | `bigint("col", { mode: "number" })` | `bigint` |
 | `boolean` | `boolean("col")` | `boolean` |
+| `decimal` | `numeric("col")` | `numeric` |
 | `uuid` | `uuid("col")` | `uuid` |
 | `json` | `jsonb("col")` | `jsonb` |
 | `timestamp` | `timestamp("col", { withTimezone: true })` | `timestamp` |

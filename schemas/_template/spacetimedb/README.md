@@ -65,6 +65,7 @@ pub struct TableName {
 | `integer` | `i32` |
 | `bigint` | `i64` |
 | `boolean` | `bool` |
+| `decimal` | `f64` |
 | `uuid` | `String` (with `// UUID` comment) |
 | `json` | `Option<String>` (JSON as string) |
 | `timestamp` | `Timestamp` (import `spacetimedb::Timestamp`) |

@@ -105,6 +105,7 @@ Firestore indexes are defined in `firestore.indexes.json`, not in the schema fil
 | `integer` | `number` |
 | `bigint` | `number` |
 | `boolean` | `boolean` |
+| `decimal` | `number` |
 | `uuid` (FK) | `string` (store the ID as a string) |
 | `json` | `Object` |
 | `timestamp` | `Timestamp` (from `firebase/firestore`) |

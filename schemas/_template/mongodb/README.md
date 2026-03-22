@@ -75,6 +75,7 @@ module.exports = mongoose.model("TableName", tableNameSchema);
 | `integer` | `Number` |
 | `bigint` | `Number` |
 | `boolean` | `Boolean` |
+| `decimal` | `Number` |
 | `uuid` (FK) | `mongoose.Schema.Types.ObjectId` with `ref` |
 | `json` | `mongoose.Schema.Types.Mixed` |
 | `timestamp` | Managed by `timestamps` option, or `Date` for non-standard |

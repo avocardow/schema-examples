@@ -26,7 +26,7 @@ Every domain follows: **research → pseudo code → implement → audit → fix
 
 ### Step 1: Research
 
-Write findings to `RESEARCH.md` (gitignored). Use web search to find official documentation, open-source implementations, and API references. Study at least 5-10 real implementations — examine overlaps, differences, best practices, and industry standards. Look for potential issues and areas to improve.
+Write findings to `RESEARCH.md` (gitignored — use `schemas/_template/RESEARCH.md` as your starting structure). Use web search to find official documentation, open-source implementations, and API references. Study at least 5-10 real implementations — examine overlaps, differences, best practices, and industry standards. For each implementation, document what they got right and what could be improved. Also identify relevant standards/specifications (RFCs, industry formats) that inform the schema design. End with a clear consensus recommendation on which patterns to adopt and a decision matrix for every significant design choice.
 
 ### Step 2: Write Pseudo Code
 
@@ -132,12 +132,26 @@ When tables reference each other (e.g., `files ↔ file_versions`):
 
 Every `@relation` on the "many" side needs a reverse field on the "one" side. Central tables (like `files`) may need 10-20+ reverse relations. **Pre-compute these** when orchestrating: scan all tables for FK references, build the reverse map, and include the full list in each Prisma agent's prompt.
 
+### Shared Enums Across Files
+
+When multiple tables use the same enum (e.g., a `status` enum shared by `translation_values` and `content_translations`):
+
+- **SpacetimeDB/Rust**: Define the enum in the first table file that uses it. In subsequent files, add a comment: `// Uses EnumName from first_table.rs — do not redefine here.` Duplicate enum definitions cause Rust compilation errors.
+- **Drizzle/TypeScript**: Define the `pgEnum` in the first table file. Import it in subsequent files: `import { statusEnum } from "./first_table";`
+- **SQL**: `CREATE TYPE` is global — define once in the first file, reference in subsequent files with a comment.
+- **Prisma/Convex/MongoDB/Firebase**: Shared enums are handled naturally (Prisma enums are global, others use inline strings).
+
+### Index Precedence Rule
+
+Format guide conventions take precedence over pseudo code for index optimization. If the pseudo code specifies an index that is redundant per the format guide's "no leading-column redundancy" rule, **omit the redundant index**. Example: if pseudo code specifies both `index(a, b, c)` and `index(a, b)`, omit the latter — the composite index covers leading-column queries.
+
 ### Cross-Domain Dependencies
 
 Most domains depend on [Auth / RBAC](./schemas/auth-rbac) for `users`. Each format handles external references the same way it handles internal ones — see `schemas/_template/{format}/README.md` for the pattern. If the dependency domain isn't complete yet, use the same patterns — the FK resolves once both are implemented.
 
 ## Audit Checklist
 
+- [ ] **Strict spec adherence** — Implement exactly what the pseudo code specifies. No extra validations, constraints, or enum restrictions beyond what's defined. If the pseudo code says `string nullable`, don't add an `enum` constraint even if the values are known.
 - [ ] **Field parity** — Every pseudo code field present, no extra fields
 - [ ] **Nullability** — `nullable` → optional; no `nullable` → required
 - [ ] **Indexes** — All present, no redundant indexes on leading columns of composite unique/index
