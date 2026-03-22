@@ -32,145 +32,145 @@ See each domain's **Dependencies** section for details.
 
 ### Core / Foundational
 
-| Domain                                                                           | Tables | Status |
-| -------------------------------------------------------------------------------- | ------ | ------ |
-| [Auth / RBAC](./schemas/auth-rbac)                                               | 26     | ✅     |
-| [Notifications System](./schemas/notifications-system)                           | 20     | ✅     |
-| [File Management / Document Storage](./schemas/file-management-document-storage) | 20     | ✅     |
-| [Multi-language / i18n](./schemas/multi-language-i18n)                           | 20     | ✅     |
-| [Analytics / Metrics](./schemas/analytics-metrics)                               | 20     | ✅     |
-| [Content Moderation](./schemas/content-moderation)                               | 20     | ✅     |
+| Domain                                                                           | Status |
+| -------------------------------------------------------------------------------- | ------ |
+| [Auth / RBAC](./schemas/auth-rbac)                                               | ✅     |
+| [Notifications System](./schemas/notifications-system)                           | ✅     |
+| [File Management / Document Storage](./schemas/file-management-document-storage) | ✅     |
+| [Multi-language / i18n](./schemas/multi-language-i18n)                           | ✅     |
+| [Analytics / Metrics](./schemas/analytics-metrics)                               | ✅     |
+| [Content Moderation](./schemas/content-moderation)                               | ✅     |
 
 ### Commerce & Marketplace
 
-| Domain                                                               | Tables | Status |
-| -------------------------------------------------------------------- | ------ | ------ |
-| [E-commerce](./schemas/e-commerce)                                   | —      | 🔲     |
-| [Marketplace (Multi-vendor)](./schemas/marketplace)                  | —      | 🔲     |
-| [Auction](./schemas/auction)                                         | —      | 🔲     |
-| [Subscription / Membership](./schemas/subscription-membership)       | —      | 🔲     |
-| [Affiliate / Referral Program](./schemas/affiliate-referral-program) | —      | 🔲     |
-| [Loyalty / Rewards Program](./schemas/loyalty-rewards-program)       | —      | 🔲     |
+| Domain                                                               | Status |
+| -------------------------------------------------------------------- | ------ |
+| [E-commerce](./schemas/e-commerce)                                   | 🔲     |
+| [Marketplace (Multi-vendor)](./schemas/marketplace)                  | 🔲     |
+| [Auction](./schemas/auction)                                         | 🔲     |
+| [Subscription / Membership](./schemas/subscription-membership)       | 🔲     |
+| [Affiliate / Referral Program](./schemas/affiliate-referral-program) | 🔲     |
+| [Loyalty / Rewards Program](./schemas/loyalty-rewards-program)       | 🔲     |
 
 ### Social & Communication
 
-| Domain                                                           | Tables | Status |
-| ---------------------------------------------------------------- | ------ | ------ |
-| [Social Media](./schemas/social-media)                           | —      | 🔲     |
-| [Messaging / Chat](./schemas/messaging-chat)                     | —      | 🔲     |
-| [Video Conferencing](./schemas/video-conferencing)               | —      | 🔲     |
-| [Email / Campaign Marketing](./schemas/email-campaign-marketing) | —      | 🔲     |
+| Domain                                                           | Status |
+| ---------------------------------------------------------------- | ------ |
+| [Social Media](./schemas/social-media)                           | 🔲     |
+| [Messaging / Chat](./schemas/messaging-chat)                     | 🔲     |
+| [Video Conferencing](./schemas/video-conferencing)               | 🔲     |
+| [Email / Campaign Marketing](./schemas/email-campaign-marketing) | 🔲     |
 
 ### Content & Media
 
-| Domain                                                               | Tables | Status |
-| -------------------------------------------------------------------- | ------ | ------ |
-| [CMS / Blog](./schemas/cms-blog)                                     | —      | 🔲     |
-| [Media Streaming](./schemas/media-streaming)                         | —      | 🔲     |
-| [Podcast Platform](./schemas/podcast-platform)                       | —      | 🔲     |
-| [Digital Asset Management (DAM)](./schemas/digital-asset-management) | —      | 🔲     |
-| [Recipe / Cooking](./schemas/recipe-cooking)                         | —      | 🔲     |
+| Domain                                                               | Status |
+| -------------------------------------------------------------------- | ------ |
+| [CMS / Blog](./schemas/cms-blog)                                     | 🔲     |
+| [Media Streaming](./schemas/media-streaming)                         | 🔲     |
+| [Podcast Platform](./schemas/podcast-platform)                       | 🔲     |
+| [Digital Asset Management (DAM)](./schemas/digital-asset-management) | 🔲     |
+| [Recipe / Cooking](./schemas/recipe-cooking)                         | 🔲     |
 
 ### Business & Enterprise
 
-| Domain                                                             | Tables | Status |
-| ------------------------------------------------------------------ | ------ | ------ |
-| [SaaS / Multi-tenant](./schemas/saas-multi-tenant)                 | —      | 🔲     |
-| [CRM](./schemas/crm)                                               | —      | 🔲     |
-| [Project Management](./schemas/project-management)                 | —      | 🔲     |
-| [HR / Payroll](./schemas/hr-payroll)                               | —      | 🔲     |
-| [Helpdesk / Customer Support](./schemas/helpdesk-customer-support) | —      | 🔲     |
-| [Compliance / GRC](./schemas/compliance-grc)                       | —      | 🔲     |
+| Domain                                                             | Status |
+| ------------------------------------------------------------------ | ------ |
+| [SaaS / Multi-tenant](./schemas/saas-multi-tenant)                 | 🔲     |
+| [CRM](./schemas/crm)                                               | 🔲     |
+| [Project Management](./schemas/project-management)                 | 🔲     |
+| [HR / Payroll](./schemas/hr-payroll)                               | 🔲     |
+| [Helpdesk / Customer Support](./schemas/helpdesk-customer-support) | 🔲     |
+| [Compliance / GRC](./schemas/compliance-grc)                       | 🔲     |
 
 ### Booking & Scheduling
 
-| Domain                                                               | Tables | Status |
-| -------------------------------------------------------------------- | ------ | ------ |
-| [Booking / Scheduling](./schemas/booking-scheduling)                 | —      | 🔲     |
-| [Event Management / Ticketing](./schemas/event-management-ticketing) | —      | 🔲     |
+| Domain                                                               | Status |
+| -------------------------------------------------------------------- | ------ |
+| [Booking / Scheduling](./schemas/booking-scheduling)                 | 🔲     |
+| [Event Management / Ticketing](./schemas/event-management-ticketing) | 🔲     |
 
 ### Healthcare & Wellness
 
-| Domain                                               | Tables | Status |
-| ---------------------------------------------------- | ------ | ------ |
-| [Healthcare / Medical](./schemas/healthcare-medical) | —      | 🔲     |
-| [Fitness / Wellness](./schemas/fitness-wellness)     | —      | 🔲     |
-| [Pet / Veterinary](./schemas/pet-veterinary)         | —      | 🔲     |
+| Domain                                               | Status |
+| ---------------------------------------------------- | ------ |
+| [Healthcare / Medical](./schemas/healthcare-medical) | 🔲     |
+| [Fitness / Wellness](./schemas/fitness-wellness)     | 🔲     |
+| [Pet / Veterinary](./schemas/pet-veterinary)         | 🔲     |
 
 ### Finance & Legal
 
-| Domain                                                           | Tables | Status |
-| ---------------------------------------------------------------- | ------ | ------ |
-| [Finance / Banking](./schemas/finance-banking)                   | —      | 🔲     |
-| [Insurance](./schemas/insurance)                                 | —      | 🔲     |
-| [Legal / Law Firm](./schemas/legal-law-firm)                     | —      | 🔲     |
-| [Fundraising / Crowdfunding](./schemas/fundraising-crowdfunding) | —      | 🔲     |
-| [Nonprofit Management](./schemas/nonprofit-management)           | —      | 🔲     |
+| Domain                                                           | Status |
+| ---------------------------------------------------------------- | ------ |
+| [Finance / Banking](./schemas/finance-banking)                   | 🔲     |
+| [Insurance](./schemas/insurance)                                 | 🔲     |
+| [Legal / Law Firm](./schemas/legal-law-firm)                     | 🔲     |
+| [Fundraising / Crowdfunding](./schemas/fundraising-crowdfunding) | 🔲     |
+| [Nonprofit Management](./schemas/nonprofit-management)           | 🔲     |
 
 ### Real Estate & Property
 
-| Domain                                                               | Tables | Status |
-| -------------------------------------------------------------------- | ------ | ------ |
-| [Real Estate](./schemas/real-estate)                                 | —      | 🔲     |
-| [Space / Facility Reservation](./schemas/space-facility-reservation) | —      | 🔲     |
+| Domain                                                               | Status |
+| -------------------------------------------------------------------- | ------ |
+| [Real Estate](./schemas/real-estate)                                 | 🔲     |
+| [Space / Facility Reservation](./schemas/space-facility-reservation) | 🔲     |
 
 ### Education & Research
 
-| Domain                                                      | Tables | Status |
-| ----------------------------------------------------------- | ------ | ------ |
-| [Education / LMS](./schemas/education-lms)                  | —      | 🔲     |
-| [Library Management](./schemas/library-management)          | —      | 🔲     |
-| [Academic Research Management](./schemas/academic-research) | —      | 🔲     |
+| Domain                                                      | Status |
+| ----------------------------------------------------------- | ------ |
+| [Education / LMS](./schemas/education-lms)                  | 🔲     |
+| [Library Management](./schemas/library-management)          | 🔲     |
+| [Academic Research Management](./schemas/academic-research) | 🔲     |
 
 ### Food & Hospitality
 
-| Domain                                                           | Tables | Status |
-| ---------------------------------------------------------------- | ------ | ------ |
-| [Restaurant / Food Delivery](./schemas/restaurant-food-delivery) | —      | 🔲     |
-| [Travel / Airlines / Hotels](./schemas/travel-airlines-hotels)   | —      | 🔲     |
+| Domain                                                           | Status |
+| ---------------------------------------------------------------- | ------ |
+| [Restaurant / Food Delivery](./schemas/restaurant-food-delivery) | 🔲     |
+| [Travel / Airlines / Hotels](./schemas/travel-airlines-hotels)   | 🔲     |
 
 ### Employment
 
-| Domain                                                     | Tables | Status |
-| ---------------------------------------------------------- | ------ | ------ |
-| [Job Board / Recruitment](./schemas/job-board-recruitment) | —      | 🔲     |
+| Domain                                                     | Status |
+| ---------------------------------------------------------- | ------ |
+| [Job Board / Recruitment](./schemas/job-board-recruitment) | 🔲     |
 
 ### Logistics & Supply Chain
 
-| Domain                                                            | Tables | Status |
-| ----------------------------------------------------------------- | ------ | ------ |
-| [Inventory / Warehouse Management](./schemas/inventory-warehouse) | —      | 🔲     |
-| [Logistics / Shipping](./schemas/logistics-shipping)              | —      | 🔲     |
-| [Supply Chain Management](./schemas/supply-chain)                 | —      | 🔲     |
-| [Manufacturing / MES](./schemas/manufacturing-mes)                | —      | 🔲     |
+| Domain                                                            | Status |
+| ----------------------------------------------------------------- | ------ |
+| [Inventory / Warehouse Management](./schemas/inventory-warehouse) | 🔲     |
+| [Logistics / Shipping](./schemas/logistics-shipping)              | 🔲     |
+| [Supply Chain Management](./schemas/supply-chain)                 | 🔲     |
+| [Manufacturing / MES](./schemas/manufacturing-mes)                | 🔲     |
 
 ### IoT & Technology
 
-| Domain                                                     | Tables | Status |
-| ---------------------------------------------------------- | ------ | ------ |
-| [IoT / Device Management](./schemas/iot-device-management) | —      | 🔲     |
-| [Gaming / Leaderboards](./schemas/gaming-leaderboards)     | —      | 🔲     |
+| Domain                                                     | Status |
+| ---------------------------------------------------------- | ------ |
+| [IoT / Device Management](./schemas/iot-device-management) | 🔲     |
+| [Gaming / Leaderboards](./schemas/gaming-leaderboards)     | 🔲     |
 
 ### Government & Utilities
 
-| Domain                                                    | Tables | Status |
-| --------------------------------------------------------- | ------ | ------ |
-| [Government / Civic Services](./schemas/government-civic) | —      | 🔲     |
-| [Energy / Utilities](./schemas/energy-utilities)          | —      | 🔲     |
+| Domain                                                    | Status |
+| --------------------------------------------------------- | ------ |
+| [Government / Civic Services](./schemas/government-civic) | 🔲     |
+| [Energy / Utilities](./schemas/energy-utilities)          | 🔲     |
 
 ### Agriculture & Environment
 
-| Domain                                                                 | Tables | Status |
-| ---------------------------------------------------------------------- | ------ | ------ |
-| [Agriculture / Farm Management](./schemas/agriculture-farm-management) | —      | 🔲     |
+| Domain                                                                 | Status |
+| ---------------------------------------------------------------------- | ------ |
+| [Agriculture / Farm Management](./schemas/agriculture-farm-management) | 🔲     |
 
 ### Events & Lifestyle
 
-| Domain                                                                     | Tables | Status |
-| -------------------------------------------------------------------------- | ------ | ------ |
-| [League / Competition Management](./schemas/league-competition-management) | —      | 🔲     |
-| [Event Planning](./schemas/event-planning)                                 | —      | 🔲     |
-| [Voting / Polling / Surveys](./schemas/voting-polling-surveys)             | —      | 🔲     |
+| Domain                                                                     | Status |
+| -------------------------------------------------------------------------- | ------ |
+| [League / Competition Management](./schemas/league-competition-management) | 🔲     |
+| [Event Planning](./schemas/event-planning)                                 | 🔲     |
+| [Voting / Polling / Surveys](./schemas/voting-polling-surveys)             | 🔲     |
 
 **57 domains — 6 complete, 51 in progress**
 
