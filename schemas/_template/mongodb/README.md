@@ -104,7 +104,7 @@ schema.index({ field: 1 }, { unique: true, sparse: true });
 ## Gotchas
 
 - **Don't index a field that has `unique: true` inline** — Mongoose creates an index automatically for unique fields.
-- **`sparse: true`** is required on optional unique fields, otherwise multiple null values violate the unique constraint.
+- **`sparse: true`** is required on unique indexes that include any nullable field — this applies to both single-field uniques (e.g., `{ email: 1 }`) and **composite uniques** where at least one field is nullable (e.g., `{ experiment_id: 1, user_id: 1 }` where `user_id` is optional). Without `sparse: true`, multiple documents with `null` in the nullable field violate the unique constraint.
 - **`required: true`** should NOT be on timestamp fields managed by the `timestamps` option.
 - **`default: null`** is how you express a nullable field without `required: true`.
 - **Model names** are `PascalCase` singular — Mongoose automatically pluralizes and lowercases for the collection name.

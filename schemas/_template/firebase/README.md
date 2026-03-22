@@ -18,8 +18,12 @@
 2. **Three exports per file**: JSDoc `@typedef`, `createXxx` factory, `xxxConverter`.
 3. **No `id` in factory output** — Firestore assigns the document ID. The converter's `fromFirestore` reads `snapshot.id`.
 4. **Timestamps** — `import { Timestamp } from "firebase/firestore"`. Use `Timestamp.now()` in factories.
-5. **Nullable fields** — Use `?? null` in both the factory and converter.
-6. **Enums** — `export const ENUM_NAME = /** @type {const} */ ({...})`.
+5. **Nullable fields** — Use `?? null` in both the factory and converter. **Non-nullable fields** use bare `data.fieldName` in the converter (no `?? default` fallbacks). The factory CAN use `?? default` for optional parameters, but the converter must trust the stored data.
+6. **FK annotations** — In the JSDoc `@typedef`, annotate foreign key fields with `- FK → collection_name`:
+   ```
+   * @property {string} userId - FK → users
+   ```
+7. **Enums** — `export const ENUM_NAME = /** @type {const} */ ({...})`.
 
 ## File Template
 
@@ -37,7 +41,7 @@ export const TABLE_STATUS = /** @type {const} */ ({
 /**
  * @typedef {Object} TableNameDocument
  * @property {string} id
- * @property {string} userId
+ * @property {string} userId - FK → users
  * @property {string} name
  * @property {string|null} description
  * @property {typeof TABLE_STATUS[keyof typeof TABLE_STATUS]} status
@@ -114,9 +118,9 @@ Firestore indexes are defined in `firestore.indexes.json`, not in the schema fil
 
 ## Gotchas
 
-- **No enforced foreign keys** — Store referenced document IDs as strings. Referential integrity is your responsibility.
+- **No enforced foreign keys** — Store referenced document IDs as strings. Referential integrity is your responsibility. Annotate FK fields in the JSDoc `@typedef` with `- FK → collection_name`.
 - **No `id` in the factory** — The document ID is set by Firestore when you call `addDoc` or `setDoc`.
-- **`?? null`** — Use this for nullable fields in both factory and converter to ensure consistent null values.
+- **`?? null`** — Use this for nullable fields in both factory and converter. **Do NOT use `?? default` on non-nullable fields in the converter** — the converter trusts stored data and uses bare `data.fieldName`. The factory CAN use `?? default` for optional constructor parameters.
 - **Converter's `fromFirestore`** — Always include `id: snapshot.id` to attach the document ID.
 - **Timestamps are Firestore `Timestamp` objects**, not JS `Date`. Use `Timestamp.now()` in factories.
 - **No `updatedAt` auto-update** — Firestore doesn't auto-update timestamps. Handle in your write logic with `serverTimestamp()`.

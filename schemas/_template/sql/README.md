@@ -90,3 +90,10 @@ CREATE INDEX idx_table_active ON table_name(status) WHERE status = 'active';
 - Don't index the leading column of a composite index separately — the composite index covers single-column lookups on the leading column
 - `NOT NULL` with `DEFAULT` means the column is required but has a fallback — the default applies on INSERT, not on NULL
 - `JSONB DEFAULT '{}'` vs `JSONB` (nullable) — choose based on pseudo code
+- **Forward FK references** — If table A references table B but B's `.sql` file loads *after* A alphabetically, don't use an inline `REFERENCES` (it will fail). Instead, use `ALTER TABLE` after the `CREATE TABLE`:
+  ```sql
+  -- Forward FK: sessions is defined in sessions.sql (loaded after events.sql).
+  ALTER TABLE events ADD CONSTRAINT fk_events_session_id
+    FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE SET NULL;
+  ```
+  This is different from *circular* FKs (A ↔ B) — forward FKs are one-directional but still need deferred definition when the target table hasn't been created yet.
