@@ -1,0 +1,18 @@
+// locale_fallbacks: Defines fallback chains between locales for missing translations.
+// See README.md for full design rationale.
+
+model LocaleFallback {
+  id               String   @id @default(uuid())
+  localeId         String   @map("locale_id")
+  fallbackLocaleId String   @map("fallback_locale_id")
+  priority         Int      @default(0) // Lower number = higher priority fallback.
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @default(now()) @map("updated_at")
+
+  locale           Locale   @relation("LocaleFallbackFrom", fields: [localeId], references: [id], onDelete: Cascade)
+  fallbackLocale   Locale   @relation("LocaleFallbackTo", fields: [fallbackLocaleId], references: [id], onDelete: Cascade)
+
+  @@unique([localeId, fallbackLocaleId])
+  @@unique([localeId, priority])
+  @@map("locale_fallbacks")
+}

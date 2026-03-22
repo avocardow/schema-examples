@@ -37,7 +37,7 @@ See each domain's **Dependencies** section for details.
 | [Auth / RBAC](./schemas/auth-rbac)                                               | 26     | ✅     |
 | [Notifications System](./schemas/notifications-system)                           | 20     | ✅     |
 | [File Management / Document Storage](./schemas/file-management-document-storage) | 20     | ✅     |
-| [Multi-language / i18n](./schemas/multi-language-i18n)                           | —      | 🔲     |
+| [Multi-language / i18n](./schemas/multi-language-i18n)                           | 20     | ✅     |
 | [Analytics / Metrics](./schemas/analytics-metrics)                               | —      | 🔲     |
 | [Content Moderation](./schemas/content-moderation)                               | —      | 🔲     |
 
@@ -172,7 +172,7 @@ See each domain's **Dependencies** section for details.
 | [Event Planning](./schemas/event-planning)                                 | —      | 🔲     |
 | [Voting / Polling / Surveys](./schemas/voting-polling-surveys)             | —      | 🔲     |
 
-**57 domains — 3 complete, 54 in progress**
+**57 domains — 4 complete, 53 in progress**
 
 ## How to Use
 

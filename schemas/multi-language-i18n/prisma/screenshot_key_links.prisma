@@ -1,0 +1,20 @@
+// screenshot_key_links: Maps translation keys to regions within screenshots.
+// See README.md for full design rationale.
+
+model ScreenshotKeyLink {
+  id               String         @id @default(uuid())
+  screenshotId     String         @map("screenshot_id")
+  translationKeyId String         @map("translation_key_id")
+  x                Int? // X coordinate of the highlighted region.
+  y                Int? // Y coordinate of the highlighted region.
+  width            Int? // Width of the highlighted region.
+  height           Int? // Height of the highlighted region.
+  createdAt        DateTime       @default(now()) @map("created_at")
+
+  screenshot       Screenshot     @relation(fields: [screenshotId], references: [id], onDelete: Cascade)
+  translationKey   TranslationKey @relation(fields: [translationKeyId], references: [id], onDelete: Cascade)
+
+  @@unique([screenshotId, translationKeyId])
+  @@index([translationKeyId])
+  @@map("screenshot_key_links")
+}

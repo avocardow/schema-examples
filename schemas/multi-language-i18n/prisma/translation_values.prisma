@@ -1,0 +1,37 @@
+// translation_values: Translated strings for each key+locale combination, with review workflow.
+// See README.md for full design rationale.
+
+enum TranslationValueStatus {
+  draft
+  in_review
+  approved
+  published
+  rejected
+}
+
+model TranslationValue {
+  id                  String                 @id @default(uuid())
+  translationKeyId    String                 @map("translation_key_id")
+  localeId            String                 @map("locale_id")
+  pluralCategory      String?                @map("plural_category") // CLDR category: "zero", "one", "two", "few", "many", "other".
+  value               String // The translated text.
+  status              TranslationValueStatus @default(draft)
+  isMachineTranslated Boolean                @default(false) @map("is_machine_translated")
+  sourceDigest        String?                @map("source_digest") // Hash of source text to detect stale translations.
+  translatorId        String?                @map("translator_id")
+  reviewedBy          String?                @map("reviewed_by")
+  publishedAt         DateTime?              @map("published_at")
+  createdAt           DateTime               @default(now()) @map("created_at")
+  updatedAt           DateTime               @default(now()) @map("updated_at")
+
+  translationKey      TranslationKey         @relation(fields: [translationKeyId], references: [id], onDelete: Cascade)
+  locale              Locale                 @relation(fields: [localeId], references: [id], onDelete: Cascade)
+  translator          User?                  @relation("TranslationValueTranslator", fields: [translatorId], references: [id], onDelete: SetNull)
+  reviewer            User?                  @relation("TranslationValueReviewer", fields: [reviewedBy], references: [id], onDelete: SetNull)
+
+  @@unique([translationKeyId, localeId, pluralCategory])
+  @@index([localeId, status])
+  @@index([status])
+  @@index([translatorId])
+  @@map("translation_values")
+}

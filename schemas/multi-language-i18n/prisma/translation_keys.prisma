@@ -1,0 +1,26 @@
+// translation_keys: Unique identifiers for translatable strings, scoped to a namespace.
+// See README.md for full design rationale.
+
+model TranslationKey {
+  id          String    @id @default(uuid())
+  namespaceId String    @map("namespace_id")
+  key         String // Dot-notation key (e.g., "button.submit", "error.not_found").
+  description String? // Context hint for translators.
+  maxLength   Int?      @map("max_length") // Character limit for translations (UI constraint).
+  isPlural    Boolean   @default(false) @map("is_plural") // Whether this key has plural variants.
+  format      String    @default("text") // "text", "html", "markdown", "icu".
+  isHidden    Boolean   @default(false) @map("is_hidden") // Hidden keys are excluded from export.
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @default(now()) @map("updated_at")
+
+  namespace   Namespace @relation(fields: [namespaceId], references: [id], onDelete: Cascade)
+
+  // Reverse relations
+  values          TranslationValue[]
+  tags            TranslationKeyTag[]
+  screenshotLinks ScreenshotKeyLink[]
+
+  @@unique([namespaceId, key])
+  @@index([isPlural])
+  @@map("translation_keys")
+}

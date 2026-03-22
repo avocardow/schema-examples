@@ -1,0 +1,19 @@
+// translation_status_history: Append-only audit log of translation status changes.
+// See README.md for full design rationale.
+
+model TranslationStatusHistory {
+  id              String   @id @default(uuid())
+  translationType String   @map("translation_type") // "value" or "content" to distinguish translation kinds.
+  translationId   String   @map("translation_id") // ID of the translation_value or content_translation.
+  fromStatus      String?  @map("from_status") // Previous status (null for initial creation).
+  toStatus        String   @map("to_status") // New status after the change.
+  changedBy       String?  @map("changed_by")
+  comment         String? // Optional reason for the status change.
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  changer         User?    @relation("StatusHistoryChanger", fields: [changedBy], references: [id], onDelete: SetNull)
+
+  @@index([translationType, translationId])
+  @@index([changedBy])
+  @@map("translation_status_history")
+}

@@ -1,0 +1,22 @@
+// screenshots: UI screenshots providing visual context for translators.
+// See README.md for full design rationale.
+
+model Screenshot {
+  id         String   @id @default(uuid())
+  name       String // Descriptive name (e.g., "Login Page - Error State").
+  filePath   String   @map("file_path") // Storage path or URL.
+  fileSize   Int?     @map("file_size") // Size in bytes.
+  mimeType   String?  @map("mime_type") // e.g., "image/png".
+  width      Int? // Image width in pixels.
+  height     Int? // Image height in pixels.
+  uploadedBy String?  @map("uploaded_by")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @default(now()) @map("updated_at")
+
+  uploader   User?    @relation("ScreenshotUploader", fields: [uploadedBy], references: [id], onDelete: SetNull)
+
+  // Reverse relations
+  keyLinks   ScreenshotKeyLink[]
+
+  @@map("screenshots")
+}

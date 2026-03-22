@@ -1,0 +1,42 @@
+// import_export_jobs: Tracks bulk import/export operations for translation files.
+// See README.md for full design rationale.
+
+enum ImportExportType {
+  import
+  export
+}
+
+enum ImportExportStatus {
+  pending
+  processing
+  completed
+  failed
+}
+
+model ImportExportJob {
+  id             String             @id @default(uuid())
+  type           ImportExportType // Whether this is an import or export job.
+  format         String // File format (e.g., "json", "xliff", "csv", "po").
+  status         ImportExportStatus @default(pending)
+  localeId       String?            @map("locale_id") // Scope to a specific locale (null = all locales).
+  namespaceId    String?            @map("namespace_id") // Scope to a specific namespace (null = all).
+  filePath       String?            @map("file_path") // Path to the import source or export output.
+  totalCount     Int                @default(0) @map("total_count") // Total items to process.
+  processedCount Int                @default(0) @map("processed_count") // Items processed so far.
+  errorMessage   String?            @map("error_message")
+  options        Json? // Additional job configuration.
+  createdBy      String?            @map("created_by")
+  startedAt      DateTime?          @map("started_at")
+  completedAt    DateTime?          @map("completed_at")
+  createdAt      DateTime           @default(now()) @map("created_at")
+  updatedAt      DateTime           @default(now()) @map("updated_at")
+
+  locale         Locale?            @relation(fields: [localeId], references: [id], onDelete: SetNull)
+  namespace      Namespace?         @relation(fields: [namespaceId], references: [id], onDelete: SetNull)
+  creator        User?              @relation("ImportExportJobCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([createdBy])
+  @@index([type, status])
+  @@map("import_export_jobs")
+}

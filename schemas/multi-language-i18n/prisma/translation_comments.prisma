@@ -1,0 +1,24 @@
+// translation_comments: Threaded discussion on translations for translator collaboration.
+// See README.md for full design rationale.
+
+model TranslationComment {
+  id              String               @id @default(uuid())
+  translationType String               @map("translation_type") // "value" or "content".
+  translationId   String               @map("translation_id")
+  parentId        String?              @map("parent_id") // Self-referential FK for threading.
+  authorId        String               @map("author_id")
+  body            String // Comment text.
+  issueType       String?              @map("issue_type") // e.g., "typo", "context", "style".
+  isResolved      Boolean              @default(false) @map("is_resolved")
+  createdAt       DateTime             @default(now()) @map("created_at")
+  updatedAt       DateTime             @default(now()) @map("updated_at")
+
+  parent          TranslationComment?  @relation("CommentThread", fields: [parentId], references: [id], onDelete: Cascade)
+  replies         TranslationComment[] @relation("CommentThread")
+  author          User                 @relation("TranslationCommentAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([translationType, translationId])
+  @@index([parentId])
+  @@index([authorId])
+  @@map("translation_comments")
+}

@@ -1,0 +1,28 @@
+// glossary_terms: Controlled vocabulary entries to ensure consistent terminology across translations.
+// See README.md for full design rationale.
+
+model GlossaryTerm {
+  id              String   @id @default(uuid())
+  term            String // The term in the source locale (e.g., "dashboard").
+  description     String? // Definition or usage context for translators.
+  partOfSpeech    String?  @map("part_of_speech") // e.g., "noun", "verb", "adjective".
+  domain          String? // Subject area (e.g., "finance", "healthcare").
+  sourceLocaleId  String   @map("source_locale_id")
+  isForbidden     Boolean  @default(false) @map("is_forbidden") // Forbidden terms should never be used.
+  isCaseSensitive Boolean  @default(false) @map("is_case_sensitive")
+  notes           String? // Additional notes for translators.
+  createdBy       String?  @map("created_by")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @default(now()) @map("updated_at")
+
+  sourceLocale    Locale   @relation(fields: [sourceLocaleId], references: [id], onDelete: Restrict)
+  creator         User?    @relation("GlossaryTermCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+
+  // Reverse relations
+  translations    GlossaryTermTranslation[]
+
+  @@index([sourceLocaleId, term])
+  @@index([sourceLocaleId])
+  @@index([domain])
+  @@map("glossary_terms")
+}

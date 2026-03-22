@@ -1,0 +1,20 @@
+// machine_translation_configs: Configuration for machine translation engine integrations.
+// See README.md for full design rationale.
+
+model MachineTranslationConfig {
+  id                  String   @id @default(uuid())
+  name                String // Display name (e.g., "Google Translate", "DeepL Pro").
+  engine              String // Engine identifier (e.g., "google", "deepl", "azure").
+  isEnabled           Boolean  @default(true) @map("is_enabled")
+  isDefault           Boolean  @default(false) @map("is_default")
+  apiKeyRef           String?  @map("api_key_ref") // Reference to secret store, never a raw key.
+  endpointUrl         String?  @map("endpoint_url") // Custom API endpoint URL.
+  supportedLocales    Json?    @map("supported_locales") // JSON array of supported locale codes.
+  defaultQualityScore Decimal? @map("default_quality_score") // Default quality score for MT output.
+  rateLimit           Int?     @map("rate_limit") // Max requests per minute.
+  options             Json? // Engine-specific configuration options.
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @default(now()) @map("updated_at")
+
+  @@map("machine_translation_configs")
+}

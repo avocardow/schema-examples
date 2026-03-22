@@ -1,0 +1,15 @@
+// translation_key_tags: Freeform tags for categorizing and filtering translation keys.
+// See README.md for full design rationale.
+
+model TranslationKeyTag {
+  id               String         @id @default(uuid())
+  translationKeyId String         @map("translation_key_id")
+  tag              String // Tag label (e.g., "ui", "email", "legal").
+  createdAt        DateTime       @default(now()) @map("created_at")
+
+  translationKey   TranslationKey @relation(fields: [translationKeyId], references: [id], onDelete: Cascade)
+
+  @@unique([translationKeyId, tag])
+  @@index([tag])
+  @@map("translation_key_tags")
+}

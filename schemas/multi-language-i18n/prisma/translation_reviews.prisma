@@ -1,0 +1,24 @@
+// translation_reviews: Append-only record of reviewer actions on translations.
+// See README.md for full design rationale.
+
+enum TranslationReviewAction {
+  approve
+  reject
+  request_changes
+}
+
+model TranslationReview {
+  id              String                  @id @default(uuid())
+  translationType String                  @map("translation_type") // "value" or "content".
+  translationId   String                  @map("translation_id")
+  reviewerId      String                  @map("reviewer_id")
+  action          TranslationReviewAction // The review decision.
+  comment         String? // Feedback or reason for the decision.
+  createdAt       DateTime                @default(now()) @map("created_at")
+
+  reviewer        User                    @relation("TranslationReviewReviewer", fields: [reviewerId], references: [id], onDelete: Cascade)
+
+  @@index([translationType, translationId])
+  @@index([reviewerId])
+  @@map("translation_reviews")
+}

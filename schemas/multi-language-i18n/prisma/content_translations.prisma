@@ -1,0 +1,27 @@
+// content_translations: Field-level translations for dynamic content entities (products, pages, etc.).
+// See README.md for full design rationale.
+
+model ContentTranslation {
+  id           String                 @id @default(uuid())
+  resourceId   String                 @map("resource_id")
+  entityId     String                 @map("entity_id") // ID of the translated entity in its source table.
+  localeId     String                 @map("locale_id")
+  fieldName    String                 @map("field_name") // Which field is translated (e.g., "title", "description").
+  value        String // The translated content for this field.
+  status       TranslationValueStatus @default(draft)
+  sourceDigest String?                @map("source_digest") // Hash of source text to detect stale translations.
+  translatorId String?                @map("translator_id")
+  version      Int                    @default(1) // Incremented on each update for optimistic locking.
+  createdAt    DateTime               @default(now()) @map("created_at")
+  updatedAt    DateTime               @default(now()) @map("updated_at")
+
+  resource     TranslatableResource   @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  locale       Locale                 @relation(fields: [localeId], references: [id], onDelete: Cascade)
+  translator   User?                  @relation("ContentTranslationTranslator", fields: [translatorId], references: [id], onDelete: SetNull)
+
+  @@unique([resourceId, entityId, localeId, fieldName])
+  @@index([resourceId, entityId])
+  @@index([localeId])
+  @@index([status])
+  @@map("content_translations")
+}

@@ -1,0 +1,18 @@
+// translation_groups: Groups all translations for a single entity, tracking its source locale.
+// See README.md for full design rationale.
+
+model TranslationGroup {
+  id             String               @id @default(uuid())
+  resourceId     String               @map("resource_id")
+  entityId       String               @map("entity_id") // ID of the entity being translated.
+  sourceLocaleId String               @map("source_locale_id") // The locale the content was originally written in.
+  createdAt      DateTime             @default(now()) @map("created_at")
+  updatedAt      DateTime             @default(now()) @map("updated_at")
+
+  resource       TranslatableResource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  sourceLocale   Locale               @relation(fields: [sourceLocaleId], references: [id], onDelete: Restrict)
+
+  @@unique([resourceId, entityId])
+  @@index([sourceLocaleId])
+  @@map("translation_groups")
+}

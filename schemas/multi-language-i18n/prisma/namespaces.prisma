@@ -1,0 +1,17 @@
+// namespaces: Logical groupings for translation keys (e.g., "common", "auth", "emails").
+// See README.md for full design rationale.
+
+model Namespace {
+  id          String   @id @default(uuid())
+  name        String   @unique // Namespace identifier (e.g., "common", "dashboard").
+  description String? // Explains what translations belong in this namespace.
+  isDefault   Boolean  @default(false) @map("is_default")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @map("updated_at")
+
+  // Reverse relations
+  translationKeys TranslationKey[]
+  importExportJobs ImportExportJob[]
+
+  @@map("namespaces")
+}

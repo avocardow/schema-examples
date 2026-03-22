@@ -1,0 +1,25 @@
+// glossary_term_translations: Locale-specific translations of glossary terms.
+// See README.md for full design rationale.
+
+enum GlossaryTermStatus {
+  draft
+  approved
+}
+
+model GlossaryTermTranslation {
+  id          String             @id @default(uuid())
+  termId      String             @map("term_id")
+  localeId    String             @map("locale_id")
+  translation String // The translated term.
+  notes       String? // Locale-specific usage notes.
+  status      GlossaryTermStatus @default(draft)
+  createdAt   DateTime           @default(now()) @map("created_at")
+  updatedAt   DateTime           @default(now()) @map("updated_at")
+
+  term        GlossaryTerm       @relation(fields: [termId], references: [id], onDelete: Cascade)
+  locale      Locale             @relation(fields: [localeId], references: [id], onDelete: Cascade)
+
+  @@unique([termId, localeId])
+  @@index([localeId])
+  @@map("glossary_term_translations")
+}

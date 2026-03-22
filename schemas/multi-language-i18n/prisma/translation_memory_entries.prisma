@@ -1,0 +1,27 @@
+// translation_memory_entries: Previously translated segments for reuse and consistency.
+// See README.md for full design rationale.
+
+model TranslationMemoryEntry {
+  id              String   @id @default(uuid())
+  sourceLocaleId  String   @map("source_locale_id")
+  targetLocaleId  String   @map("target_locale_id")
+  sourceText      String   @map("source_text") // Original text segment.
+  targetText      String   @map("target_text") // Translated text segment.
+  sourceHash      String   @map("source_hash") // Hash of sourceText for fast lookup.
+  domain          String? // Translation domain (e.g., "legal", "marketing").
+  qualityScore    Decimal? @map("quality_score") // 0.0-1.0 confidence score.
+  usageCount      Int      @default(0) @map("usage_count") // How many times this entry has been reused.
+  source          String   @default("human") // Origin: "human", "machine", "import".
+  createdBy       String?  @map("created_by")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @default(now()) @map("updated_at")
+
+  sourceLocale    Locale   @relation("TMSource", fields: [sourceLocaleId], references: [id], onDelete: Cascade)
+  targetLocale    Locale   @relation("TMTarget", fields: [targetLocaleId], references: [id], onDelete: Cascade)
+  creator         User?    @relation("TMEntryCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+
+  @@index([sourceLocaleId, targetLocaleId, sourceHash])
+  @@index([sourceLocaleId, targetLocaleId])
+  @@index([domain])
+  @@map("translation_memory_entries")
+}
