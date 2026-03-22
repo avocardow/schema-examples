@@ -20,6 +20,8 @@ Production-ready database schema examples across formats and domains. Each domai
 
 Pay attention to: how pseudo code maps to each format, comment conventions, Prisma reverse relations (the `File` model has 19+ reverse relation fields), circular FK handling (SQL uses `ALTER TABLE`, Drizzle uses a comment instead of `.references()`), and enum declarations per format.
 
+**Do not let completed domains influence your table count.** The number of tables in a new domain should be determined entirely by your research — what the domain actually needs. Don't anchor on the table counts of existing domains.
+
 ## The Proven Workflow
 
 Every domain follows: **research → pseudo code → implement → audit → fix → review → update → commit**.
