@@ -1,0 +1,35 @@
+// dashboard_widgets: Individual chart/metric widgets placed on dashboards.
+// See README.md for full design rationale.
+
+enum ChartType {
+  line
+  bar
+  area
+  pie
+  number
+  table
+  funnel
+  map
+}
+
+model DashboardWidget {
+  id          String            @id @default(uuid())
+  dashboardId String            @map("dashboard_id")
+  metricId    String?           @map("metric_id")
+  title       String?
+  chartType   ChartType         @default(line) @map("chart_type")
+  config      Json?
+  positionX   Int               @default(0) @map("position_x")
+  positionY   Int               @default(0) @map("position_y")
+  width       Int               @default(6)
+  height      Int               @default(4)
+  createdAt   DateTime          @default(now()) @map("created_at")
+  updatedAt   DateTime          @default(now()) @updatedAt @map("updated_at")
+
+  dashboard   Dashboard         @relation(fields: [dashboardId], references: [id], onDelete: Cascade)
+  metric      MetricDefinition? @relation(fields: [metricId], references: [id], onDelete: SetNull)
+
+  @@index([dashboardId])
+  @@index([metricId])
+  @@map("dashboard_widgets")
+}

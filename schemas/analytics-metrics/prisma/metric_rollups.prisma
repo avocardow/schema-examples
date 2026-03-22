@@ -1,0 +1,29 @@
+// metric_rollups: Pre-aggregated metric values at various time granularities.
+// See README.md for full design rationale.
+
+enum RollupGranularity {
+  hourly
+  daily
+  weekly
+  monthly
+}
+
+model MetricRollup {
+  id          String            @id @default(uuid())
+  metricId    String            @map("metric_id")
+  granularity RollupGranularity
+  periodStart DateTime          @map("period_start")
+  periodEnd   DateTime          @map("period_end")
+  value       Decimal
+  count       BigInt            @default(0)
+  dimensions  Json?
+  computedAt  DateTime          @map("computed_at")
+  createdAt   DateTime          @default(now()) @map("created_at")
+
+  metric      MetricDefinition  @relation(fields: [metricId], references: [id], onDelete: Cascade)
+
+  @@unique([metricId, granularity, periodStart, dimensions])
+  // @@index([metricId, granularity, periodStart]) omitted — leading columns of the unique index above.
+  @@index([periodStart])
+  @@map("metric_rollups")
+}

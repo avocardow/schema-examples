@@ -1,0 +1,21 @@
+// experiment_variants: Treatment and control variants within an experiment.
+// See README.md for full design rationale.
+
+model ExperimentVariant {
+  id           String     @id @default(uuid())
+  experimentId String     @map("experiment_id")
+  name         String
+  description  String?
+  isControl    Boolean    @default(false) @map("is_control")
+  weight       Decimal    @default(0.5)
+  config       Json?
+  createdAt    DateTime   @default(now()) @map("created_at")
+
+  experiment   Experiment @relation(fields: [experimentId], references: [id], onDelete: Cascade)
+
+  assignments  ExperimentAssignment[]
+  results      ExperimentResult[]
+
+  @@unique([experimentId, name])
+  @@map("experiment_variants")
+}

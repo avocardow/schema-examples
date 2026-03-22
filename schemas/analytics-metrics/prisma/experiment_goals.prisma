@@ -1,0 +1,17 @@
+// experiment_goals: Links experiments to their target conversion goals.
+// See README.md for full design rationale.
+
+model ExperimentGoal {
+  id           String     @id @default(uuid())
+  experimentId String     @map("experiment_id")
+  goalId       String     @map("goal_id")
+  isPrimary    Boolean    @default(false) @map("is_primary")
+  createdAt    DateTime   @default(now()) @map("created_at")
+
+  experiment   Experiment @relation(fields: [experimentId], references: [id], onDelete: Cascade)
+  goal         Goal       @relation(fields: [goalId], references: [id], onDelete: Cascade)
+
+  @@unique([experimentId, goalId])
+  @@index([goalId])
+  @@map("experiment_goals")
+}

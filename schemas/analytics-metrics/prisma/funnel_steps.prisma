@@ -1,0 +1,18 @@
+// funnel_steps: Ordered steps within a conversion funnel, each tied to an event type.
+// See README.md for full design rationale.
+
+model FunnelStep {
+  id          String   @id @default(uuid())
+  funnelId    String   @map("funnel_id")
+  eventTypeId String   @map("event_type_id")
+  stepOrder   Int      @map("step_order")
+  name        String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  funnel      Funnel    @relation(fields: [funnelId], references: [id], onDelete: Cascade)
+  eventType   EventType @relation(fields: [eventTypeId], references: [id], onDelete: Restrict)
+
+  @@unique([funnelId, stepOrder])
+  @@unique([funnelId, eventTypeId])
+  @@map("funnel_steps")
+}

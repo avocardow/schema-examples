@@ -1,0 +1,23 @@
+// event_types: Catalog of trackable event types with optional JSON schema validation.
+// See README.md for full design rationale.
+
+model EventType {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  category    String?
+  displayName String    @map("display_name")
+  description String?
+  isActive    Boolean   @default(true) @map("is_active")
+  eventSchema Json?     @map("schema")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  events            Event[]
+  funnelSteps       FunnelStep[]
+  goals             Goal[]
+  metricDefinitions MetricDefinition[]
+
+  @@index([category])
+  @@index([isActive])
+  @@map("event_types")
+}

@@ -1,0 +1,30 @@
+// dashboards: Configurable analytics dashboards with layout and refresh settings.
+// See README.md for full design rationale.
+
+enum DashboardVisibility {
+  private
+  team
+  public
+}
+
+model Dashboard {
+  id              String              @id @default(uuid())
+  name            String
+  description     String?
+  layout          Json?
+  visibility      DashboardVisibility @default(private)
+  isDefault       Boolean             @default(false) @map("is_default")
+  refreshInterval Int?                @map("refresh_interval")
+  createdBy       String              @map("created_by")
+  createdAt       DateTime            @default(now()) @map("created_at")
+  updatedAt       DateTime            @default(now()) @updatedAt @map("updated_at")
+
+  creator         User                @relation("DashboardCreator", fields: [createdBy], references: [id], onDelete: Restrict)
+
+  widgets         DashboardWidget[]
+
+  @@index([createdBy])
+  @@index([visibility])
+  @@index([isDefault])
+  @@map("dashboards")
+}

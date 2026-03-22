@@ -1,0 +1,25 @@
+// saved_reports: User-saved report configurations with visibility controls.
+// See README.md for full design rationale.
+
+enum ReportVisibility {
+  private
+  team
+  public
+}
+
+model SavedReport {
+  id          String           @id @default(uuid())
+  name        String
+  description String?
+  config      Json
+  visibility  ReportVisibility @default(private)
+  createdBy   String           @map("created_by")
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @default(now()) @updatedAt @map("updated_at")
+
+  creator     User             @relation("SavedReportCreator", fields: [createdBy], references: [id], onDelete: Cascade)
+
+  @@index([createdBy])
+  @@index([visibility])
+  @@map("saved_reports")
+}

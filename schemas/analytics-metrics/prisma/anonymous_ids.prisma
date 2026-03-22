@@ -1,0 +1,17 @@
+// anonymous_ids: Maps anonymous visitor identifiers to authenticated user accounts.
+// See README.md for full design rationale.
+
+model AnonymousId {
+  id           String   @id @default(uuid())
+  anonymousId  String   @map("anonymous_id")
+  userId       String   @map("user_id")
+  firstSeenAt  DateTime @map("first_seen_at")
+  identifiedAt DateTime @map("identified_at")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  user         User     @relation("AnonymousIdUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([anonymousId, userId])
+  @@index([userId])
+  @@map("anonymous_ids")
+}

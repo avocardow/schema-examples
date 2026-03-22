@@ -1,0 +1,33 @@
+// goals: Conversion goals defined by event type, page view pattern, or custom logic.
+// See README.md for full design rationale.
+
+enum GoalType {
+  event
+  page_view
+  custom
+}
+
+model Goal {
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  goalType    GoalType  @map("goal_type")
+  eventTypeId String?   @map("event_type_id")
+  urlPattern  String?   @map("url_pattern")
+  value       Decimal?
+  isActive    Boolean   @default(true) @map("is_active")
+  createdBy   String    @map("created_by")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  eventType   EventType? @relation(fields: [eventTypeId], references: [id], onDelete: SetNull)
+  creator     User       @relation("GoalCreator", fields: [createdBy], references: [id], onDelete: Restrict)
+
+  experimentGoals ExperimentGoal[]
+
+  @@index([goalType])
+  @@index([eventTypeId])
+  @@index([isActive])
+  @@index([createdBy])
+  @@map("goals")
+}

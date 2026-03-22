@@ -1,0 +1,34 @@
+// experiments: A/B test experiments with traffic allocation and lifecycle tracking.
+// See README.md for full design rationale.
+
+enum ExperimentStatus {
+  draft
+  running
+  paused
+  completed
+}
+
+model Experiment {
+  id                String           @id @default(uuid())
+  name              String
+  description       String?
+  hypothesis        String?
+  status            ExperimentStatus @default(draft)
+  trafficPercentage Decimal          @default(1.0) @map("traffic_percentage")
+  startedAt         DateTime?        @map("started_at")
+  endedAt           DateTime?        @map("ended_at")
+  createdBy         String           @map("created_by")
+  createdAt         DateTime         @default(now()) @map("created_at")
+  updatedAt         DateTime         @default(now()) @updatedAt @map("updated_at")
+
+  creator           User             @relation("ExperimentCreator", fields: [createdBy], references: [id], onDelete: Restrict)
+
+  variants          ExperimentVariant[]
+  assignments       ExperimentAssignment[]
+  results           ExperimentResult[]
+  experimentGoals   ExperimentGoal[]
+
+  @@index([status])
+  @@index([createdBy])
+  @@map("experiments")
+}

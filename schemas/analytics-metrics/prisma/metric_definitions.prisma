@@ -1,0 +1,42 @@
+// metric_definitions: Reusable metric definitions with aggregation rules and display formatting.
+// See README.md for full design rationale.
+
+enum AggregationType {
+  count
+  sum
+  average
+  min
+  max
+  count_unique
+  percentile
+}
+
+model MetricDefinition {
+  id          String          @id @default(uuid())
+  name        String          @unique
+  displayName String          @map("display_name")
+  description String?
+  aggregation AggregationType
+  eventTypeId String?         @map("event_type_id")
+  propertyKey String?         @map("property_key")
+  filters     Json?
+  unit        String?
+  format      String?
+  isActive    Boolean         @default(true) @map("is_active")
+  createdBy   String          @map("created_by")
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @default(now()) @updatedAt @map("updated_at")
+
+  eventType   EventType?      @relation(fields: [eventTypeId], references: [id], onDelete: SetNull)
+  creator     User            @relation("MetricDefinitionCreator", fields: [createdBy], references: [id], onDelete: Restrict)
+
+  rollups           MetricRollup[]
+  dashboardWidgets  DashboardWidget[]
+  experimentResults ExperimentResult[]
+
+  @@index([eventTypeId])
+  @@index([aggregation])
+  @@index([isActive])
+  @@index([createdBy])
+  @@map("metric_definitions")
+}

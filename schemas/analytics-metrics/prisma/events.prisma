@@ -1,0 +1,41 @@
+// events: Individual tracked events with device, geo, and campaign context.
+// See README.md for full design rationale.
+
+model Event {
+  id          String    @id @default(uuid())
+  eventTypeId String    @map("event_type_id")
+  userId      String?   @map("user_id")
+  anonymousId String?   @map("anonymous_id")
+  sessionId   String?   @map("session_id")
+  timestamp   DateTime
+  ipAddress   String?   @map("ip_address")
+  userAgent   String?   @map("user_agent")
+  deviceType  String?   @map("device_type")
+  os          String?
+  browser     String?
+  country     String?
+  region      String?
+  city        String?
+  locale      String?
+  referrer    String?
+  campaignId  String?   @map("campaign_id")
+  properties  Json?
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  eventType   EventType  @relation(fields: [eventTypeId], references: [id], onDelete: Restrict)
+  user        User?      @relation("EventUser", fields: [userId], references: [id], onDelete: SetNull)
+  session     Session?   @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+  campaign    Campaign?  @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+
+  properties_ EventProperty[]
+  pageViews   PageView[]
+
+  @@index([eventTypeId])
+  @@index([userId, timestamp])
+  @@index([sessionId])
+  @@index([timestamp])
+  @@index([campaignId])
+  @@index([anonymousId])
+  @@index([country])
+  @@map("events")
+}

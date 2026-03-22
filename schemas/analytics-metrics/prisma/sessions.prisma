@@ -1,0 +1,43 @@
+// sessions: User browsing sessions with device, geo, and engagement metrics.
+// See README.md for full design rationale.
+
+model Session {
+  id          String    @id @default(uuid())
+  userId      String?   @map("user_id")
+  anonymousId String?   @map("anonymous_id")
+  startedAt   DateTime  @map("started_at")
+  endedAt     DateTime? @map("ended_at")
+  duration    Int?
+  pageCount   Int       @default(0) @map("page_count")
+  eventCount  Int       @default(0) @map("event_count")
+  isBounce    Boolean   @default(true) @map("is_bounce")
+  entryUrl    String?   @map("entry_url")
+  exitUrl     String?   @map("exit_url")
+  ipAddress   String?   @map("ip_address")
+  userAgent   String?   @map("user_agent")
+  deviceType  String?   @map("device_type")
+  os          String?
+  browser     String?
+  country     String?
+  region      String?
+  city        String?
+  locale      String?
+  referrer    String?
+  campaignId  String?   @map("campaign_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  user        User?     @relation("SessionUser", fields: [userId], references: [id], onDelete: SetNull)
+  campaign    Campaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+
+  events      Event[]
+  pageViews   PageView[]
+
+  @@index([userId, startedAt])
+  @@index([anonymousId])
+  @@index([startedAt])
+  @@index([campaignId])
+  @@index([country])
+  @@index([isBounce])
+  @@map("sessions")
+}

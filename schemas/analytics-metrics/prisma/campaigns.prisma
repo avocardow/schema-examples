@@ -1,0 +1,26 @@
+// campaigns: Marketing campaign definitions with UTM-style source/medium tracking.
+// See README.md for full design rationale.
+
+model Campaign {
+  id         String   @id @default(uuid())
+  name       String
+  source     String
+  medium     String
+  term       String?
+  content    String?
+  landingUrl String?  @map("landing_url")
+  isActive   Boolean  @default(true) @map("is_active")
+  createdBy  String   @map("created_by")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at")
+
+  creator    User     @relation("CampaignCreator", fields: [createdBy], references: [id], onDelete: Restrict)
+
+  events     Event[]
+  sessions   Session[]
+
+  @@unique([source, medium, name])
+  @@index([isActive])
+  @@index([createdBy])
+  @@map("campaigns")
+}
