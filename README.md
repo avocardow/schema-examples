@@ -39,7 +39,7 @@ See each domain's **Dependencies** section for details.
 | [File Management / Document Storage](./schemas/file-management-document-storage) | 20     | ✅     |
 | [Multi-language / i18n](./schemas/multi-language-i18n)                           | 20     | ✅     |
 | [Analytics / Metrics](./schemas/analytics-metrics)                               | 20     | ✅     |
-| [Content Moderation](./schemas/content-moderation)                               | —      | 🔲     |
+| [Content Moderation](./schemas/content-moderation)                               | 20     | ✅     |
 
 ### Commerce & Marketplace
 
@@ -172,7 +172,7 @@ See each domain's **Dependencies** section for details.
 | [Event Planning](./schemas/event-planning)                                 | —      | 🔲     |
 | [Voting / Polling / Surveys](./schemas/voting-polling-surveys)             | —      | 🔲     |
 
-**57 domains — 5 complete, 52 in progress**
+**57 domains — 6 complete, 51 in progress**
 
 ## How to Use
 

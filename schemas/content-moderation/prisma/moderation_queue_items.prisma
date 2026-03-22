@@ -1,0 +1,71 @@
+// moderation_queue_items: Central moderation queue for content review.
+// See README.md for full design rationale.
+
+enum QueueItemContentType {
+  post
+  comment
+  message
+  user
+  media
+}
+
+enum QueueItemSource {
+  user_report
+  auto_detection
+  manual
+}
+
+enum QueueItemStatus {
+  pending
+  in_review
+  resolved
+  escalated
+}
+
+enum QueueItemPriority {
+  low
+  medium
+  high
+  critical
+}
+
+enum QueueItemResolution {
+  approved
+  removed
+  escalated
+}
+
+model ModerationQueueItem {
+  id                  String              @id @default(uuid())
+  contentType         QueueItemContentType @map("content_type") // What type of content is being reviewed.
+  contentId           String              @map("content_id") // ID of the flagged content. String, not UUID — supports external ID formats.
+  source              QueueItemSource // How this item entered the queue.
+  status              QueueItemStatus     @default(pending)
+  priority            QueueItemPriority   @default(medium)
+  assignedModeratorId String?             @map("assigned_moderator_id")
+  contentSnapshot     Json?               @map("content_snapshot") // Frozen copy of the content at time of flagging. Preserves evidence even if original is edited/deleted.
+  reportCount         Int                 @default(0) @map("report_count") // Denormalized from reports table for queue sorting.
+  resolution          QueueItemResolution? // Final outcome. Null = not yet resolved.
+  resolvedAt          DateTime?           @map("resolved_at") // When the item was resolved. Null = still open.
+  resolvedBy          String?             @map("resolved_by")
+  createdAt           DateTime            @default(now()) @map("created_at")
+  updatedAt           DateTime            @default(now()) @map("updated_at")
+
+  // Relations
+  assignedModerator User? @relation("QueueAssignedModerator", fields: [assignedModeratorId], references: [id], onDelete: SetNull)
+  resolver          User? @relation("QueueResolver", fields: [resolvedBy], references: [id], onDelete: SetNull)
+
+  // Reverse relations
+  reports          Report[]
+  notes            ReportNote[]
+  detectionResults AutoDetectionResult[]
+  actions          ModerationAction[]
+
+  @@index([status, priority, createdAt]) // Primary queue query: pending items by priority, oldest first.
+  @@index([contentType, contentId]) // All queue items for this specific content.
+  @@index([assignedModeratorId]) // My assigned items.
+  @@index([source]) // All auto-detected items vs all user-reported items.
+  @@index([status]) // All pending items.
+  @@index([resolvedAt]) // Time-range queries and metrics.
+  @@map("moderation_queue_items")
+}

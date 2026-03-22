@@ -1,0 +1,54 @@
+// moderation_actions: Enforcement actions taken by moderators or automated systems.
+// See README.md for full design rationale.
+
+enum ModerationActionType {
+  approve
+  remove
+  warn
+  mute
+  ban
+  restrict
+  escalate
+  label
+}
+
+enum ModerationActionTargetType {
+  content
+  user
+  account
+}
+
+model ModerationAction {
+  id                  String                     @id @default(uuid())
+  queueItemId         String?                    @map("queue_item_id")
+  moderatorId         String?                    @map("moderator_id") // Null = automated action.
+  actionType          ModerationActionType       @map("action_type")
+  targetType          ModerationActionTargetType @map("target_type")
+  targetId            String                     @map("target_id") // String for external ID support.
+  reason              String?
+  violationCategoryId String?                    @map("violation_category_id")
+  responseTemplateId  String?                    @map("response_template_id")
+  isAutomated         Boolean                    @default(false) @map("is_automated") // DSA requires tracking automation level.
+  metadata            Json?                      @default("{}")
+  createdAt           DateTime                   @default(now()) @map("created_at") // Actions are immutable. No updated_at.
+
+  // Relations
+  queueItem        ModerationQueueItem? @relation(fields: [queueItemId], references: [id], onDelete: SetNull)
+  moderator        User?                @relation(fields: [moderatorId], references: [id], onDelete: SetNull)
+  violationCategory ViolationCategory?  @relation(fields: [violationCategoryId], references: [id], onDelete: SetNull)
+  responseTemplate ResponseTemplate?    @relation(fields: [responseTemplateId], references: [id], onDelete: SetNull)
+
+  // Reverse relations
+  appeal       Appeal?
+  restrictions UserRestriction[]
+  strikes      Strike[]
+
+  @@index([queueItemId])
+  @@index([moderatorId])
+  @@index([actionType])
+  @@index([targetType, targetId])
+  @@index([violationCategoryId])
+  @@index([isAutomated])
+  @@index([createdAt])
+  @@map("moderation_actions")
+}

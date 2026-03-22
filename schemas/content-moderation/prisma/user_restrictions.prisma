@@ -1,0 +1,48 @@
+// user_restrictions: Active restrictions on user accounts.
+// See README.md for full design rationale.
+
+enum UserRestrictionType {
+  ban
+  mute
+  post_restriction
+  shadow_ban
+  warning
+  probation
+}
+
+enum UserRestrictionScope {
+  global
+  community
+  channel
+}
+
+model UserRestriction {
+  id                 String               @id @default(uuid())
+  userId             String               @map("user_id")
+  restrictionType    UserRestrictionType   @map("restriction_type")
+  scope              UserRestrictionScope  @default(global)
+  scopeId            String?              @map("scope_id")
+  reason             String?
+  moderationActionId String?              @map("moderation_action_id")
+  imposedBy          String               @map("imposed_by")
+  imposedAt          DateTime             @default(now()) @map("imposed_at")
+  expiresAt          DateTime?            @map("expires_at")
+  isActive           Boolean              @default(true) @map("is_active")
+  liftedBy           String?              @map("lifted_by")
+  liftedAt           DateTime?            @map("lifted_at")
+  createdAt          DateTime             @default(now()) @map("created_at")
+  updatedAt          DateTime             @default(now()) @map("updated_at")
+
+  // Relations
+  user             User              @relation("RestrictionUser", fields: [userId], references: [id], onDelete: Cascade)
+  moderationAction ModerationAction? @relation(fields: [moderationActionId], references: [id], onDelete: SetNull)
+  imposer          User              @relation("RestrictionImposer", fields: [imposedBy], references: [id], onDelete: Restrict)
+  lifter           User?             @relation("RestrictionLifter", fields: [liftedBy], references: [id], onDelete: SetNull)
+
+  @@index([userId, isActive])
+  @@index([restrictionType])
+  @@index([scope, scopeId])
+  @@index([expiresAt, isActive])
+  @@index([imposedBy])
+  @@map("user_restrictions")
+}

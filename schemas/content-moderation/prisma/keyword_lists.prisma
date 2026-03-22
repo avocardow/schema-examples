@@ -1,0 +1,42 @@
+// keyword_lists: Managed word/phrase lists for auto-moderation.
+// See README.md for full design rationale.
+
+enum KeywordListType {
+  blocklist
+  allowlist
+  watchlist
+}
+
+enum KeywordListScope {
+  global
+  community
+}
+
+model KeywordList {
+  id          String           @id @default(uuid())
+  name        String // List name (e.g., "Profanity — English", "Competitor URLs").
+  description String? // What this list contains and how it's used.
+
+  // blocklist = content matching these entries is blocked/flagged.
+  // allowlist = entries that override blocklist matches.
+  // watchlist = entries that flag content for review.
+  listType    KeywordListType  @map("list_type")
+
+  scope       KeywordListScope @default(global) @map("scope")
+  scopeId     String?          @map("scope_id") // Community ID. Null when scope = global.
+  isEnabled   Boolean          @default(true) @map("is_enabled")
+  createdBy   String           @map("created_by")
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @default(now()) @map("updated_at")
+
+  // Relations
+  creator     User             @relation(fields: [createdBy], references: [id], onDelete: Restrict)
+
+  // Reverse relations
+  entries     KeywordListEntry[]
+
+  @@index([scope, scopeId])
+  @@index([listType])
+  @@index([isEnabled])
+  @@map("keyword_lists")
+}

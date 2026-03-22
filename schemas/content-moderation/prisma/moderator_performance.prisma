@@ -1,0 +1,23 @@
+// moderator_performance: Pre-aggregated moderator performance metrics.
+// See README.md for full design rationale.
+
+model ModeratorPerformance {
+  id                       String   @id @default(uuid())
+  moderatorId              String   @map("moderator_id")
+  periodStart              DateTime @map("period_start")
+  periodEnd                DateTime @map("period_end")
+  itemsReviewed            Int      @default(0) @map("items_reviewed")
+  itemsActioned            Int      @default(0) @map("items_actioned")
+  averageReviewTimeSeconds Int      @default(0) @map("average_review_time_seconds")
+  appealsOverturned        Int      @default(0) @map("appeals_overturned")
+  accuracyScore            Float    @default(1.0) @map("accuracy_score")
+  computedAt               DateTime @default(now()) @map("computed_at")
+  createdAt                DateTime @default(now()) @map("created_at")
+
+  // Relations
+  moderator User @relation(fields: [moderatorId], references: [id], onDelete: Cascade)
+
+  @@unique([moderatorId, periodStart, periodEnd])
+  @@index([periodStart, periodEnd])
+  @@map("moderator_performance")
+}

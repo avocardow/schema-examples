@@ -1,0 +1,32 @@
+// blocked_domains: Domain-level content blocking.
+// See README.md for full design rationale.
+
+enum BlockedDomainBlockType {
+  full
+  media_only
+  report_reject
+}
+
+model BlockedDomain {
+  id             String                 @id @default(uuid())
+  domain         String                 @unique // The blocked domain (e.g., "spam-site.com").
+
+  // full = all content from this domain is blocked.
+  // media_only = text content allowed, media rejected.
+  // report_reject = reports from this domain's users are ignored.
+  blockType      BlockedDomainBlockType @default(full) @map("block_type")
+
+  reason         String? // Why this domain was blocked.
+  publicComment  String?                @map("public_comment") // Comment visible to users about why the domain is blocked.
+  privateComment String?                @map("private_comment") // Internal moderator note. Not visible to users.
+  createdBy      String                 @map("created_by")
+  createdAt      DateTime               @default(now()) @map("created_at")
+  updatedAt      DateTime               @default(now()) @map("updated_at")
+
+  // Relations
+  creator User @relation(fields: [createdBy], references: [id], onDelete: Restrict)
+
+  @@index([blockType])
+  @@index([createdBy])
+  @@map("blocked_domains")
+}

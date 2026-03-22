@@ -1,0 +1,54 @@
+// reports: User-submitted content reports.
+// See README.md for full design rationale.
+
+enum ReportContentType {
+  post
+  comment
+  message
+  user
+  media
+}
+
+enum ReportCategory {
+  spam
+  harassment
+  hate_speech
+  violence
+  sexual_content
+  illegal
+  misinformation
+  self_harm
+  other
+}
+
+enum ReportStatus {
+  pending
+  reviewed
+  dismissed
+}
+
+model Report {
+  id          String            @id @default(uuid())
+  reporterId  String            @map("reporter_id")
+  contentType ReportContentType @map("content_type")
+  contentId   String            @map("content_id")
+  queueItemId String?           @map("queue_item_id")
+  category    ReportCategory
+  reasonText  String?           @map("reason_text")
+  policyId    String?           @map("policy_id")
+  status      ReportStatus      @default(pending)
+  createdAt   DateTime          @default(now()) @map("created_at")
+
+  // Relations
+  reporter  User                 @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+  queueItem ModerationQueueItem? @relation(fields: [queueItemId], references: [id], onDelete: SetNull)
+  policy    ModerationPolicy?    @relation(fields: [policyId], references: [id], onDelete: SetNull)
+
+  @@index([queueItemId])
+  @@index([reporterId])
+  @@index([contentType, contentId])
+  @@index([status])
+  @@index([category])
+  @@index([createdAt])
+  @@map("reports")
+}

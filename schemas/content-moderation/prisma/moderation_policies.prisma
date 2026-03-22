@@ -1,0 +1,32 @@
+// moderation_policies: Community/platform rule definitions.
+// See README.md for full design rationale.
+
+enum ModerationPolicyScope {
+  global
+  community
+  channel
+}
+
+model ModerationPolicy {
+  id                  String               @id @default(uuid())
+  scope               ModerationPolicyScope @default(global) @map("scope")
+  scopeId             String?              @map("scope_id") // ID of the community/channel. Null when scope = global.
+  title               String // Short policy title (e.g., "No Hate Speech").
+  description         String // Full policy text explaining what's prohibited and why.
+  violationCategoryId String?              @map("violation_category_id")
+  sortOrder           Int                  @default(0) @map("sort_order") // Display ordering within the scope.
+  isActive            Boolean              @default(true) @map("is_active") // Soft-disable without deleting.
+  createdAt           DateTime             @default(now()) @map("created_at")
+  updatedAt           DateTime             @default(now()) @map("updated_at")
+
+  // Relations
+  violationCategory ViolationCategory? @relation(fields: [violationCategoryId], references: [id], onDelete: SetNull)
+
+  // Reverse relations
+  reports Report[]
+
+  @@index([scope, scopeId])
+  @@index([violationCategoryId])
+  @@index([isActive])
+  @@map("moderation_policies")
+}

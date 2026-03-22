@@ -1,0 +1,18 @@
+// report_notes: Internal moderator notes on queue items.
+// See README.md for full design rationale.
+
+model ReportNote {
+  id           String   @id @default(uuid())
+  queueItemId  String   @map("queue_item_id")
+  moderatorId  String   @map("moderator_id")
+  content      String                        // The note text. Internal-only, never shown to the reported user.
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  // Relations
+  queueItem ModerationQueueItem @relation(fields: [queueItemId], references: [id], onDelete: Cascade)
+  moderator User                @relation(fields: [moderatorId], references: [id], onDelete: Restrict)
+
+  @@index([queueItemId])
+  @@index([moderatorId])
+  @@map("report_notes")
+}

@@ -1,0 +1,46 @@
+// auto_detection_results: Automated content analysis results.
+// See README.md for full design rationale.
+
+enum DetectionResultContentType {
+  post
+  comment
+  message
+  user
+  media
+}
+
+enum DetectionMethod {
+  ml_classifier
+  hash_match
+  keyword
+  regex
+  blocklist
+}
+
+model AutoDetectionResult {
+  id              String                     @id @default(uuid())
+  contentType     DetectionResultContentType  @map("content_type")
+  contentId       String                     @map("content_id") // What was analyzed.
+  queueItemId     String?                    @map("queue_item_id") // Queue item created/updated by this detection.
+  detectionMethod DetectionMethod            @map("detection_method") // Type of detection that produced this result.
+  detectionSource String                     @map("detection_source") // Specific detector name (e.g., "perspective", "openai", "photodna").
+  category        String?                    // Detected violation category (e.g., "toxicity", "hate_speech", "csam_hash_match").
+  confidenceScore Float?                     @map("confidence_score") // Detection confidence, 0.00 to 1.00. Nullable: some methods (keyword match) are binary, not scored.
+  matchedValue    String?                    @map("matched_value") // What triggered the match (keyword, regex pattern, hash ID). Null for ml_classifier.
+  isActionable    Boolean                    @default(false) @map("is_actionable") // Whether this result met the threshold for automated action.
+  metadata        Json?                      @default("{}") // Detection-specific extra data (per-category scores, hash distances, etc.).
+  ruleId          String?                    @map("rule_id") // The rule that triggered this detection, if applicable.
+  createdAt       DateTime                   @default(now()) @map("created_at") // Detections are immutable. No updated_at.
+
+  // Relations
+  queueItem ModerationQueueItem? @relation(fields: [queueItemId], references: [id], onDelete: SetNull)
+  rule      ModerationRule?      @relation(fields: [ruleId], references: [id], onDelete: SetNull)
+
+  @@index([contentType, contentId])
+  @@index([queueItemId])
+  @@index([detectionMethod])
+  @@index([detectionSource])
+  @@index([isActionable])
+  @@index([createdAt])
+  @@map("auto_detection_results")
+}

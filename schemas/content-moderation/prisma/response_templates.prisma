@@ -1,0 +1,45 @@
+// response_templates: Pre-written response messages for moderator actions.
+// See README.md for full design rationale.
+
+enum ResponseTemplateActionType {
+  approve
+  remove
+  warn
+  mute
+  ban
+  restrict
+  escalate
+  label
+}
+
+enum ResponseTemplateScope {
+  global
+  community
+}
+
+model ResponseTemplate {
+  id                  String                      @id @default(uuid())
+  name                String // Internal template name (e.g., "Spam Removal — First Offense").
+  actionType          ResponseTemplateActionType?  @map("action_type") // Null = usable with any action type.
+  content             String // Template text. May include placeholders like {{username}}, {{rule}}, {{appeal_url}}.
+  violationCategoryId String?                      @map("violation_category_id")
+  scope               ResponseTemplateScope        @default(global) @map("scope")
+  scopeId             String?                      @map("scope_id") // Community ID. Null when scope = global.
+  isActive            Boolean                      @default(true) @map("is_active")
+  createdBy           String                       @map("created_by")
+  createdAt           DateTime                     @default(now()) @map("created_at")
+  updatedAt           DateTime                     @default(now()) @map("updated_at")
+
+  // Relations
+  violationCategory ViolationCategory? @relation(fields: [violationCategoryId], references: [id], onDelete: SetNull)
+  creator           User               @relation(fields: [createdBy], references: [id], onDelete: Restrict)
+
+  // Reverse relations
+  actions ModerationAction[]
+
+  @@index([scope, scopeId])
+  @@index([actionType])
+  @@index([violationCategoryId])
+  @@index([isActive])
+  @@map("response_templates")
+}

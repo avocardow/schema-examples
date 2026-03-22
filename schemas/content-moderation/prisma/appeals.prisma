@@ -1,0 +1,31 @@
+// appeals: User appeals against moderation actions.
+// See README.md for full design rationale.
+
+enum AppealStatus {
+  pending
+  approved
+  rejected
+}
+
+model Appeal {
+  id                  String       @id @default(uuid())
+  moderationActionId  String       @unique @map("moderation_action_id")
+  appellantId         String       @map("appellant_id")
+  appealText          String       @map("appeal_text")
+  status              AppealStatus @default(pending)
+  reviewerId          String?      @map("reviewer_id")
+  reviewerNotes       String?      @map("reviewer_notes")
+  reviewedAt          DateTime?    @map("reviewed_at")
+  createdAt           DateTime     @default(now()) @map("created_at")
+
+  // Relations
+  moderationAction ModerationAction @relation(fields: [moderationActionId], references: [id], onDelete: Restrict)
+  appellant        User             @relation("AppealAppellant", fields: [appellantId], references: [id], onDelete: Cascade)
+  reviewer         User?            @relation("AppealReviewer", fields: [reviewerId], references: [id], onDelete: SetNull)
+
+  @@index([appellantId])
+  @@index([status])
+  @@index([reviewerId])
+  @@index([createdAt])
+  @@map("appeals")
+}

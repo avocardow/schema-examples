@@ -1,0 +1,53 @@
+// moderation_rules: Configurable auto-moderation rules.
+// See README.md for full design rationale.
+
+enum ModerationRuleScope {
+  global
+  community
+  channel
+}
+
+enum ModerationRuleTriggerType {
+  keyword
+  regex
+  ml_score
+  hash_match
+  mention_spam
+  user_attribute
+}
+
+enum ModerationRuleActionType {
+  block
+  flag
+  hold
+  timeout
+  notify
+}
+
+model ModerationRule {
+  id            String                     @id @default(uuid())
+  name          String // Human-readable rule name (e.g., "Block Profanity", "Flag Toxicity > 0.8").
+  description   String? // What this rule does and why it exists.
+  scope         ModerationRuleScope        @default(global)
+  scopeId       String?                    @map("scope_id") // Community/channel ID. Null when scope = global.
+  triggerType   ModerationRuleTriggerType  @map("trigger_type")
+  triggerConfig Json                       @map("trigger_config") // Trigger-specific configuration (keyword lists, regex patterns, ML thresholds, etc.).
+  actionType    ModerationRuleActionType   @map("action_type")
+  actionConfig  Json?                      @default("{}") @map("action_config") // Action-specific parameters (timeout duration, notification channel, custom message, etc.).
+  priority      Int                        @default(0) // Rule evaluation order. Higher = evaluated first. First matching rule wins.
+  isEnabled     Boolean                    @default(true) @map("is_enabled") // Disable without deleting.
+  createdBy     String                     @map("created_by")
+  createdAt     DateTime                   @default(now()) @map("created_at")
+  updatedAt     DateTime                   @default(now()) @map("updated_at")
+
+  // Relations
+  creator User @relation(fields: [createdBy], references: [id], onDelete: Restrict)
+
+  // Reverse relations
+  detectionResults AutoDetectionResult[]
+
+  @@index([scope, scopeId, isEnabled])
+  @@index([triggerType])
+  @@index([isEnabled, priority])
+  @@map("moderation_rules")
+}

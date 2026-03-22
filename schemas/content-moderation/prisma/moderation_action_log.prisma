@@ -1,0 +1,24 @@
+// moderation_action_log: Immutable audit trail of moderation events.
+// See README.md for full design rationale.
+
+model ModerationActionLog {
+  id          String   @id @default(uuid())
+  actorId     String   @map("actor_id")
+
+  actionType  String   @map("action_type")  // Intentionally not an enum — new action types should not require schema migration.
+  targetType  String   @map("target_type")  // Polymorphic: "queue_item", "report", "user", "moderation_rule", "policy", etc.
+  targetId    String   @map("target_id")    // Not a FK — target may span multiple tables.
+
+  details     Json?                         // Event-specific context (e.g., action_taken: {"action_type": "ban", "reason": "..."}).
+  ipAddress   String?  @map("ip_address")   // Client IP address for security audit.
+  createdAt   DateTime @default(now()) @map("created_at") // Immutable. Log entries are append-only.
+
+  // Relations
+  actor User @relation(fields: [actorId], references: [id], onDelete: Restrict)
+
+  @@index([actorId])
+  @@index([actionType])
+  @@index([targetType, targetId])
+  @@index([createdAt])
+  @@map("moderation_action_log")
+}

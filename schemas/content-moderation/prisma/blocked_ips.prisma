@@ -1,0 +1,32 @@
+// blocked_ips: IP-level access blocking.
+// See README.md for full design rationale.
+
+enum BlockedIpSeverity {
+  sign_up_block
+  login_block
+  full_block
+}
+
+model BlockedIp {
+  id        String            @id @default(uuid())
+  ipAddress String            @unique @map("ip_address") // IP address or CIDR range (e.g., "192.168.1.100", "10.0.0.0/8").
+
+  // sign_up_block = prevent new account creation from this IP.
+  // login_block = prevent login from this IP.
+  // full_block = block all access from this IP.
+  severity  BlockedIpSeverity @default(full_block) @map("severity")
+
+  reason    String? // Why this IP was blocked.
+  expiresAt DateTime?         @map("expires_at") // When this block expires. Null = permanent.
+  createdBy String            @map("created_by")
+  createdAt DateTime          @default(now()) @map("created_at")
+  updatedAt DateTime          @default(now()) @map("updated_at")
+
+  // Relations
+  creator User @relation(fields: [createdBy], references: [id], onDelete: Restrict)
+
+  @@index([severity])
+  @@index([expiresAt])
+  @@index([createdBy])
+  @@map("blocked_ips")
+}
