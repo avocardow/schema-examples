@@ -74,7 +74,16 @@ Which pattern(s) the schema will adopt and why.
      (field names, types, key constraints) to bridge from research to pseudo code.
      IMPORTANT: This table list IS the final table list for the domain. Every table listed here
      will be implemented in pseudo code and all 7 formats. Do not reduce, collapse, or merge
-     tables in Step 2 to hit a target number. Do not add tables not listed here. -->
+     tables in Step 2 to hit a target number. Do not add tables not listed here.
+
+     Before finalizing this list, apply two filters to every table:
+     1. DEPENDENCY TEST: Would another domain own this table? (e.g., users → auth-rbac,
+        projects → project-management, payments → billing). If yes, don't include it —
+        reference it as an external FK dependency instead.
+     2. USER VALUE TEST: Would a developer building an app that *uses* this domain actually
+        need this table? Or does it only make sense if you're building the SaaS platform
+        studied in research? (e.g., TMS task assignment, billing plan tiers, analytics
+        dashboard configs are platform features, not domain data.) If platform-only, exclude it. -->
 
 ### Category 1
 - `table_name` — brief description

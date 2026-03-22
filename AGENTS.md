@@ -26,6 +26,14 @@ Pay attention to: how pseudo code maps to each format, comment conventions, Pris
 
 **⚠️ Common failure mode:** Agents say "I need to refine to N" and start collapsing well-researched tables to hit a round number. This is exactly wrong. Never merge, collapse, or remove tables from your research to reach a specific count. Never add filler tables to inflate the count either. The research output is the table list — do not adjust it.
 
+**Apply the dependency test to every table.** Before finalizing your table list, ask two questions about each table:
+
+1. **"Would this table be owned by a different domain?"** — If another domain in this project would naturally own this concept (e.g., `users` belongs to auth-rbac, `projects` belongs to project-management, `payments` belongs to billing), then reference it as an external FK dependency — don't recreate it. Use generic names like `users(id)` as FKs and list the dependency in the README's Dependencies section.
+
+2. **"Is this table actually useful for users building real apps?"** — Users adopt these schemas to build applications, not to rebuild the SaaS platforms we studied in research. A table that exists in Crowdin/Stripe/Datadog doesn't automatically belong in the schema. Ask: would a developer building an app that *uses* this domain actually need this table, or is it admin/platform infrastructure? Tables that only make sense if you're building the platform itself (e.g., TMS task assignment, billing plan management, analytics dashboard configuration) should be excluded.
+
+These two filters — dependency ownership and user value — prevent scope creep and keep schemas composable.
+
 ## The Proven Workflow
 
 Every domain follows these steps **strictly in order**. Do not skip ahead — each step's output is the input for the next. **After completing each step, stop and re-read this workflow section before proceeding to the next step.** Do not chain steps together in one continuous run.
@@ -41,6 +49,8 @@ Every domain follows these steps **strictly in order**. Do not skip ahead — ea
 Write findings to `RESEARCH.md` (gitignored — use `schemas/_template/RESEARCH.md` as your starting structure). Use web search to find official documentation, open-source implementations, and API references. Study at least 5-10 real implementations — examine overlaps, differences, best practices, and industry standards. For each implementation, document what they got right and what could be improved. Also identify relevant standards/specifications (RFCs, industry formats) that inform the schema design. End with a clear consensus recommendation on which patterns to adopt and a decision matrix for every significant design choice.
 
 The table list and table count must emerge from this research — not from preconceptions or other domains' patterns.
+
+Before finalizing the table list, apply the **dependency test** and **user value test** from [Before You Start](#before-you-start) to every table. Remove tables that belong to other domains (reference them as external FKs instead) and tables that are only useful for building the platform itself rather than apps that use the domain.
 
 **⛔ STOP after this step.** Confirm `RESEARCH.md` is complete before moving to Step 2. The README.md must not exist yet.
 
@@ -210,7 +220,15 @@ Format guide conventions take precedence over pseudo code for index optimization
 
 ### Cross-Domain Dependencies
 
-Most domains depend on [Auth / RBAC](./schemas/auth-rbac) for `users`. Each format handles external references the same way it handles internal ones — see `schemas/_template/{format}/README.md` for the pattern. If the dependency domain isn't complete yet, use the same patterns — the FK resolves once both are implemented.
+Most domains depend on [Auth / RBAC](./schemas/auth-rbac) for `users`. Some domains may depend on others for `projects`, `teams`, `payments`, etc. **Never recreate a table that belongs to another domain** — reference it as an external FK instead.
+
+How to handle dependencies:
+- **README Dependencies section:** List each external domain and the tables/columns referenced (see any completed domain for the format).
+- **FK references:** Use the external table name in pseudo code and all formats (e.g., `references users(id)`). The FK resolves once both domains are implemented.
+- **Format files:** Each format handles external references the same way it handles internal ones — see `schemas/_template/{format}/README.md` for the pattern.
+- **Prisma:** External models don't need reverse relations in your domain files (the dependency domain owns those).
+
+Common dependencies: `users` (auth-rbac), `files` (file-management), `locales` (i18n). If you're unsure whether a table is a dependency or belongs in your domain, apply the ownership test: which domain would a user expect to find this table in?
 
 ## Audit Checklist
 
