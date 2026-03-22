@@ -1,0 +1,42 @@
+// email_suppression_list: Email addresses that should not be sent to.
+// See README.md for full design rationale and field documentation.
+
+enum SuppressionReason {
+  hard_bounce
+  soft_bounce
+  spam_complaint
+  manual_unsubscribe
+  invalid_address
+}
+
+enum SuppressionSource {
+  provider_webhook
+  user_action
+  admin
+  system
+}
+
+model EmailSuppressionEntry {
+  id            String            @id @default(uuid())
+
+  email         String // Lowercase, trimmed.
+
+  reason        SuppressionReason // Why this address is suppressed.
+  source        SuppressionSource // How this suppression was created.
+
+  channelId     String?           @map("channel_id") // Which provider reported the suppression (for webhook-sourced entries).
+
+  details       Json? // Provider-specific details for debugging.
+
+  suppressedAt  DateTime          @default(now()) @map("suppressed_at") // When the suppression took effect. May differ from created_at if back-dated.
+  expiresAt     DateTime?         @map("expires_at") // Null = permanent suppression. Set for soft bounces that should be retried.
+  createdAt     DateTime          @default(now()) @map("created_at")
+
+  channel       NotificationChannel? @relation(fields: [channelId], references: [id], onDelete: SetNull)
+
+  @@unique([email, reason])
+  @@index([email])
+  @@index([reason])
+  @@index([expiresAt])
+  @@map("email_suppression_list")
+}

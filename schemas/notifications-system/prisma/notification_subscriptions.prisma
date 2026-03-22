@@ -1,0 +1,23 @@
+// notification_subscriptions: Links users to topics for fan-out delivery with per-channel granularity.
+// When a notification targets a topic, the system looks up all subscriptions and creates a notification per subscriber.
+// See README.md for full design rationale and field documentation.
+
+model NotificationSubscription {
+  id          String       @id @default(uuid())
+  userId      String       @map("user_id")
+  topicId     String       @map("topic_id")
+
+  // Channel scope: null = subscribed on all channels.
+  // Set to a specific channel to subscribe only that channel.
+  channelType ChannelType? @map("channel_type")
+
+  createdAt   DateTime     @default(now()) @map("created_at")
+
+  user  User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topic NotificationTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, topicId, channelType])
+  @@index([topicId])
+  @@index([userId])
+  @@map("notification_subscriptions")
+}

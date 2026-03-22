@@ -1,0 +1,37 @@
+// notification_preference_defaults: System-level and tenant-level default preferences.
+// Base layers of the three-tier preference hierarchy: system defaults → tenant defaults → user overrides.
+// See README.md for full design rationale and field documentation.
+
+enum PreferenceScope {
+  system
+  tenant
+}
+
+model NotificationPreferenceDefault {
+  id          String          @id @default(uuid())
+
+  // "system" = applies to all users platform-wide. "tenant" = applies within a specific org/tenant.
+  scope       PreferenceScope
+
+  // The tenant/org ID. Null when scope = "system".
+  // Not a FK — keeps this domain portable across orgs, workspaces, teams, etc.
+  scopeId     String?         @map("scope_id")
+
+  // Category scope: null = global preference (applies to all categories without a specific default).
+  categoryId  String?         @map("category_id")
+
+  // Channel scope: null = all channels (applies to all channels without a specific default).
+  channelType ChannelType?    @map("channel_type")
+
+  enabled     Boolean
+
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+
+  category NotificationCategory? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([scope, scopeId, categoryId, channelType])
+  @@index([scope, scopeId])
+  @@index([scope])
+  @@map("notification_preference_defaults")
+}

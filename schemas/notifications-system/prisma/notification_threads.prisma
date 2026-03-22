@@ -1,0 +1,28 @@
+// notification_threads: Thread-level state for grouping related notifications.
+// Provides per-thread read tracking, thread-level metadata (title, icon), and efficient "threads with unread" queries.
+// See README.md for full design rationale and field documentation.
+
+model NotificationThread {
+  id                String    @id @default(uuid())
+
+  // Matches notification_events.thread_key. All events with this thread_key belong to this thread.
+  threadKey         String    @unique @map("thread_key")
+
+  // Thread metadata: displayed in the thread list UI.
+  title             String?
+  icon              String?
+  categoryId        String?   @map("category_id")
+
+  // Counter cache: avoids COUNT(*) on every thread list render. Updated by your app when notifications are created.
+  notificationCount Int       @default(0) @map("notification_count")
+
+  lastActivityAt    DateTime? @map("last_activity_at")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  category          NotificationCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@index([categoryId])
+  @@index([lastActivityAt])
+  @@map("notification_threads")
+}

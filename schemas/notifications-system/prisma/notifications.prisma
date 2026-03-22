@@ -1,0 +1,48 @@
+// notifications: Per-recipient notification record — one row per recipient per event.
+// Tracks delivery status (provider handoff) and engagement status (user interaction) as separate concerns.
+// See README.md for full design rationale and field documentation.
+
+enum DeliveryStatus {
+  pending
+  queued
+  sent
+  delivered
+  failed
+  canceled
+}
+
+model Notification {
+  id              String                      @id @default(uuid())
+  eventId         String                      @map("event_id")
+
+  // Polymorphic recipient: NOT a FK. Recipients can be any entity type (user, team, organization).
+  recipientType   String                      @map("recipient_type")
+  recipientId     String                      @map("recipient_id")
+
+  reason          String?
+
+  deliveryStatus  DeliveryStatus              @default(pending) @map("delivery_status")
+
+  // Engagement status: nullable timestamps that can coexist.
+  seenAt          DateTime?                   @map("seen_at")
+  readAt          DateTime?                   @map("read_at")
+  interactedAt    DateTime?                   @map("interacted_at")
+  archivedAt      DateTime?                   @map("archived_at")
+
+  expiresAt       DateTime?                   @map("expires_at")
+  createdAt       DateTime                    @default(now()) @map("created_at")
+  updatedAt       DateTime                    @updatedAt @map("updated_at")
+
+  event           NotificationEvent           @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  // Reverse relations
+  deliveryAttempts NotificationDeliveryAttempt[]
+
+  @@index([eventId])
+  @@index([recipientType, recipientId, readAt])
+  @@index([recipientType, recipientId, createdAt])
+  @@index([recipientType, recipientId, seenAt])
+  @@index([deliveryStatus])
+  @@index([expiresAt])
+  @@map("notifications")
+}

@@ -1,0 +1,28 @@
+// notification_preferences: Per-user opt-in/opt-out controls for notification categories and channels.
+// User layer of the three-tier preference hierarchy: system defaults → tenant defaults → user overrides.
+// See README.md for full design rationale and field documentation.
+
+model NotificationPreference {
+  id          String       @id @default(uuid())
+  userId      String       @map("user_id")
+
+  // Category scope: null = global preference (applies to all categories without a specific preference).
+  categoryId  String?      @map("category_id")
+
+  // Channel scope: null = all channels (applies to all channels without a specific preference).
+  channelType ChannelType? @map("channel_type")
+
+  // true = opted in, false = opted out. Does NOT override is_required categories.
+  enabled     Boolean
+
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+
+  user     User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category NotificationCategory? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, categoryId, channelType])
+  @@index([userId])
+  @@index([userId, categoryId])
+  @@map("notification_preferences")
+}

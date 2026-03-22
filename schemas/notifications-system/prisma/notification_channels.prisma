@@ -1,0 +1,30 @@
+// notification_channels: Configured delivery provider instances for each channel type.
+// See README.md for full design rationale and field documentation.
+
+model NotificationChannel {
+  id          String      @id @default(uuid())
+
+  channelType ChannelType @map("channel_type") // email, sms, push, in_app, chat, webhook.
+
+  provider    String // e.g., 'sendgrid', 'twilio', 'fcm', 'slack', 'custom'.
+  name        String // Display name (e.g., "SendGrid Production", "Twilio SMS").
+
+  credentials Json // ⚠️ Must be encrypted at rest. Contains API keys, auth tokens, webhook secrets.
+
+  isActive    Boolean     @default(true) @map("is_active") // Toggle provider on/off without deleting config.
+  isPrimary   Boolean     @default(false) @map("is_primary") // Default provider for this channel type.
+  priority    Int         @default(0) // Failover priority: lower = higher priority.
+
+  config      Json?       @default("{}") // Provider-specific configuration beyond credentials.
+
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  deliveryAttempts  NotificationDeliveryAttempt[]
+  suppressionEntries EmailSuppressionEntry[]
+
+  @@index([channelType, isActive])
+  @@index([channelType, isPrimary])
+  @@index([channelType, priority])
+  @@map("notification_channels")
+}

@@ -1,0 +1,47 @@
+// device_tokens: Push notification device tokens and web push subscriptions.
+// See README.md for full design rationale and field documentation.
+
+enum Platform {
+  ios
+  android
+  web
+  macos
+  windows
+}
+
+model DeviceToken {
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+
+  platform      Platform // Which type of device/browser this token is for.
+  token         String         // Opaque push token from FCM, APNs, or web push endpoint URL.
+  provider      String         // e.g., "fcm", "apns", "web_push", "onesignal", "expo".
+
+  appId         String?   @map("app_id") // e.g., Firebase project ID, APNs bundle ID. Null if only one app.
+
+  // Web Push specific fields (RFC 8030 / VAPID). Null for native push tokens.
+  p256dhKey     String?   @map("p256dh_key")  // ECDH P-256 public key from the browser.
+  authKey       String?   @map("auth_key")    // 16-byte authentication secret from the browser.
+  endpointUrl   String?   @map("endpoint_url") // Web push endpoint URL.
+
+  // Device metadata.
+  deviceName    String?   @map("device_name")  // e.g., "iPhone 15 Pro", "Chrome on MacBook".
+  deviceModel   String?   @map("device_model") // e.g., "iPhone15,3", "Pixel 8".
+  osVersion     String?   @map("os_version")   // e.g., "17.2", "14".
+  appVersion    String?   @map("app_version")  // e.g., "2.1.0".
+
+  isActive      Boolean   @default(true) @map("is_active") // False when provider reports token as invalid.
+  lastUsedAt    DateTime? @map("last_used_at") // When a push was last successfully sent to this token.
+  expiresAt     DateTime? @map("expires_at")   // Some tokens have explicit expiry. Null = no known expiry.
+
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, platform, isActive])
+  @@index([token, provider])
+  @@index([isActive, lastUsedAt])
+  @@map("device_tokens")
+}

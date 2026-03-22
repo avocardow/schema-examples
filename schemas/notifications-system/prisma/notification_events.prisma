@@ -1,0 +1,41 @@
+// notification_events: Immutable event records — the trigger that causes notifications to be sent.
+// One row per occurrence. Per-recipient state lives in the notifications table.
+// Uses polymorphic actor/target (not FKs) so events survive entity deletion.
+// See README.md for full design rationale and field documentation.
+
+model NotificationEvent {
+  id              String    @id @default(uuid())
+  categoryId      String    @map("category_id")
+
+  // Polymorphic actor: who/what triggered this event (Activity Streams 2.0 pattern).
+  actorType       String?   @map("actor_type")
+  actorId         String?   @map("actor_id")
+
+  // Polymorphic target: what was acted upon.
+  targetType      String?   @map("target_type")
+  targetId        String?   @map("target_id")
+
+  // Threading: lightweight grouping for related events.
+  threadKey       String?   @map("thread_key")
+
+  workflowId      String?   @map("workflow_id")
+
+  data            Json?     @default("{}") @map("data")
+  idempotencyKey  String?   @unique @map("idempotency_key")
+  expiresAt       DateTime? @map("expires_at")
+  createdAt       DateTime  @default(now()) @map("created_at") // Immutable. Events are append-only.
+
+  category        NotificationCategory  @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  workflow        NotificationWorkflow? @relation(fields: [workflowId], references: [id], onDelete: SetNull)
+
+  // Reverse relations
+  notifications   Notification[]
+  workflowRuns    NotificationWorkflowRun[]
+
+  @@index([categoryId])
+  @@index([actorType, actorId])
+  @@index([targetType, targetId])
+  @@index([threadKey])
+  @@index([createdAt])
+  @@map("notification_events")
+}

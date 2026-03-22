@@ -1,0 +1,37 @@
+// notification_categories: Classification of notification types for user preferences and feed routing.
+// Every event belongs to exactly one category. Categories are defined by the app developer, not users.
+// See README.md for full design rationale and field documentation.
+
+model NotificationCategory {
+  id            String   @id @default(uuid())
+  name          String // Display name (e.g., "Comments", "Billing", "Security Alerts").
+  slug          String   @unique // Identifier used in code and API (e.g., "comments", "billing", "security").
+  description   String?
+  color         String? // Hex color for UI display (e.g., "#3B82F6").
+  icon          String? // Icon identifier or URL for UI display.
+
+  // Critical/required notifications bypass user preferences entirely.
+  // Users cannot opt out of required categories.
+  isRequired    Boolean  @default(false) @map("is_required")
+
+  // Default feed: where notifications appear if no category_feeds mapping exists.
+  // Null = no default feed (must be explicitly mapped via notification_category_feeds).
+  defaultFeedId String?  @map("default_feed_id")
+
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @default(now()) @updatedAt @map("updated_at")
+
+  defaultFeed        NotificationFeed?             @relation(fields: [defaultFeedId], references: [id], onDelete: SetNull)
+
+  // Reverse relations
+  events             NotificationEvent[]
+  templates          NotificationTemplate[]
+  threads            NotificationThread[]
+  categoryFeeds      NotificationCategoryFeed[]
+  preferences        NotificationPreference[]
+  preferenceDefaults NotificationPreferenceDefault[]
+  workflows          NotificationWorkflow[]
+
+  @@index([isRequired])
+  @@map("notification_categories")
+}

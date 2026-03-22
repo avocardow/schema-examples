@@ -1,0 +1,42 @@
+// notification_workflow_steps: Individual steps within a workflow, executed in order by step_order.
+// See README.md for full design rationale and field documentation.
+
+enum WorkflowStepType {
+  channel   // Deliver to a specific channel.
+  delay     // Wait for a duration before proceeding.
+  digest    // Batch/accumulate events within a time window.
+  condition // Evaluate a rule; skip remaining steps if false.
+  throttle  // Limit delivery frequency (e.g., max 1 per hour).
+}
+
+model NotificationWorkflowStep {
+  id               String      @id @default(uuid())
+  workflowId       String      @map("workflow_id")
+
+  // Execution order within the workflow. Steps run in ascending order.
+  stepOrder        Int         @map("step_order")
+
+  stepType         WorkflowStepType @map("step_type")
+
+  // For channel steps: which channel type to deliver to. Null for non-channel step types.
+  channelType      ChannelType? @map("channel_type")
+
+  // Step configuration as JSON. Schema depends on step_type.
+  config           Json?       @default("{}") @map("config")
+
+  // Should the workflow stop if this step fails?
+  // true = abort remaining steps (fail-fast). false = continue to next step (best-effort).
+  shouldStopOnFail Boolean     @default(false) @map("should_stop_on_fail")
+
+  createdAt        DateTime    @default(now()) @map("created_at")
+  updatedAt        DateTime    @default(now()) @updatedAt @map("updated_at")
+
+  workflow         NotificationWorkflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+  // Reverse relations
+  errorRuns        NotificationWorkflowRun[] // Runs that failed at this step (via error_step_id).
+
+  @@unique([workflowId, stepOrder])
+  @@index([workflowId])
+  @@map("notification_workflow_steps")
+}

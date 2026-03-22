@@ -1,0 +1,34 @@
+// notification_template_contents: Per-channel content variants for a template.
+// Each channel gets its own content definition with channel-specific metadata.
+// See README.md for full design rationale and field documentation.
+
+enum ChannelType {
+  email
+  sms
+  push
+  in_app
+  chat
+  webhook
+}
+
+model NotificationTemplateContent {
+  id          String      @id @default(uuid())
+  templateId  String      @map("template_id")
+
+  channelType ChannelType @map("channel_type")
+
+  subject     String? // Email subject, push title. Not applicable for SMS or webhook.
+  body        String
+
+  // Channel-specific metadata (provider-specific fields, CTA blocks, etc.).
+  metadata    Json?       @default("{}")
+
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  template    NotificationTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  @@unique([templateId, channelType])
+  @@index([templateId])
+  @@map("notification_template_contents")
+}

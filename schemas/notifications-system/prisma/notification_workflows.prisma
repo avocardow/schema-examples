@@ -1,0 +1,36 @@
+// notification_workflows: Orchestration definitions for multi-step notification delivery.
+// See README.md for full design rationale and field documentation.
+
+model NotificationWorkflow {
+  id                 String   @id @default(uuid())
+  name               String // Display name (e.g., "Comment Notification", "Weekly Digest").
+  slug               String   @unique // Identifier used in code and API (e.g., "comment_notification").
+  description        String?
+
+  // Link to the category this workflow handles.
+  // A category can have multiple workflows (e.g., immediate + digest versions).
+  categoryId         String?  @map("category_id")
+
+  // Critical workflows bypass user preferences entirely.
+  // Use sparingly: security alerts, billing failures, legal notices.
+  isCritical         Boolean  @default(false) @map("is_critical")
+
+  isActive           Boolean  @default(true) @map("is_active") // Toggle a workflow without deleting it.
+
+  // The trigger identifier: what your app code calls to fire this workflow.
+  triggerIdentifier  String   @unique @map("trigger_identifier") // Must be unique. Used in API/SDK calls.
+
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @default(now()) @updatedAt @map("updated_at")
+
+  category           NotificationCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  // Reverse relations
+  steps              NotificationWorkflowStep[]
+  runs               NotificationWorkflowRun[]
+  events             NotificationEvent[]
+
+  @@index([categoryId])
+  @@index([isActive])
+  @@map("notification_workflows")
+}

@@ -1,0 +1,46 @@
+// notification_delivery_attempts: Per-notification, per-channel delivery attempt log.
+// Enables full delivery audit trails, retry tracking, and provider response logging.
+// See README.md for full design rationale and field documentation.
+
+enum DeliveryAttemptStatus {
+  pending
+  queued
+  sent
+  delivered
+  bounced
+  failed
+}
+
+model NotificationDeliveryAttempt {
+  id                String                @id @default(uuid())
+  notificationId    String                @map("notification_id")
+  channelId         String                @map("channel_id")
+
+  // Delivery lifecycle. Mutually exclusive, progresses forward.
+  status            DeliveryAttemptStatus @default(pending)
+
+  providerMessageId String?               @map("provider_message_id") // e.g., SendGrid's "X-Message-Id", Twilio's "SM..." SID.
+  providerResponse  Json?                 @map("provider_response") // Raw provider response for debugging delivery issues.
+
+  errorCode         String?               @map("error_code") // Provider-specific error code (e.g., "550", "InvalidRegistration").
+  errorMessage      String?               @map("error_message")
+
+  // Retry tracking.
+  attemptNumber     Int                   @default(1) @map("attempt_number") // 1 = first try, 2 = first retry, etc.
+  nextRetryAt       DateTime?             @map("next_retry_at") // Null = no retry planned (success or max retries reached).
+
+  sentAt            DateTime?             @map("sent_at") // When the provider accepted the request.
+  deliveredAt       DateTime?             @map("delivered_at") // When delivery was confirmed (from provider webhook).
+  createdAt         DateTime              @default(now()) @map("created_at")
+  updatedAt         DateTime              @updatedAt @map("updated_at")
+
+  notification      Notification          @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+  channel           NotificationChannel   @relation(fields: [channelId], references: [id], onDelete: Restrict)
+
+  @@index([notificationId])
+  @@index([channelId, status])
+  @@index([providerMessageId])
+  @@index([status, nextRetryAt])
+  @@index([createdAt])
+  @@map("notification_delivery_attempts")
+}

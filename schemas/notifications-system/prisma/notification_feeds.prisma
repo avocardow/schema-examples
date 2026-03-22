@@ -1,0 +1,17 @@
+// notification_feeds: Named UI surfaces where notifications can appear (e.g., bell icon, activity tab, announcements banner).
+// See README.md for full design rationale and field documentation.
+
+model NotificationFeed {
+  id          String   @id @default(uuid())
+  name        String // Display name (e.g., "General", "Activity", "Announcements").
+  slug        String   @unique // URL-safe identifier. Used in API calls: GET /feeds/general.
+  description String?
+
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+
+  categories    NotificationCategory[]
+  categoryFeeds NotificationCategoryFeed[]
+
+  @@map("notification_feeds")
+}

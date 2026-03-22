@@ -1,0 +1,32 @@
+// quiet_hours: Per-user Do Not Disturb schedules with timezone support.
+// During quiet hours, non-critical notifications are held and delivered when quiet hours end.
+// See README.md for full design rationale and field documentation.
+
+model QuietHours {
+  id           String    @id @default(uuid())
+  userId       String    @map("user_id")
+
+  // IANA timezone (e.g., "America/New_York"). Quiet hours are evaluated in the user's local time.
+  timezone     String
+
+  // Local times in HH:MM format. Cross-midnight works naturally: start=22:00, end=08:00.
+  startTime    String    @map("start_time")
+  endTime      String    @map("end_time")
+
+  // Array of ISO day numbers (1=Monday through 7=Sunday). E.g., [1,2,3,4,5] = weekdays only.
+  daysOfWeek   Int[]     @map("days_of_week")
+
+  isActive     Boolean   @default(true) @map("is_active")
+
+  // Ad-hoc snooze: temporary DND override. Null = no active snooze.
+  snoozeUntil  DateTime? @map("snooze_until")
+
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, isActive])
+  @@map("quiet_hours")
+}

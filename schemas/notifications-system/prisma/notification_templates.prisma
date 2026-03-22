@@ -1,0 +1,27 @@
+// notification_templates: Reusable content definitions for a notification category.
+// Templates contain interpolatable strings rendered with the event's data payload at delivery time.
+// See README.md for full design rationale and field documentation.
+
+model NotificationTemplate {
+  id                String    @id @default(uuid())
+  categoryId        String    @map("category_id")
+  name              String // Internal name (e.g., "Comment Created — Default").
+  slug              String    @unique // Identifier used in code (e.g., "comment_created_default").
+
+  // Default content (channel-agnostic). Used when no channel-specific template_content exists.
+  titleTemplate     String?   @map("title_template")
+  bodyTemplate      String?   @map("body_template")
+  actionUrlTemplate String?   @map("action_url_template")
+
+  isActive          Boolean   @default(true) @map("is_active")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  category          NotificationCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  // Reverse relations
+  contents          NotificationTemplateContent[]
+
+  @@index([categoryId])
+  @@map("notification_templates")
+}
