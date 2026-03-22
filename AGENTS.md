@@ -22,7 +22,9 @@ Production-ready database schema examples across formats and domains. Each domai
 
 Pay attention to: how pseudo code maps to each format, comment conventions, Prisma reverse relations (the `File` model has 19+ reverse relation fields), circular FK handling (SQL uses `ALTER TABLE`, Drizzle uses a comment instead of `.references()`), and enum declarations per format.
 
-**Do not let completed domains influence your table count.** The number of tables in a new domain should be determined entirely by your research — what the domain actually needs. Don't anchor on the table counts of existing domains.
+**Do not let completed domains influence your table count.** The number of tables in a new domain should be determined entirely by your research — what the domain actually needs. Don't anchor on the table counts of existing domains. Most completed domains happen to have 20 tables — **this is a coincidence, not a target.** If your research identifies 24 tables, implement 24. If it identifies 15, implement 15.
+
+**⚠️ Common failure mode:** Agents see that existing domains have 20 tables, then say "I need to refine to 20" and start collapsing well-researched tables to hit that number. This is exactly wrong. Never merge, collapse, or remove tables from your research to reach a specific count. Never add filler tables to inflate the count either. The research output is the table list — do not adjust it.
 
 ## The Proven Workflow
 
@@ -48,7 +50,7 @@ The table list and table count must emerge from this research — not from preco
 **Output:** A completed `README.md` with full pseudo code for every table.
 **Gate:** Do not launch any implementation agents until every table's pseudo code block is finalized in the README.
 
-Write format-agnostic pseudo code in the domain's `README.md`. The table list, table count, and table designs must be derived from the research in `RESEARCH.md` — not from general knowledge or patterns in other domains. Follow the pseudo code conventions and structure in [CONTRIBUTING.md](./CONTRIBUTING.md). Model the README after a completed domain (e.g., [file-management-document-storage](./schemas/file-management-document-storage/README.md)): overview, dependencies, table list, pseudo code with design notes, relationships diagram, best practices, and formats table.
+Write format-agnostic pseudo code in the domain's `README.md`. The table list, table count, and table designs must be derived from the research in `RESEARCH.md` — not from general knowledge or patterns in other domains. **Implement every table identified in the research.** Do not collapse, merge, or remove tables to reach a lower count. Do not add tables not in the research. Follow the pseudo code conventions and structure in [CONTRIBUTING.md](./CONTRIBUTING.md). Model the README after a completed domain (e.g., [file-management-document-storage](./schemas/file-management-document-storage/README.md)): overview, dependencies, table list, pseudo code with design notes, relationships diagram, best practices, and formats table.
 
 **⛔ STOP after this step.** Confirm `README.md` pseudo code is complete for all tables before moving to Step 3. No schema files should exist yet.
 

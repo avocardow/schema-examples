@@ -71,7 +71,10 @@ Which pattern(s) the schema will adopt and why.
 ## Tables Identified
 
 <!-- List all tables grouped by category. Include brief proto-schema notes for complex tables
-     (field names, types, key constraints) to bridge from research to pseudo code. -->
+     (field names, types, key constraints) to bridge from research to pseudo code.
+     IMPORTANT: This table list IS the final table list for the domain. Every table listed here
+     will be implemented in pseudo code and all 7 formats. Do not reduce, collapse, or merge
+     tables in Step 2 to hit a target number. Do not add tables not listed here. -->
 
 ### Category 1
 - `table_name` — brief description
