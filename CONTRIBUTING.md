@@ -59,16 +59,34 @@ schemas/{domain}/
 ├── ...
 ```
 
-Implement from the pseudo code, not from another format's implementation. Each format should be idiomatic — see [Format Conventions](#format-conventions) below.
+Implement from the pseudo code, not from another format's implementation. Each format should be idiomatic — see [Format Conventions](#format-conventions) below, or the detailed implementation guides in `schemas/_template/{format}/README.md`.
+
+> **For AI agents**: Use one subagent per table file (tables × formats = total agents). Do NOT have one agent write the same table across all formats or all tables in one format — this causes context-switching errors. See [AGENTS.md](./AGENTS.md) for the full workflow.
 
 ### 4. Audit
 
-After implementation, cross-check every format file against the pseudo code for:
-- Field parity (every field present, no extra fields)
-- Correct nullability
-- Correct indexes
-- Correct foreign key references and cascade behavior
-- Idiomatic naming for the format
+After implementation, cross-check every format file against the pseudo code. Run one audit pass per format (7 total), checking:
+
+- **Field parity** — Every pseudo code field is present, no extra fields
+- **Nullability** — `nullable` → optional; no `nullable` → required
+- **Indexes** — All indexes present with correct fields; no redundant indexes on leading columns of composite unique/indexes
+- **Foreign keys** — Correct references and cascade behavior (`cascade`, `set_null`, `restrict`)
+- **Enums** — All values match pseudo code exactly
+- **Defaults** — Default values match
+- **Timestamps** — Only present when pseudo code includes them
+- **Naming** — Follows format's naming convention
+- **Format idioms** — Uses format-specific patterns correctly
+
+### 5. Fix
+
+After auditing, fix all identified issues. Run one fix pass per format (7 total) with the compiled audit results.
+
+### 6. Final review
+
+Manual deep review for issues that automated auditing misses:
+- Cross-format consistency (did all formats apply the same fix?)
+- Subtle convention violations (e.g., `@@map` on Prisma enums, unsigned integers in SpacetimeDB)
+- Edge cases in format-specific idioms
 
 ## Format Conventions
 
@@ -240,24 +258,27 @@ export const sessionConverter = {
 
 ## Adding a New Format
 
-If you want to add an 8th (or 9th, etc.) format to the project:
+If you want to add a new format to the project:
 
 1. **Document the format's conventions** — Add a section to this file under [Format Conventions](#format-conventions) with the same level of detail as the existing formats. Cover: module system, naming conventions, ID/PK patterns, timestamps, references/FKs, nullable handling, indexes, and a minimal example.
 
-2. **Implement for all completed domains** — A new format must be added to every domain that has a ✅ status. Partial coverage is not acceptable. Implement from each domain's README pseudo code.
+2. **Add a template implementation guide** — Create `schemas/_template/{format}/README.md` following the same structure as the existing format guides (quick reference table, key rules, file template, type mappings, indexes, gotchas).
 
-3. **Update every domain README** — Add a row to the Formats table in each completed domain's README.
+3. **Update [AGENTS.md](./AGENTS.md)** — Add the format to the Common Pitfalls section, File Naming table, and Dependencies Between Domains section.
 
-4. **Update the root README** — Add the format to the Formats table at the top.
+4. **Implement for all completed domains** — A new format must be added to every domain that has a ✅ status. Partial coverage is not acceptable. Implement from each domain's README pseudo code.
 
-5. **One file per table** — Follow the same pattern: one file per table, named after the table.
+5. **Update every domain README** — Add a row to the Formats table in each completed domain's README.
+
+6. **Update the root README** — Add the format to the Formats table at the top.
+
+7. **One file per table** — Follow the same pattern: one file per table, named after the table.
 
 ## Adding a New Domain
 
-1. Create the domain directory: `schemas/{domain-name}/`
-2. Create format subdirectories: `convex/`, `sql/`, `prisma/`, `mongodb/`, `drizzle/`, `spacetimedb/`, `firebase/` (with `.gitkeep` files to preserve empty directories until implementation)
-3. **Research first** — Create a `RESEARCH.md` (gitignored) studying real-world products and services in the domain
-4. **Write the README** — Must include:
+1. **Copy the template**: `cp -r schemas/_template schemas/{domain-name}/`
+2. **Research first** — Fill out `RESEARCH.md` (gitignored) studying real-world products and services in the domain. Study at least 5-10 real implementations.
+3. **Write the README** — Follow the template structure. Must include:
    - Overview
    - Dependencies (which other domains this one references)
    - Table of Contents with all tables
@@ -265,8 +286,10 @@ If you want to add an 8th (or 9th, etc.) format to the project:
    - Relationships section
    - Best Practices section
    - Formats table (all 🔲 Todo until implemented)
-5. **Implement all formats** — Follow the process: pseudo code → implement → audit
-6. **Update the root README** — Add the domain to the appropriate category table with the correct table count and status
+4. **Implement all formats** — Follow the process: pseudo code → implement → audit → fix → final review. See each format's `_template/{format}/README.md` for detailed implementation guides.
+5. **Update the root README** — Add the domain to the appropriate category table with the correct table count and status
+
+See [AGENTS.md](./AGENTS.md) for the proven AI-assisted workflow (1 agent per file for implementation, 1 agent per format for auditing).
 
 ## Comments in Schema Files
 
@@ -285,6 +308,18 @@ If you want to add an 8th (or 9th, etc.) format to the project:
 ## Code of Conduct
 
 Be kind, be helpful, be constructive. We're all here to learn and share knowledge.
+
+## Common Pitfalls
+
+Lessons learned from implementing completed domains:
+
+- **Prisma enum `@@map`** — Don't add `@@map` to Prisma enum blocks. Only models get `@@map`.
+- **Redundant indexes** — Don't index a single column that's already the leading column of a composite unique or composite index. The composite covers single-column lookups.
+- **Prisma reverse relations** — Every `@relation` on the "many" side needs a corresponding array field on the "one" side (e.g., `files File[]`).
+- **Drizzle array defaults** — Use `.default(sql\`'{}'\`)`, not `.default({})`. The latter generates invalid SQL.
+- **SpacetimeDB integer types** — Use `i32`/`i64` (signed), not `u32`/`u64` (unsigned), for standard database columns.
+- **Prisma `@default(now())`** — Add to both `createdAt` and `updatedAt` fields. Prisma's `@updatedAt` is a client annotation, not a schema default.
+- **Drizzle bigint mode** — Use `{ mode: "number" }` for bigint fields unless the value exceeds `Number.MAX_SAFE_INTEGER`.
 
 ## Questions?
 

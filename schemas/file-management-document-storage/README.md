@@ -1012,10 +1012,10 @@ Each table is a separate file within each format folder:
 
 | Format      | Directory                        | Status  |
 | ----------- | -------------------------------- | ------- |
-| Convex      | [`convex/`](./convex/)           | ✅      |
-| SQL         | [`sql/`](./sql/)                 | ✅      |
-| Prisma      | [`prisma/`](./prisma/)           | ✅      |
-| MongoDB     | [`mongodb/`](./mongodb/)         | ✅      |
-| Drizzle     | [`drizzle/`](./drizzle/)         | ✅      |
-| SpacetimeDB | [`spacetimedb/`](./spacetimedb/) | ✅      |
-| Firebase    | [`firebase/`](./firebase/)       | ✅      |
+| Convex      | [`convex/`](./convex/)           | ✅ Done |
+| SQL         | [`sql/`](./sql/)                 | ✅ Done |
+| Prisma      | [`prisma/`](./prisma/)           | ✅ Done |
+| MongoDB     | [`mongodb/`](./mongodb/)         | ✅ Done |
+| Drizzle     | [`drizzle/`](./drizzle/)         | ✅ Done |
+| SpacetimeDB | [`spacetimedb/`](./spacetimedb/) | ✅ Done |
+| Firebase    | [`firebase/`](./firebase/)       | ✅ Done |

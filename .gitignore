@@ -13,6 +13,7 @@ Desktop.ini
 # Research and working notes (local reference only)
 RESEARCH.md
 **/RESEARCH.md
+!schemas/_template/RESEARCH.md
 **/NOTES.md
 **/TODO.md
 **/SCRATCH.md

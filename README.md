@@ -1,6 +1,6 @@
 # Schema Examples
 
-A collection of production-ready database schema examples across multiple formats. Common patterns for e-commerce, SaaS, social media, healthcare, and 50+ more domains — with explanations and best practices.
+A growing collection of production-ready database schema examples across multiple formats — with explanations and best practices. Currently covering auth, notifications, and file management, with more domains planned.
 
 **Copy. Learn. Contribute. Ship.**
 
@@ -32,145 +32,145 @@ See each domain's **Dependencies** section for details.
 
 ### Core / Foundational
 
-| Domain                                                       | Tables | Status |
-| ------------------------------------------------------------ | ------ | ------ |
-| [Auth / RBAC](./schemas/auth-rbac)                           | 26     | ✅     |
-| [Notifications System](./schemas/notifications-system)       | 20     | ✅     |
+| Domain                                                                           | Tables | Status |
+| -------------------------------------------------------------------------------- | ------ | ------ |
+| [Auth / RBAC](./schemas/auth-rbac)                                               | 26     | ✅     |
+| [Notifications System](./schemas/notifications-system)                           | 20     | ✅     |
 | [File Management / Document Storage](./schemas/file-management-document-storage) | 20     | ✅     |
-| [Multi-language / i18n](./schemas/multi-language-i18n)       | —      | 🔲     |
-| [Analytics / Metrics](./schemas/analytics-metrics)           | —      | 🔲     |
-| [Content Moderation](./schemas/content-moderation)           | —      | 🔲     |
+| [Multi-language / i18n](./schemas/multi-language-i18n)                           | —      | 🔲     |
+| [Analytics / Metrics](./schemas/analytics-metrics)                               | —      | 🔲     |
+| [Content Moderation](./schemas/content-moderation)                               | —      | 🔲     |
 
 ### Commerce & Marketplace
 
-| Domain                                                       | Tables | Status |
-| ------------------------------------------------------------ | ------ | ------ |
-| [E-commerce](./schemas/e-commerce)                           | —      | 🔲     |
-| [Marketplace (Multi-vendor)](./schemas/marketplace)          | —      | 🔲     |
-| [Auction](./schemas/auction)                                 | —      | 🔲     |
-| [Subscription / Membership](./schemas/subscription-membership) | —    | 🔲     |
-| [Affiliate / Referral Program](./schemas/affiliate-referral-program) | — | 🔲 |
-| [Loyalty / Rewards Program](./schemas/loyalty-rewards-program) | —    | 🔲     |
+| Domain                                                               | Tables | Status |
+| -------------------------------------------------------------------- | ------ | ------ |
+| [E-commerce](./schemas/e-commerce)                                   | —      | 🔲     |
+| [Marketplace (Multi-vendor)](./schemas/marketplace)                  | —      | 🔲     |
+| [Auction](./schemas/auction)                                         | —      | 🔲     |
+| [Subscription / Membership](./schemas/subscription-membership)       | —      | 🔲     |
+| [Affiliate / Referral Program](./schemas/affiliate-referral-program) | —      | 🔲     |
+| [Loyalty / Rewards Program](./schemas/loyalty-rewards-program)       | —      | 🔲     |
 
 ### Social & Communication
 
-| Domain                                                       | Tables | Status |
-| ------------------------------------------------------------ | ------ | ------ |
-| [Social Media](./schemas/social-media)                       | —      | 🔲     |
-| [Messaging / Chat](./schemas/messaging-chat)                 | —      | 🔲     |
-| [Video Conferencing](./schemas/video-conferencing)           | —      | 🔲     |
-| [Email / Campaign Marketing](./schemas/email-campaign-marketing) | —  | 🔲     |
+| Domain                                                           | Tables | Status |
+| ---------------------------------------------------------------- | ------ | ------ |
+| [Social Media](./schemas/social-media)                           | —      | 🔲     |
+| [Messaging / Chat](./schemas/messaging-chat)                     | —      | 🔲     |
+| [Video Conferencing](./schemas/video-conferencing)               | —      | 🔲     |
+| [Email / Campaign Marketing](./schemas/email-campaign-marketing) | —      | 🔲     |
 
 ### Content & Media
 
-| Domain                                                       | Tables | Status |
-| ------------------------------------------------------------ | ------ | ------ |
-| [CMS / Blog](./schemas/cms-blog)                             | —      | 🔲     |
-| [Media Streaming](./schemas/media-streaming)                 | —      | 🔲     |
-| [Podcast Platform](./schemas/podcast-platform)               | —      | 🔲     |
-| [Digital Asset Management (DAM)](./schemas/digital-asset-management) | — | 🔲 |
-| [Recipe / Cooking](./schemas/recipe-cooking)                 | —      | 🔲     |
+| Domain                                                               | Tables | Status |
+| -------------------------------------------------------------------- | ------ | ------ |
+| [CMS / Blog](./schemas/cms-blog)                                     | —      | 🔲     |
+| [Media Streaming](./schemas/media-streaming)                         | —      | 🔲     |
+| [Podcast Platform](./schemas/podcast-platform)                       | —      | 🔲     |
+| [Digital Asset Management (DAM)](./schemas/digital-asset-management) | —      | 🔲     |
+| [Recipe / Cooking](./schemas/recipe-cooking)                         | —      | 🔲     |
 
 ### Business & Enterprise
 
-| Domain                                                       | Tables | Status |
-| ------------------------------------------------------------ | ------ | ------ |
-| [SaaS / Multi-tenant](./schemas/saas-multi-tenant)           | —      | 🔲     |
-| [CRM](./schemas/crm)                                         | —      | 🔲     |
-| [Project Management](./schemas/project-management)           | —      | 🔲     |
-| [HR / Payroll](./schemas/hr-payroll)                         | —      | 🔲     |
-| [Helpdesk / Customer Support](./schemas/helpdesk-customer-support) | — | 🔲   |
-| [Compliance / GRC](./schemas/compliance-grc)                 | —      | 🔲     |
+| Domain                                                             | Tables | Status |
+| ------------------------------------------------------------------ | ------ | ------ |
+| [SaaS / Multi-tenant](./schemas/saas-multi-tenant)                 | —      | 🔲     |
+| [CRM](./schemas/crm)                                               | —      | 🔲     |
+| [Project Management](./schemas/project-management)                 | —      | 🔲     |
+| [HR / Payroll](./schemas/hr-payroll)                               | —      | 🔲     |
+| [Helpdesk / Customer Support](./schemas/helpdesk-customer-support) | —      | 🔲     |
+| [Compliance / GRC](./schemas/compliance-grc)                       | —      | 🔲     |
 
 ### Booking & Scheduling
 
-| Domain                                                       | Tables | Status |
-| ------------------------------------------------------------ | ------ | ------ |
-| [Booking / Scheduling](./schemas/booking-scheduling)         | —      | 🔲     |
-| [Event Management / Ticketing](./schemas/event-management-ticketing) | — | 🔲 |
+| Domain                                                               | Tables | Status |
+| -------------------------------------------------------------------- | ------ | ------ |
+| [Booking / Scheduling](./schemas/booking-scheduling)                 | —      | 🔲     |
+| [Event Management / Ticketing](./schemas/event-management-ticketing) | —      | 🔲     |
 
 ### Healthcare & Wellness
 
-| Domain                                                       | Tables | Status |
-| ------------------------------------------------------------ | ------ | ------ |
-| [Healthcare / Medical](./schemas/healthcare-medical)         | —      | 🔲     |
-| [Fitness / Wellness](./schemas/fitness-wellness)             | —      | 🔲     |
-| [Pet / Veterinary](./schemas/pet-veterinary)                 | —      | 🔲     |
+| Domain                                               | Tables | Status |
+| ---------------------------------------------------- | ------ | ------ |
+| [Healthcare / Medical](./schemas/healthcare-medical) | —      | 🔲     |
+| [Fitness / Wellness](./schemas/fitness-wellness)     | —      | 🔲     |
+| [Pet / Veterinary](./schemas/pet-veterinary)         | —      | 🔲     |
 
 ### Finance & Legal
 
-| Domain                                                       | Tables | Status |
-| ------------------------------------------------------------ | ------ | ------ |
-| [Finance / Banking](./schemas/finance-banking)               | —      | 🔲     |
-| [Insurance](./schemas/insurance)                             | —      | 🔲     |
-| [Legal / Law Firm](./schemas/legal-law-firm)                 | —      | 🔲     |
-| [Fundraising / Crowdfunding](./schemas/fundraising-crowdfunding) | —  | 🔲     |
-| [Nonprofit Management](./schemas/nonprofit-management)       | —      | 🔲     |
+| Domain                                                           | Tables | Status |
+| ---------------------------------------------------------------- | ------ | ------ |
+| [Finance / Banking](./schemas/finance-banking)                   | —      | 🔲     |
+| [Insurance](./schemas/insurance)                                 | —      | 🔲     |
+| [Legal / Law Firm](./schemas/legal-law-firm)                     | —      | 🔲     |
+| [Fundraising / Crowdfunding](./schemas/fundraising-crowdfunding) | —      | 🔲     |
+| [Nonprofit Management](./schemas/nonprofit-management)           | —      | 🔲     |
 
 ### Real Estate & Property
 
-| Domain                                                       | Tables | Status |
-| ------------------------------------------------------------ | ------ | ------ |
-| [Real Estate](./schemas/real-estate)                         | —      | 🔲     |
-| [Space / Facility Reservation](./schemas/space-facility-reservation) | — | 🔲 |
+| Domain                                                               | Tables | Status |
+| -------------------------------------------------------------------- | ------ | ------ |
+| [Real Estate](./schemas/real-estate)                                 | —      | 🔲     |
+| [Space / Facility Reservation](./schemas/space-facility-reservation) | —      | 🔲     |
 
 ### Education & Research
 
-| Domain                                                       | Tables | Status |
-| ------------------------------------------------------------ | ------ | ------ |
-| [Education / LMS](./schemas/education-lms)                   | —      | 🔲     |
-| [Library Management](./schemas/library-management)           | —      | 🔲     |
-| [Academic Research Management](./schemas/academic-research)  | —      | 🔲     |
+| Domain                                                      | Tables | Status |
+| ----------------------------------------------------------- | ------ | ------ |
+| [Education / LMS](./schemas/education-lms)                  | —      | 🔲     |
+| [Library Management](./schemas/library-management)          | —      | 🔲     |
+| [Academic Research Management](./schemas/academic-research) | —      | 🔲     |
 
 ### Food & Hospitality
 
-| Domain                                                       | Tables | Status |
-| ------------------------------------------------------------ | ------ | ------ |
-| [Restaurant / Food Delivery](./schemas/restaurant-food-delivery) | —  | 🔲     |
-| [Travel / Airlines / Hotels](./schemas/travel-airlines-hotels) | —    | 🔲     |
+| Domain                                                           | Tables | Status |
+| ---------------------------------------------------------------- | ------ | ------ |
+| [Restaurant / Food Delivery](./schemas/restaurant-food-delivery) | —      | 🔲     |
+| [Travel / Airlines / Hotels](./schemas/travel-airlines-hotels)   | —      | 🔲     |
 
 ### Employment
 
-| Domain                                                       | Tables | Status |
-| ------------------------------------------------------------ | ------ | ------ |
-| [Job Board / Recruitment](./schemas/job-board-recruitment)   | —      | 🔲     |
+| Domain                                                     | Tables | Status |
+| ---------------------------------------------------------- | ------ | ------ |
+| [Job Board / Recruitment](./schemas/job-board-recruitment) | —      | 🔲     |
 
 ### Logistics & Supply Chain
 
-| Domain                                                       | Tables | Status |
-| ------------------------------------------------------------ | ------ | ------ |
-| [Inventory / Warehouse Management](./schemas/inventory-warehouse) | — | 🔲     |
-| [Logistics / Shipping](./schemas/logistics-shipping)         | —      | 🔲     |
-| [Supply Chain Management](./schemas/supply-chain)            | —      | 🔲     |
-| [Manufacturing / MES](./schemas/manufacturing-mes)           | —      | 🔲     |
+| Domain                                                            | Tables | Status |
+| ----------------------------------------------------------------- | ------ | ------ |
+| [Inventory / Warehouse Management](./schemas/inventory-warehouse) | —      | 🔲     |
+| [Logistics / Shipping](./schemas/logistics-shipping)              | —      | 🔲     |
+| [Supply Chain Management](./schemas/supply-chain)                 | —      | 🔲     |
+| [Manufacturing / MES](./schemas/manufacturing-mes)                | —      | 🔲     |
 
 ### IoT & Technology
 
-| Domain                                                       | Tables | Status |
-| ------------------------------------------------------------ | ------ | ------ |
-| [IoT / Device Management](./schemas/iot-device-management)   | —      | 🔲     |
-| [Gaming / Leaderboards](./schemas/gaming-leaderboards)       | —      | 🔲     |
+| Domain                                                     | Tables | Status |
+| ---------------------------------------------------------- | ------ | ------ |
+| [IoT / Device Management](./schemas/iot-device-management) | —      | 🔲     |
+| [Gaming / Leaderboards](./schemas/gaming-leaderboards)     | —      | 🔲     |
 
 ### Government & Utilities
 
-| Domain                                                       | Tables | Status |
-| ------------------------------------------------------------ | ------ | ------ |
-| [Government / Civic Services](./schemas/government-civic)    | —      | 🔲     |
-| [Energy / Utilities](./schemas/energy-utilities)             | —      | 🔲     |
+| Domain                                                    | Tables | Status |
+| --------------------------------------------------------- | ------ | ------ |
+| [Government / Civic Services](./schemas/government-civic) | —      | 🔲     |
+| [Energy / Utilities](./schemas/energy-utilities)          | —      | 🔲     |
 
 ### Agriculture & Environment
 
-| Domain                                                       | Tables | Status |
-| ------------------------------------------------------------ | ------ | ------ |
-| [Agriculture / Farm Management](./schemas/agriculture-farm-management) | — | 🔲 |
+| Domain                                                                 | Tables | Status |
+| ---------------------------------------------------------------------- | ------ | ------ |
+| [Agriculture / Farm Management](./schemas/agriculture-farm-management) | —      | 🔲     |
 
 ### Events & Lifestyle
 
-| Domain                                                       | Tables | Status |
-| ------------------------------------------------------------ | ------ | ------ |
-| [League / Competition Management](./schemas/league-competition-management) | — | 🔲 |
-| [Event Planning](./schemas/event-planning)                   | —      | 🔲     |
-| [Voting / Polling / Surveys](./schemas/voting-polling-surveys) | —    | 🔲     |
+| Domain                                                                     | Tables | Status |
+| -------------------------------------------------------------------------- | ------ | ------ |
+| [League / Competition Management](./schemas/league-competition-management) | —      | 🔲     |
+| [Event Planning](./schemas/event-planning)                                 | —      | 🔲     |
+| [Voting / Polling / Surveys](./schemas/voting-polling-surveys)             | —      | 🔲     |
 
 **57 domains — 3 complete, 54 in progress**
 
@@ -182,10 +182,30 @@ See each domain's **Dependencies** section for details.
 4. **Customize** — Adapt it to your specific requirements
 5. **Contribute** — (Optional) Share your knowledge and expand the examples
 
+## Quick Start for New Domains
+
+Copy the template directory to get started:
+
+```bash
+cp -r schemas/_template schemas/{your-domain-name}
+```
+
+The template includes a README structure, research document, and format subdirectories with implementation guides. See [CONTRIBUTING.md](./CONTRIBUTING.md) for the full workflow.
+
 ## Project Structure
 
 ```
 schemas/
+├── _template/                 # Copy this to start a new domain
+│   ├── README.md              # Domain README template (pseudo code structure)
+│   ├── RESEARCH.md            # Research document template
+│   ├── convex/README.md       # Convex implementation guide
+│   ├── sql/README.md          # PostgreSQL implementation guide
+│   ├── prisma/README.md       # Prisma implementation guide
+│   ├── mongodb/README.md      # MongoDB/Mongoose implementation guide
+│   ├── drizzle/README.md      # Drizzle implementation guide
+│   ├── spacetimedb/README.md  # SpacetimeDB implementation guide
+│   └── firebase/README.md     # Firebase/Firestore implementation guide
 ├── {domain}/
 │   ├── README.md              # Pseudo code (source of truth), relationships, best practices
 │   ├── RESEARCH.md            # Local research notes (gitignored)
@@ -227,9 +247,11 @@ schemas/
 We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for the full process, format conventions, and guidelines.
 
 The short version:
+
 - The domain README's pseudo code is the **source of truth** for all format implementations
-- Follow the workflow: research → pseudo code → implement → audit
-- Each format has specific conventions — check CONTRIBUTING.md before implementing
+- Follow the workflow: research → pseudo code → implement → audit → fix → final review → update → commit
+- Each format has specific conventions — check CONTRIBUTING.md or the `_template/{format}/README.md` guides
+- See [AGENTS.md](./AGENTS.md) for AI agent workflow instructions and common pitfalls
 
 ## License
 
