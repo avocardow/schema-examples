@@ -18,6 +18,13 @@ export const locales = pgTable(
     pluralForms: integer("plural_forms").notNull().default(2),
     isDefault: boolean("is_default").notNull().default(false),
     isEnabled: boolean("is_enabled").notNull().default(true),
+    dateFormat: text("date_format"),
+    timeFormat: text("time_format"),
+    numberFormat: text("number_format"),
+    currencyCode: text("currency_code"),
+    currencySymbol: text("currency_symbol"),
+    firstDayOfWeek: integer("first_day_of_week").notNull().default(1),
+    measurementSystem: text("measurement_system"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),

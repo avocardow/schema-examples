@@ -16,7 +16,7 @@ Designed from a study of 12 systems: CMS platforms (WordPress WPML, Drupal, Stra
 - [Schema](#schema)
 
 <details>
-<summary>Schema table list (20 tables)</summary>
+<summary>Schema table list (18 tables)</summary>
 
 - [Multi-language / i18n](#multi-language--i18n)
   - [Overview](#overview)
@@ -24,7 +24,7 @@ Designed from a study of 12 systems: CMS platforms (WordPress WPML, Drupal, Stra
   - [Dependencies](#dependencies)
   - [Tables](#tables)
     - [Core Locale Management](#core-locale-management)
-    - [Translation Key Management](#translation-key-management)
+    - [Key Management](#key-management)
     - [Content Translation](#content-translation)
     - [Translation Memory & Glossary](#translation-memory--glossary)
     - [Workflow & Quality](#workflow--quality)
@@ -32,19 +32,17 @@ Designed from a study of 12 systems: CMS platforms (WordPress WPML, Drupal, Stra
   - [Schema](#schema)
     - [`locales`](#locales)
     - [`locale_fallbacks`](#locale_fallbacks)
-    - [`locale_settings`](#locale_settings)
+    - [`locale_plural_rules`](#locale_plural_rules)
     - [`namespaces`](#namespaces)
     - [`translation_keys`](#translation_keys)
     - [`translation_values`](#translation_values)
     - [`translation_key_tags`](#translation_key_tags)
     - [`translatable_resources`](#translatable_resources)
     - [`content_translations`](#content_translations)
-    - [`translation_groups`](#translation_groups)
     - [`translation_memory_entries`](#translation_memory_entries)
     - [`glossary_terms`](#glossary_terms)
     - [`glossary_term_translations`](#glossary_term_translations)
     - [`translation_status_history`](#translation_status_history)
-    - [`translation_reviews`](#translation_reviews)
     - [`translation_comments`](#translation_comments)
     - [`screenshots`](#screenshots)
     - [`screenshot_key_links`](#screenshot_key_links)
@@ -52,7 +50,6 @@ Designed from a study of 12 systems: CMS platforms (WordPress WPML, Drupal, Stra
     - [`machine_translation_configs`](#machine_translation_configs)
   - [Relationships](#relationships)
     - [One-to-Many](#one-to-many)
-    - [One-to-One](#one-to-one)
     - [Many-to-Many (via junction tables)](#many-to-many-via-junction-tables)
   - [Best Practices](#best-practices)
   - [Formats](#formats)
@@ -75,9 +72,9 @@ Designed from a study of 12 systems: CMS platforms (WordPress WPML, Drupal, Stra
 
 - `locales`
 - `locale_fallbacks`
-- `locale_settings`
+- `locale_plural_rules`
 
-### Translation Key Management
+### Key Management
 
 - `namespaces`
 - `translation_keys`
@@ -88,7 +85,6 @@ Designed from a study of 12 systems: CMS platforms (WordPress WPML, Drupal, Stra
 
 - `translatable_resources`
 - `content_translations`
-- `translation_groups`
 
 ### Translation Memory & Glossary
 
@@ -99,7 +95,6 @@ Designed from a study of 12 systems: CMS platforms (WordPress WPML, Drupal, Stra
 ### Workflow & Quality
 
 - `translation_status_history`
-- `translation_reviews`
 - `translation_comments`
 
 ### Context & Tooling
@@ -144,6 +139,15 @@ table locales {
                                                          -- Enforce via partial unique index or application logic.
   is_enabled        boolean not_null default true        -- Whether this locale is active. Disabled locales are hidden from
                                                          -- end users but preserved for translators and admin.
+  date_format       string nullable                      -- Display format override (e.g., "MM/DD/YYYY", "DD.MM.YYYY").
+                                                         -- Null = use CLDR default for this locale.
+  time_format       string nullable                      -- Display format override (e.g., "h:mm A", "HH:mm").
+  number_format     string nullable                      -- Display format override (e.g., "1,234.56", "1.234,56").
+  currency_code     string nullable                      -- ISO 4217 currency code (e.g., "USD", "EUR", "JPY").
+  currency_symbol   string nullable                      -- Currency symbol (e.g., "$", "€", "¥", "£").
+  first_day_of_week integer not_null default 1           -- 0 = Sunday, 1 = Monday, 6 = Saturday.
+                                                         -- Varies by region: US=0, most of Europe=1, Middle East=6.
+  measurement_system string nullable                     -- "metric" or "imperial". Null = use locale default.
   created_at        timestamp default now
   updated_at        timestamp default now on_update
 
@@ -181,28 +185,31 @@ table locale_fallbacks {
 }
 ```
 
-### 3. locale_settings
+### 3. locale_plural_rules
 
-Per-locale formatting preferences for dates, numbers, currency, and measurement. Separated from
-`locales` to keep the core table lean — these are display preferences, not translation data. CLDR
-provides canonical values; this table allows per-application overrides. One-to-one with `locales`.
+Per-locale CLDR plural category definitions. Defines which plural categories (zero, one, two, few,
+many, other) apply to each locale and provides example numbers and rule formulas. Acts as an integrity
+anchor for `translation_values.plural_category` — without this table, nothing validates which categories
+are valid for a given locale. Inspired by Weblate's Plural model and CLDR plural rules.
 
 ```pseudo
-table locale_settings {
-  id                    uuid primary_key default auto_generate
-  locale_id             uuid unique not_null references locales(id) on_delete cascade
-                                                         -- One settings record per locale.
-                                                         -- Cascade: removing a locale removes its settings.
-  date_format           string nullable                  -- Display format (e.g., "MM/DD/YYYY", "DD.MM.YYYY").
-  time_format           string nullable                  -- Display format (e.g., "h:mm A", "HH:mm").
-  number_format         string nullable                  -- Display format (e.g., "1,234.56", "1.234,56").
-  currency_code         string nullable                  -- ISO 4217 currency code (e.g., "USD", "EUR", "JPY").
-  currency_symbol       string nullable                  -- Currency symbol (e.g., "$", "€", "¥", "£").
-  first_day_of_week     integer not_null default 1       -- 0 = Sunday, 1 = Monday, 6 = Saturday.
-                                                         -- Varies by region: US=0, most of Europe=1, Middle East=6.
-  measurement_system    string nullable                  -- "metric" or "imperial". Null = use locale default.
-  created_at            timestamp default now
-  updated_at            timestamp default now on_update
+table locale_plural_rules {
+  id                uuid primary_key default auto_generate
+  locale_id         uuid not_null references locales(id) on_delete cascade
+                                                         -- Which locale this rule applies to.
+                                                         -- Cascade: removing a locale removes its plural rules.
+  category          enum(zero, one, two, few, many, other) not_null
+                                                         -- CLDR plural category.
+  example           string nullable                      -- Example number(s) for this category (e.g., "0" for zero, "1" for one,
+                                                         -- "2" for two, "3,4" for few, "5-19" for many).
+                                                         -- Helps translators understand when each form is used.
+  rule_formula      string nullable                      -- CLDR rule expression (e.g., "n = 1", "n % 10 = 2..4 and n % 100 != 12..14").
+                                                         -- Machine-readable rule for the application layer.
+  created_at        timestamp default now
+
+  indexes {
+    composite_unique(locale_id, category)                -- One rule per locale per plural category.
+  }
 }
 ```
 
@@ -216,7 +223,7 @@ Supports dot notation in names for hierarchical organization (e.g., "admin.users
 table namespaces {
   id                uuid primary_key default auto_generate
   name              string unique not_null               -- Namespace identifier (e.g., "common", "checkout", "admin.users").
-                                                         -- Unique across the system. Used in API paths and cache keys.
+                                                         -- Unique globally. Used in API paths and cache keys.
   description       string nullable                      -- Explain what this namespace contains (e.g., "Shared UI labels").
   is_default        boolean not_null default false       -- Default namespace for keys without explicit namespace assignment.
   created_at        timestamp default now
@@ -401,34 +408,7 @@ table content_translations {
 }
 ```
 
-### 10. translation_groups
-
-Links content entries that are translations of each other into translation sets. For applications
-using a row-per-locale content model (like WPML or Strapi), this table groups all locale rows for
-the same logical entity. `source_locale_id` identifies the original language.
-
-```pseudo
-table translation_groups {
-  id                    uuid primary_key default auto_generate
-  resource_id           uuid not_null references translatable_resources(id) on_delete cascade
-                                                         -- Which resource type these entries belong to.
-                                                         -- Cascade: removing a resource type removes its translation groups.
-  entity_id             string not_null                  -- The primary entity ID (typically the source language version).
-                                                         -- Not a FK — target depends on resource_type.
-  source_locale_id      uuid not_null references locales(id) on_delete restrict
-                                                         -- The original language of this content.
-                                                         -- Restrict: don't delete a locale that is a source for grouped content.
-  created_at            timestamp default now
-  updated_at            timestamp default now on_update
-
-  indexes {
-    composite_unique(resource_id, entity_id)             -- One group per resource × entity.
-    index(source_locale_id)                              -- "All groups originating from this locale."
-  }
-}
-```
-
-### 11. translation_memory_entries
+### 10. translation_memory_entries
 
 Source-target segment pairs for translation reuse. TMX-compatible structure enabling import/export
 with industry-standard Translation Memory eXchange format. `source_hash` enables O(1) exact match
@@ -470,7 +450,7 @@ table translation_memory_entries {
 }
 ```
 
-### 12. glossary_terms
+### 11. glossary_terms
 
 Terminology entries with metadata for translation consistency. Each term is defined in a source
 language with part of speech, domain context, and usage notes. The `is_forbidden` flag marks terms
@@ -506,7 +486,7 @@ table glossary_terms {
 }
 ```
 
-### 13. glossary_term_translations
+### 12. glossary_term_translations
 
 Per-locale translations of glossary terms. One translation per term per locale. Simpler workflow
 than full translations — just draft/approved status. Locale-specific notes allow guidance like
@@ -535,7 +515,7 @@ table glossary_term_translations {
 }
 ```
 
-### 14. translation_status_history
+### 13. translation_status_history
 
 Audit trail for translation status changes. Records every workflow transition — who changed what,
 when, and why. The `translation_type` discriminator identifies whether the translation is a UI string
@@ -563,35 +543,7 @@ table translation_status_history {
 }
 ```
 
-### 15. translation_reviews
-
-Formal review records for translations. Each review captures the reviewer, action, and optional
-comment. Multiple reviews per translation are allowed (e.g., peer review + manager approval).
-Inspired by Crowdin's Translation Approvals.
-
-```pseudo
-table translation_reviews {
-  id                    uuid primary_key default auto_generate
-  translation_type      string not_null                  -- Discriminator: 'key_value' or 'content'.
-  translation_id        uuid not_null                    -- FK to translation_values.id or content_translations.id.
-                                                         -- Not a database FK — target depends on translation_type.
-  reviewer_id           uuid not_null references users(id) on_delete cascade
-                                                         -- Who performed this review.
-                                                         -- Cascade: deleting a reviewer removes their review records.
-  action                enum(approve, reject, request_changes) not_null
-                                                         -- Review outcome. request_changes allows iterative review
-                                                         -- without full rejection.
-  comment               string nullable                  -- Reviewer's feedback.
-  created_at            timestamp default now
-
-  indexes {
-    index(translation_type, translation_id)              -- "All reviews for this translation."
-    index(reviewer_id)                                   -- "All reviews by this reviewer."
-  }
-}
-```
-
-### 16. translation_comments
+### 14. translation_comments
 
 Threaded discussion on specific translations or keys. Supports issue tracking with categorized
 comment types and resolution status. `parent_id` enables thread replies. Inspired by Crowdin's
@@ -624,7 +576,7 @@ table translation_comments {
 }
 ```
 
-### 17. screenshots
+### 15. screenshots
 
 Visual context images for translators. Screenshots show where strings appear in the UI, dramatically
 improving translation quality. File storage is external — this table stores path/URL references and
@@ -646,7 +598,7 @@ table screenshots {
 }
 ```
 
-### 18. screenshot_key_links
+### 16. screenshot_key_links
 
 Many-to-many junction between screenshots and translation keys. Optional bounding box coordinates
 identify exactly where a string appears in the screenshot. Translators see the visual context
@@ -674,7 +626,7 @@ table screenshot_key_links {
 }
 ```
 
-### 19. import_export_jobs
+### 17. import_export_jobs
 
 Bulk import/export operations for translation files. Supports all major i18n file formats:
 JSON, PO/POT, XLIFF, CSV, TMX, YAML, ARB, Java .properties. Tracks progress with counters and
@@ -713,7 +665,7 @@ table import_export_jobs {
 }
 ```
 
-### 20. machine_translation_configs
+### 18. machine_translation_configs
 
 Configured machine translation providers. Stores engine configuration, supported locales, and
 rate limits. The actual API key is stored in an external secret manager — `api_key_ref` holds
@@ -747,19 +699,18 @@ table machine_translation_configs {
 
 - `locales` → `locale_fallbacks` (a locale has many fallback rules, via `locale_id`)
 - `locales` → `locale_fallbacks` (a locale is a fallback target for many locales, via `fallback_locale_id`)
+- `locales` → `locale_plural_rules` (a locale has many plural category rules)
 - `locales` → `translation_values` (a locale has many translation values)
 - `locales` → `content_translations` (a locale has many content translations)
 - `locales` → `translation_memory_entries` (a locale is source for many TM entries, via `source_locale_id`)
 - `locales` → `translation_memory_entries` (a locale is target for many TM entries, via `target_locale_id`)
 - `locales` → `glossary_terms` (a locale is source for many glossary terms)
 - `locales` → `glossary_term_translations` (a locale has many glossary translations)
-- `locales` → `translation_groups` (a locale is source for many translation groups)
 - `namespaces` → `translation_keys` (a namespace contains many keys)
 - `translation_keys` → `translation_values` (a key has many translations across locales and plural forms)
 - `translation_keys` → `translation_key_tags` (a key has many tags)
 - `translation_keys` → `screenshot_key_links` (a key appears in many screenshots)
 - `translatable_resources` → `content_translations` (a resource type has many content translations)
-- `translatable_resources` → `translation_groups` (a resource type has many translation groups)
 - `glossary_terms` → `glossary_term_translations` (a term has many locale translations)
 - `screenshots` → `screenshot_key_links` (a screenshot links to many keys)
 - `translation_comments` → `translation_comments` (a comment has many replies, via `parent_id`)
@@ -767,16 +718,11 @@ table machine_translation_configs {
 - `users` → `translation_values` (a user reviews many values, via `reviewed_by`)
 - `users` → `content_translations` (a user translates many content fields, via `translator_id`)
 - `users` → `translation_status_history` (a user makes many status changes, via `changed_by`)
-- `users` → `translation_reviews` (a user writes many reviews, via `reviewer_id`)
 - `users` → `translation_comments` (a user writes many comments, via `author_id`)
 - `users` → `translation_memory_entries` (a user creates many TM entries, via `created_by`)
 - `users` → `glossary_terms` (a user creates many glossary terms, via `created_by`)
 - `users` → `screenshots` (a user uploads many screenshots, via `uploaded_by`)
 - `users` → `import_export_jobs` (a user initiates many jobs, via `created_by`)
-
-### One-to-One
-
-- `locales` → `locale_settings` (a locale has one settings record)
 
 ### Many-to-Many (via junction tables)
 

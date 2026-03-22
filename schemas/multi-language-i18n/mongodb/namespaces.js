@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 
 const namespacesSchema = new mongoose.Schema(
   {
-    name: { type: String, unique: true, required: true },
+    name: { type: String, required: true, unique: true },
     description: { type: String },
     is_default: { type: Boolean, required: true, default: false },
   },

@@ -19,6 +19,13 @@ const localesSchema = new mongoose.Schema(
     plural_forms: { type: Number, required: true, default: 2 },
     is_default: { type: Boolean, required: true, default: false },
     is_enabled: { type: Boolean, required: true, default: true },
+    date_format: { type: String },
+    time_format: { type: String },
+    number_format: { type: String },
+    currency_code: { type: String },
+    currency_symbol: { type: String },
+    first_day_of_week: { type: Number, required: true, default: 1 },
+    measurement_system: { type: String },
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },

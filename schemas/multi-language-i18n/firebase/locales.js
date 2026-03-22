@@ -20,12 +20,19 @@ export const TEXT_DIRECTION = /** @type {const} */ ({
  * @property {number}      pluralForms
  * @property {boolean}     isDefault
  * @property {boolean}     isEnabled
+ * @property {string|null} dateFormat
+ * @property {string|null} timeFormat
+ * @property {string|null} numberFormat
+ * @property {string|null} currencyCode
+ * @property {string|null} currencySymbol
+ * @property {number}      firstDayOfWeek
+ * @property {string|null} measurementSystem
  * @property {Timestamp}   createdAt
  * @property {Timestamp}   updatedAt
  */
 
 /**
- * @param {Pick<LocaleDocument, "code" | "name"> & Partial<Pick<LocaleDocument, "nativeName" | "textDirection" | "script" | "pluralRule" | "pluralForms" | "isDefault" | "isEnabled">>} fields
+ * @param {Pick<LocaleDocument, "code" | "name"> & Partial<Pick<LocaleDocument, "nativeName" | "textDirection" | "script" | "pluralRule" | "pluralForms" | "isDefault" | "isEnabled" | "dateFormat" | "timeFormat" | "numberFormat" | "currencyCode" | "currencySymbol" | "firstDayOfWeek" | "measurementSystem">>} fields
  * @returns {Omit<LocaleDocument, "id">}
  */
 export function createLocale(fields) {
@@ -39,6 +46,13 @@ export function createLocale(fields) {
     pluralForms:   fields.pluralForms  ?? 2,
     isDefault:     fields.isDefault    ?? false,
     isEnabled:     fields.isEnabled    ?? true,
+    dateFormat:    fields.dateFormat    ?? null,
+    timeFormat:    fields.timeFormat    ?? null,
+    numberFormat:  fields.numberFormat  ?? null,
+    currencyCode:  fields.currencyCode  ?? null,
+    currencySymbol: fields.currencySymbol ?? null,
+    firstDayOfWeek: fields.firstDayOfWeek ?? 1,
+    measurementSystem: fields.measurementSystem ?? null,
     createdAt:     Timestamp.now(),
     updatedAt:     Timestamp.now(),
   };
@@ -61,6 +75,13 @@ export const localeConverter = {
       pluralForms:   data.pluralForms  ?? 2,
       isDefault:     data.isDefault    ?? false,
       isEnabled:     data.isEnabled    ?? true,
+      dateFormat:    data.dateFormat    ?? null,
+      timeFormat:    data.timeFormat    ?? null,
+      numberFormat:  data.numberFormat  ?? null,
+      currencyCode:  data.currencyCode  ?? null,
+      currencySymbol: data.currencySymbol ?? null,
+      firstDayOfWeek: data.firstDayOfWeek ?? 1,
+      measurementSystem: data.measurementSystem ?? null,
       createdAt:     data.createdAt,
       updatedAt:     data.updatedAt,
     };

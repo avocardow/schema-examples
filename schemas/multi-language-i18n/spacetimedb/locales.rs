@@ -31,6 +31,14 @@ pub struct Locale {
     #[index(btree)]
     pub is_enabled: bool,
 
+    pub date_format: Option<String>,
+    pub time_format: Option<String>,
+    pub number_format: Option<String>,
+    pub currency_code: Option<String>,
+    pub currency_symbol: Option<String>,
+    pub first_day_of_week: i32,
+    pub measurement_system: Option<String>,
+
     pub created_at: Timestamp,
     pub updated_at: Timestamp,
 }

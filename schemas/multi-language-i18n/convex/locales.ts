@@ -14,6 +14,13 @@ export const locales = defineTable({
   pluralForms: v.number(), // Default 2.
   isDefault: v.boolean(), // Default false.
   isEnabled: v.boolean(), // Default true.
+  dateFormat: v.optional(v.string()),
+  timeFormat: v.optional(v.string()),
+  numberFormat: v.optional(v.string()),
+  currencyCode: v.optional(v.string()),
+  currencySymbol: v.optional(v.string()),
+  firstDayOfWeek: v.number(), // Default 1. 0=Sunday, 1=Monday, 6=Saturday.
+  measurementSystem: v.optional(v.string()),
   updatedAt: v.number(),
 })
   .index("by_code", ["code"])

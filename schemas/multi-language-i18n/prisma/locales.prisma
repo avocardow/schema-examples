@@ -17,16 +17,22 @@ model Locale {
   pluralForms   Int           @default(2) @map("plural_forms") // Number of plural categories.
   isDefault     Boolean       @default(false) @map("is_default")
   isEnabled     Boolean       @default(true) @map("is_enabled")
+  dateFormat    String?       @map("date_format") // Display format override (e.g., "MM/DD/YYYY").
+  timeFormat    String?       @map("time_format") // Display format override (e.g., "h:mm A").
+  numberFormat  String?       @map("number_format") // Display format override (e.g., "1,234.56").
+  currencyCode  String?       @map("currency_code") // ISO 4217 currency code.
+  currencySymbol String?      @map("currency_symbol") // Currency symbol (e.g., "$", "€").
+  firstDayOfWeek Int          @default(1) @map("first_day_of_week") // 0=Sunday, 1=Monday, 6=Saturday.
+  measurementSystem String?   @map("measurement_system") // "metric" or "imperial".
   createdAt     DateTime      @default(now()) @map("created_at")
   updatedAt     DateTime      @default(now()) @map("updated_at")
 
   // Reverse relations
   fallbacksFrom             LocaleFallback[]           @relation("LocaleFallbackFrom")
   fallbacksTo               LocaleFallback[]           @relation("LocaleFallbackTo")
-  settings                  LocaleSetting?
   translationValues         TranslationValue[]
   contentTranslations       ContentTranslation[]
-  translationGroups         TranslationGroup[]
+  pluralRules               LocalePluralRule[]
   tmEntriesAsSource         TranslationMemoryEntry[]   @relation("TMSource")
   tmEntriesAsTarget         TranslationMemoryEntry[]   @relation("TMTarget")
   glossaryTerms             GlossaryTerm[]

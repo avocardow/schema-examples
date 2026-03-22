@@ -14,6 +14,13 @@ CREATE TABLE locales (
   plural_forms    INTEGER NOT NULL DEFAULT 2,
   is_default      BOOLEAN NOT NULL DEFAULT FALSE,
   is_enabled      BOOLEAN NOT NULL DEFAULT TRUE,
+  date_format     TEXT,
+  time_format     TEXT,
+  number_format   TEXT,
+  currency_code   TEXT,
+  currency_symbol TEXT,
+  first_day_of_week INTEGER NOT NULL DEFAULT 1,
+  measurement_system TEXT,
   created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

@@ -1,0 +1,26 @@
+// locale_plural_rules: Defines plural rule categories for a locale with example values and formulas.
+// See README.md for full design rationale.
+
+enum PluralCategory {
+  zero
+  one
+  two
+  few
+  many
+  other
+}
+
+model LocalePluralRule {
+  id          String         @id @default(uuid())
+  localeId    String         @map("locale_id")
+  category    PluralCategory
+  example     String?
+  ruleFormula String?        @map("rule_formula")
+  createdAt   DateTime       @default(now()) @map("created_at")
+
+  // Relations
+  locale      Locale         @relation(fields: [localeId], references: [id], onDelete: Cascade)
+
+  @@unique([localeId, category])
+  @@map("locale_plural_rules")
+}

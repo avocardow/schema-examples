@@ -13,7 +13,6 @@ model TranslatableResource {
 
   // Reverse relations
   contentTranslations ContentTranslation[]
-  translationGroups   TranslationGroup[]
 
   @@map("translatable_resources")
 }
