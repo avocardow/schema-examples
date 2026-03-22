@@ -9,7 +9,7 @@ CREATE TABLE product_collections (
     image_url       TEXT,
     sort_order      INTEGER NOT NULL DEFAULT 0,
     is_active       BOOLEAN NOT NULL DEFAULT TRUE,
-    metadata        JSONB NOT NULL DEFAULT '{}',
+    metadata        JSONB DEFAULT '{}',
     published_at    TIMESTAMPTZ,
     created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()

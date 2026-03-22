@@ -13,7 +13,7 @@ CREATE TABLE products (
     status          product_status NOT NULL DEFAULT 'draft',
     product_type    TEXT,
     options         JSONB,
-    metadata        JSONB NOT NULL DEFAULT '{}',
+    metadata        JSONB DEFAULT '{}',
     is_featured     BOOLEAN NOT NULL DEFAULT FALSE,
     deleted_at      TIMESTAMPTZ,
     created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),

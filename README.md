@@ -1,6 +1,6 @@
 # Schema Examples
 
-A growing collection of production-ready database schema examples across multiple formats — with explanations and best practices. Currently covering auth, notifications, and file management, with more domains planned.
+A growing collection of production-ready database schema examples across multiple formats — with explanations and best practices. Seven domains complete (auth, notifications, file management, i18n, analytics, content moderation, e-commerce), with 50 more planned.
 
 **Copy. Learn. Contribute. Ship.**
 
@@ -172,7 +172,7 @@ See each domain's **Dependencies** section for details.
 | [Event Planning](./schemas/event-planning)                                 |        | 🔲     |
 | [Voting / Polling / Surveys](./schemas/voting-polling-surveys)             |        | 🔲     |
 
-**57 domains — 7 complete, 50 in progress**
+**57 domains — 7 complete, 50 planned**
 
 ## How to Use
 

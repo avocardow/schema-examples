@@ -16,7 +16,8 @@ Production-ready database schema examples across formats and domains. Each domai
 
 **Study a completed domain first.** Read the domain README (pseudo code), then read 2-3 schema files per format to internalize the patterns:
 
-- [Auth / RBAC](./schemas/auth-rbac) — 26 tables, the most comprehensive example
+- [Auth / RBAC](./schemas/auth-rbac) — 26 tables, the most comprehensive foundational example
+- [E-commerce](./schemas/e-commerce) — 35 tables, the largest domain with complex order/payment/fulfillment flows
 - [File Management / Document Storage](./schemas/file-management-document-storage) — good example of cross-table references and circular FKs
 - [Notifications System](./schemas/notifications-system)
 
