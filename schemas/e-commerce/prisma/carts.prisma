@@ -1,0 +1,26 @@
+// carts: Shopping carts supporting both authenticated users and anonymous sessions.
+// See README.md for full design rationale.
+
+model Cart {
+  id                String   @id @default(uuid())
+  userId            String?  @map("user_id")
+  sessionId         String?  @map("session_id")
+  currency          String   @default("USD")
+  shippingAddressId String?  @map("shipping_address_id")
+  billingAddressId  String?  @map("billing_address_id")
+  discountCode      String?  @map("discount_code")
+  note              String?
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @default(now()) @map("updated_at")
+
+  user            User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  shippingAddress Address? @relation("CartShippingAddress", fields: [shippingAddressId], references: [id], onDelete: SetNull)
+  billingAddress  Address? @relation("CartBillingAddress", fields: [billingAddressId], references: [id], onDelete: SetNull)
+
+  items           CartItem[]
+  paymentSessions PaymentSession[]
+
+  @@index([userId])
+  @@index([sessionId])
+  @@map("carts")
+}

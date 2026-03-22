@@ -1,0 +1,18 @@
+// discount_usages: Tracks each application of a discount to an order, enforcing one-use-per-order limits.
+// See README.md for full design rationale.
+
+model DiscountUsage {
+  id         String   @id @default(uuid())
+  discountId String   @map("discount_id")
+  orderId    String   @map("order_id")
+  userId     String?  @map("user_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  discount   Discount @relation(fields: [discountId], references: [id], onDelete: Cascade)
+  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@unique([discountId, orderId])
+  @@index([discountId, userId])
+  @@map("discount_usages")
+}

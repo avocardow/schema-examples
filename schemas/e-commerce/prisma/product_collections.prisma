@@ -1,0 +1,21 @@
+// product_collections: Curated groupings of products for merchandising and storefront display.
+// See README.md for full design rationale.
+
+model ProductCollection {
+  id          String    @id @default(uuid())
+  name        String
+  slug        String    @unique
+  description String?
+  imageUrl    String?   @map("image_url")
+  sortOrder   Int       @default(0) @map("sort_order")
+  isActive    Boolean   @default(true) @map("is_active")
+  metadata    Json?     @default("{}")
+  publishedAt DateTime? @map("published_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @default(now()) @map("updated_at")
+
+  items       ProductCollectionItem[]
+
+  @@index([isActive, sortOrder])
+  @@map("product_collections")
+}

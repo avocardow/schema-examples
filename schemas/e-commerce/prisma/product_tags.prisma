@@ -1,0 +1,14 @@
+// product_tags: Freeform labels for flexible, cross-cutting product classification.
+// See README.md for full design rationale.
+
+model ProductTag {
+  id          String    @id @default(uuid())
+  name        String
+  slug        String    @unique
+  description String?
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  assignments ProductTagAssignment[]
+
+  @@map("product_tags")
+}

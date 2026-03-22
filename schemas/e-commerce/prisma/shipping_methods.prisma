@@ -1,0 +1,28 @@
+// shipping_methods: Available delivery options within a shipping zone, with pricing and constraints.
+// See README.md for full design rationale.
+
+model ShippingMethod {
+  id              String   @id @default(uuid())
+  zoneId          String   @map("zone_id")
+  profileId       String?  @map("profile_id")
+  name            String
+  description     String?
+  price           Int
+  currency        String
+  minDeliveryDays Int?     @map("min_delivery_days")
+  maxDeliveryDays Int?     @map("max_delivery_days")
+  minOrderAmount  Int?     @map("min_order_amount")
+  maxWeightGrams  Int?     @map("max_weight_grams")
+  isActive        Boolean  @default(true) @map("is_active")
+  sortOrder       Int      @default(0) @map("sort_order")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @default(now()) @map("updated_at")
+
+  zone         ShippingZone     @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  profile      ShippingProfile? @relation(fields: [profileId], references: [id], onDelete: SetNull)
+  fulfillments Fulfillment[]
+
+  @@index([zoneId, isActive, sortOrder])
+  @@index([profileId])
+  @@map("shipping_methods")
+}

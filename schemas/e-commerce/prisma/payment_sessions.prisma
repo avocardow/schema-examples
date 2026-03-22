@@ -1,0 +1,32 @@
+// payment_sessions: Tracks payment attempts and provider interactions for each cart.
+// See README.md for full design rationale.
+
+enum PaymentSessionStatus {
+  pending
+  authorized
+  requires_action
+  completed
+  canceled
+  error
+}
+
+model PaymentSession {
+  id         String               @id @default(uuid())
+  cartId     String               @map("cart_id")
+  provider   String
+  providerId String?              @map("provider_id")
+  status     PaymentSessionStatus @default(pending)
+  amount     Int
+  currency   String
+  data       Json?
+  isSelected Boolean              @default(false) @map("is_selected")
+  createdAt  DateTime             @default(now()) @map("created_at")
+  updatedAt  DateTime             @default(now()) @map("updated_at")
+
+  cart Cart @relation(fields: [cartId], references: [id], onDelete: Cascade)
+
+  @@index([cartId])
+  @@index([provider, providerId])
+  @@index([status])
+  @@map("payment_sessions")
+}

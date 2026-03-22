@@ -1,0 +1,30 @@
+// order_items: Individual line items within an order, capturing product snapshot and pricing at time of purchase.
+// See README.md for full design rationale.
+
+model OrderItem {
+  id                 String   @id @default(uuid())
+  orderId            String   @map("order_id")
+  variantId          String?  @map("variant_id")
+  productName        String   @map("product_name")
+  variantTitle       String   @map("variant_title")
+  sku                String?
+  imageUrl           String?  @map("image_url")
+  unitPrice          Int      @map("unit_price")
+  quantity           Int
+  subtotal           Int
+  discountTotal      Int      @default(0) @map("discount_total")
+  taxTotal           Int      @default(0) @map("tax_total")
+  total              Int
+  fulfilledQuantity  Int      @default(0) @map("fulfilled_quantity")
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  order              Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  variant            ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+
+  fulfillmentItems   FulfillmentItem[]
+  returnItems        ReturnItem[]
+
+  @@index([orderId])
+  @@index([variantId])
+  @@map("order_items")
+}

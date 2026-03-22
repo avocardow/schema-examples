@@ -1,0 +1,30 @@
+// addresses: User-associated postal addresses for shipping and billing.
+// See README.md for full design rationale.
+
+model Address {
+  id                String   @id @default(uuid())
+  userId            String   @map("user_id")
+  label             String?
+  firstName         String   @map("first_name")
+  lastName          String   @map("last_name")
+  company           String?
+  addressLine1      String   @map("address_line1")
+  addressLine2      String?  @map("address_line2")
+  city              String
+  region            String?
+  postalCode        String?  @map("postal_code")
+  country           String
+  phone             String?
+  isDefaultShipping Boolean  @default(false) @map("is_default_shipping")
+  isDefaultBilling  Boolean  @default(false) @map("is_default_billing")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @default(now()) @map("updated_at")
+
+  user          User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  cartsShipping Cart[] @relation("CartShippingAddress")
+  cartsBilling  Cart[] @relation("CartBillingAddress")
+
+  @@index([userId])
+  @@map("addresses")
+}

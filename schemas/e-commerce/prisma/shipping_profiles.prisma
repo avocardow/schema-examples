@@ -1,0 +1,23 @@
+// shipping_profiles: Reusable shipping configuration profiles assigned to product variants.
+// See README.md for full design rationale.
+
+enum ShippingProfileType {
+  default
+  digital
+  custom
+}
+
+model ShippingProfile {
+  id          String              @id @default(uuid())
+  name        String
+  type        ShippingProfileType @default(default)
+  description String?
+  createdAt   DateTime            @default(now()) @map("created_at")
+  updatedAt   DateTime            @default(now()) @map("updated_at")
+
+  variants        ProductVariant[]
+  shippingMethods ShippingMethod[]
+
+  @@index([type])
+  @@map("shipping_profiles")
+}

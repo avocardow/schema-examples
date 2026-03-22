@@ -1,0 +1,16 @@
+// product_tag_assignments: Join table linking products to tags for flexible, user-defined categorization.
+// See README.md for full design rationale.
+
+model ProductTagAssignment {
+  id         String     @id @default(uuid())
+  productId  String     @map("product_id")
+  tagId      String     @map("tag_id")
+  createdAt  DateTime   @default(now()) @map("created_at")
+
+  product    Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  tag        ProductTag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, tagId])
+  @@index([tagId])
+  @@map("product_tag_assignments")
+}

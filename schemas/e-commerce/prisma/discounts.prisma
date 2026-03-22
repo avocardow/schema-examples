@@ -1,0 +1,34 @@
+// discounts: Discount codes and rules with usage tracking and time-bounded activation.
+// See README.md for full design rationale.
+
+enum DiscountType {
+  percentage
+  fixed_amount
+  free_shipping
+}
+
+model Discount {
+  id               String        @id @default(uuid())
+  code             String?       @unique
+  type             DiscountType
+  value            Decimal
+  currency         String?
+  conditions       Json?
+  usageLimit       Int?          @map("usage_limit")
+  usageCount       Int           @default(0) @map("usage_count")
+  perCustomerLimit Int?          @map("per_customer_limit")
+  startsAt         DateTime?     @map("starts_at")
+  endsAt           DateTime?     @map("ends_at")
+  isActive         Boolean       @default(true) @map("is_active")
+  createdBy        String        @map("created_by")
+  createdAt        DateTime      @default(now()) @map("created_at")
+  updatedAt        DateTime      @default(now()) @map("updated_at")
+
+  creator          User          @relation(fields: [createdBy], references: [id], onDelete: Restrict)
+
+  usages           DiscountUsage[]
+
+  @@index([type])
+  @@index([isActive, startsAt, endsAt])
+  @@map("discounts")
+}

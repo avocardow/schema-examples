@@ -1,0 +1,27 @@
+// categories: Hierarchical product classification with materialized path for efficient tree queries.
+// See README.md for full design rationale.
+
+model Category {
+  id          String    @id @default(uuid())
+  parentId    String?   @map("parent_id")
+  name        String
+  slug        String    @unique
+  description String?
+  path        String
+  depth       Int       @default(0)
+  sortOrder   Int       @default(0) @map("sort_order")
+  isActive    Boolean   @default(true) @map("is_active")
+  imageUrl    String?   @map("image_url")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @default(now()) @map("updated_at")
+
+  parent      Category?   @relation("CategoryParent", fields: [parentId], references: [id], onDelete: Cascade)
+  children    Category[]  @relation("CategoryParent")
+
+  products    Product[]
+
+  @@index([parentId])
+  @@index([path])
+  @@index([isActive, sortOrder])
+  @@map("categories")
+}

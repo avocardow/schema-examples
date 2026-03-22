@@ -1,0 +1,21 @@
+// tax_rates: Tax rate definitions by country, region, and product category.
+// See README.md for full design rationale.
+
+model TaxRate {
+  id          String    @id @default(uuid())
+  name        String
+  country     String
+  region      String?
+  rate        Decimal
+  category    String?
+  isCompound  Boolean   @default(false) @map("is_compound")
+  isActive    Boolean   @default(true) @map("is_active")
+  priority    Int       @default(0)
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @default(now()) @map("updated_at")
+
+  @@index([country, region])
+  @@index([category])
+  @@index([isActive])
+  @@map("tax_rates")
+}

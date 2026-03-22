@@ -1,0 +1,17 @@
+// product_collection_items: Join table linking products to curated collections with display ordering.
+// See README.md for full design rationale.
+
+model ProductCollectionItem {
+  id           String   @id @default(uuid())
+  collectionId String   @map("collection_id")
+  productId    String   @map("product_id")
+  sortOrder    Int      @default(0) @map("sort_order")
+  addedAt      DateTime @default(now()) @map("added_at")
+
+  collection   ProductCollection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  product      Product           @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([collectionId, productId])
+  @@index([productId])
+  @@map("product_collection_items")
+}

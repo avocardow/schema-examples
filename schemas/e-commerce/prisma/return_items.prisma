@@ -1,0 +1,28 @@
+// return_items: Individual line items within a return authorization, tracking quantity, condition, and receipt.
+// See README.md for full design rationale.
+
+enum ReturnItemCondition {
+  unopened
+  like_new
+  used
+  damaged
+  defective
+}
+
+model ReturnItem {
+  id                    String               @id @default(uuid())
+  returnAuthorizationId String               @map("return_authorization_id")
+  orderItemId           String               @map("order_item_id")
+  quantity              Int
+  reason                String?
+  condition             ReturnItemCondition?
+  receivedQuantity      Int                  @default(0) @map("received_quantity")
+  createdAt             DateTime             @default(now()) @map("created_at")
+  updatedAt             DateTime             @default(now()) @map("updated_at")
+
+  returnAuthorization ReturnAuthorization @relation(fields: [returnAuthorizationId], references: [id], onDelete: Cascade)
+  orderItem           OrderItem           @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+
+  @@unique([returnAuthorizationId, orderItemId])
+  @@map("return_items")
+}

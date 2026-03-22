@@ -1,0 +1,38 @@
+// return_authorizations: Tracks return merchandise authorizations (RMAs) for orders, from request through approval and refund.
+// See README.md for full design rationale.
+
+enum ReturnAuthorizationStatus {
+  requested
+  approved
+  rejected
+  received
+  refunded
+  canceled
+}
+
+model ReturnAuthorization {
+  id           String                    @id @default(uuid())
+  orderId      String                    @map("order_id")
+  rmaNumber    String                    @unique @map("rma_number")
+  status       ReturnAuthorizationStatus @default(requested)
+  reason       String?
+  note         String?
+  refundAmount Int?                      @map("refund_amount")
+  currency     String
+  requestedBy  String?                   @map("requested_by")
+  approvedBy   String?                   @map("approved_by")
+  receivedAt   DateTime?                 @map("received_at")
+  createdAt    DateTime                  @default(now()) @map("created_at")
+  updatedAt    DateTime                  @default(now()) @map("updated_at")
+
+  order           Order  @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  requestedByUser User?  @relation("ReturnRequester", fields: [requestedBy], references: [id], onDelete: SetNull)
+  approvedByUser  User?  @relation("ReturnApprover", fields: [approvedBy], references: [id], onDelete: SetNull)
+
+  items ReturnItem[]
+
+  @@index([orderId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("return_authorizations")
+}

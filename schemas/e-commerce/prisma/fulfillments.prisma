@@ -1,0 +1,41 @@
+// fulfillments: Tracks shipment lifecycle for orders, linking carriers, providers, and delivery status.
+// See README.md for full design rationale.
+
+enum FulfillmentShipmentStatus {
+  pending
+  shipped
+  in_transit
+  delivered
+  failed
+  returned
+}
+
+model Fulfillment {
+  id               String                    @id @default(uuid())
+  orderId          String                    @map("order_id")
+  providerId       String?                   @map("provider_id")
+  shippingMethodId String?                   @map("shipping_method_id")
+  status           FulfillmentShipmentStatus @default(pending)
+  trackingNumber   String?                   @map("tracking_number")
+  trackingUrl      String?                   @map("tracking_url")
+  carrier          String?
+  shippedAt        DateTime?                 @map("shipped_at")
+  deliveredAt      DateTime?                 @map("delivered_at")
+  note             String?
+  createdBy        String?                   @map("created_by")
+  createdAt        DateTime                  @default(now()) @map("created_at")
+  updatedAt        DateTime                  @default(now()) @map("updated_at")
+
+  order          Order                @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  provider       FulfillmentProvider? @relation(fields: [providerId], references: [id], onDelete: SetNull)
+  shippingMethod ShippingMethod?      @relation(fields: [shippingMethodId], references: [id], onDelete: SetNull)
+  createdByUser  User?                @relation(fields: [createdBy], references: [id], onDelete: SetNull)
+
+  items FulfillmentItem[]
+
+  @@index([orderId])
+  @@index([providerId])
+  @@index([status])
+  @@index([trackingNumber])
+  @@map("fulfillments")
+}

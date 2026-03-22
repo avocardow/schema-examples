@@ -1,0 +1,33 @@
+// payment_methods: Stored payment instruments linked to a user for checkout.
+// See README.md for full design rationale.
+
+enum PaymentMethodType {
+  card
+  bank_account
+  paypal
+  apple_pay
+  google_pay
+}
+
+model PaymentMethod {
+  id         String            @id @default(uuid())
+  userId     String            @map("user_id")
+  type       PaymentMethodType
+  provider   String
+  providerId String            @map("provider_id")
+  label      String?
+  lastFour   String?           @map("last_four")
+  brand      String?
+  expMonth   Int?              @map("exp_month")
+  expYear    Int?              @map("exp_year")
+  isDefault  Boolean           @default(false) @map("is_default")
+  createdAt  DateTime          @default(now()) @map("created_at")
+  updatedAt  DateTime          @default(now()) @map("updated_at")
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payments Payment[]
+
+  @@index([userId])
+  @@unique([provider, providerId])
+  @@map("payment_methods")
+}

@@ -1,0 +1,25 @@
+// fulfillment_providers: Configurable providers that handle order fulfillment via different shipping strategies.
+// See README.md for full design rationale.
+
+enum FulfillmentProviderType {
+  manual
+  flat_rate
+  carrier_calculated
+  third_party
+}
+
+model FulfillmentProvider {
+  id        String                  @id @default(uuid())
+  name      String
+  code      String                  @unique
+  type      FulfillmentProviderType
+  config    Json?
+  isActive  Boolean                 @default(true) @map("is_active")
+  createdAt DateTime                @default(now()) @map("created_at")
+  updatedAt DateTime                @default(now()) @map("updated_at")
+
+  fulfillments Fulfillment[]
+
+  @@index([isActive])
+  @@map("fulfillment_providers")
+}

@@ -1,0 +1,42 @@
+// payments: Individual payment transactions against an order, tracking provider interactions and lifecycle.
+// See README.md for full design rationale.
+
+enum PaymentType {
+  authorization
+  capture
+  sale
+}
+
+enum PaymentTransactionStatus {
+  pending
+  succeeded
+  failed
+  canceled
+}
+
+model Payment {
+  id              String                   @id @default(uuid())
+  orderId         String                   @map("order_id")
+  paymentMethodId String?                  @map("payment_method_id")
+  provider        String
+  providerId      String?                  @map("provider_id")
+  type            PaymentType
+  status          PaymentTransactionStatus @default(pending)
+  currency        String
+  amount          Int
+  providerFee     Int?                     @map("provider_fee")
+  metadata        Json?
+  errorMessage    String?                  @map("error_message")
+  createdAt       DateTime                 @default(now()) @map("created_at")
+  updatedAt       DateTime                 @default(now()) @map("updated_at")
+
+  order         Order          @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  paymentMethod PaymentMethod? @relation(fields: [paymentMethodId], references: [id], onDelete: SetNull)
+
+  refunds Refund[]
+
+  @@index([orderId])
+  @@index([provider, providerId])
+  @@index([status])
+  @@map("payments")
+}

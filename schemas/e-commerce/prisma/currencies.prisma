@@ -1,0 +1,18 @@
+// currencies: Supported currencies with exchange rates and display formatting.
+// See README.md for full design rationale.
+
+model Currency {
+  id            String   @id @default(uuid())
+  code          String   @unique
+  name          String
+  symbol        String
+  decimalPlaces Int      @default(2) @map("decimal_places")
+  exchangeRate  Decimal  @default(1.0) @map("exchange_rate")
+  isBase        Boolean  @default(false) @map("is_base")
+  isActive      Boolean  @default(true) @map("is_active")
+  updatedAt     DateTime @default(now()) @map("updated_at")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@index([isActive])
+  @@map("currencies")
+}

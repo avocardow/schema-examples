@@ -1,0 +1,16 @@
+// fulfillment_items: Links individual order items to a fulfillment with the shipped quantity.
+// See README.md for full design rationale.
+
+model FulfillmentItem {
+  id            String   @id @default(uuid())
+  fulfillmentId String   @map("fulfillment_id")
+  orderItemId   String   @map("order_item_id")
+  quantity      Int
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  fulfillment   Fulfillment @relation(fields: [fulfillmentId], references: [id], onDelete: Cascade)
+  orderItem     OrderItem   @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+
+  @@unique([fulfillmentId, orderItemId])
+  @@map("fulfillment_items")
+}

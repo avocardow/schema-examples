@@ -1,0 +1,79 @@
+// orders: Customer orders with denormalized shipping/billing addresses, monetary totals, and lifecycle tracking.
+// See README.md for full design rationale.
+
+enum OrderStatus {
+  pending
+  confirmed
+  processing
+  shipped
+  delivered
+  canceled
+  refunded
+}
+
+enum PaymentStatus {
+  unpaid
+  partially_paid
+  paid
+  partially_refunded
+  refunded
+}
+
+enum FulfillmentStatus {
+  unfulfilled
+  partially_fulfilled
+  fulfilled
+}
+
+model Order {
+  id                   String            @id @default(uuid())
+  orderNumber          String            @unique @map("order_number")
+  userId               String?           @map("user_id")
+  email                String
+  status               OrderStatus       @default(pending)
+  currency             String
+  subtotal             Int
+  discountTotal        Int               @default(0) @map("discount_total")
+  taxTotal             Int               @default(0) @map("tax_total")
+  shippingTotal        Int               @default(0) @map("shipping_total")
+  grandTotal           Int               @map("grand_total")
+  paymentStatus        PaymentStatus     @default(unpaid) @map("payment_status")
+  fulfillmentStatus    FulfillmentStatus @default(unfulfilled) @map("fulfillment_status")
+  shippingName         String?           @map("shipping_name")
+  shippingAddressLine1 String?           @map("shipping_address_line1")
+  shippingAddressLine2 String?           @map("shipping_address_line2")
+  shippingCity         String?           @map("shipping_city")
+  shippingRegion       String?           @map("shipping_region")
+  shippingPostalCode   String?           @map("shipping_postal_code")
+  shippingCountry      String?           @map("shipping_country")
+  shippingPhone        String?           @map("shipping_phone")
+  billingName          String?           @map("billing_name")
+  billingAddressLine1  String?           @map("billing_address_line1")
+  billingAddressLine2  String?           @map("billing_address_line2")
+  billingCity          String?           @map("billing_city")
+  billingRegion        String?           @map("billing_region")
+  billingPostalCode    String?           @map("billing_postal_code")
+  billingCountry       String?           @map("billing_country")
+  discountCode         String?           @map("discount_code")
+  note                 String?
+  canceledAt           DateTime?         @map("canceled_at")
+  createdAt            DateTime          @default(now()) @map("created_at")
+  updatedAt            DateTime          @default(now()) @map("updated_at")
+
+  user                 User?             @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  items                OrderItem[]
+  statusHistory        OrderStatusHistory[]
+  discountUsages       DiscountUsage[]
+  payments             Payment[]
+  refunds              Refund[]
+  fulfillments         Fulfillment[]
+  returnAuthorizations ReturnAuthorization[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([paymentStatus])
+  @@index([fulfillmentStatus])
+  @@index([createdAt])
+  @@map("orders")
+}

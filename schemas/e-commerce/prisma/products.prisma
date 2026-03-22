@@ -1,0 +1,42 @@
+// products: Core product catalog with status lifecycle, categorization, and branding.
+// See README.md for full design rationale.
+
+enum ProductStatus {
+  draft
+  active
+  archived
+}
+
+model Product {
+  id          String         @id @default(uuid())
+  categoryId  String?        @map("category_id")
+  brandId     String?        @map("brand_id")
+  name        String
+  slug        String         @unique
+  description String?
+  status      ProductStatus  @default(draft)
+  productType String?        @map("product_type")
+  options     Json?
+  metadata    Json?          @default("{}")
+  isFeatured  Boolean        @default(false) @map("is_featured")
+  deletedAt   DateTime?      @map("deleted_at")
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @default(now()) @map("updated_at")
+
+  category    Category?      @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  brand       Brand?         @relation(fields: [brandId], references: [id], onDelete: SetNull)
+
+  variants        ProductVariant[]
+  images          ProductImage[]
+  collectionItems ProductCollectionItem[]
+  tagAssignments  ProductTagAssignment[]
+  reviews         ProductReview[]
+
+  @@index([categoryId])
+  @@index([brandId])
+  @@index([status])
+  @@index([isFeatured])
+  @@index([deletedAt])
+  @@index([status, deletedAt])
+  @@map("products")
+}

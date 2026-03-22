@@ -1,0 +1,31 @@
+// refunds: Tracks refund transactions against payments and orders, including provider state and internal notes.
+// See README.md for full design rationale.
+
+enum RefundStatus {
+  pending
+  succeeded
+  failed
+}
+
+model Refund {
+  id           String       @id @default(uuid())
+  paymentId    String       @map("payment_id")
+  orderId      String       @map("order_id")
+  providerId   String?      @map("provider_id")
+  amount       Int
+  currency     String
+  reason       String?
+  status       RefundStatus @default(pending)
+  note         String?
+  refundedBy   String?      @map("refunded_by")
+  createdAt    DateTime     @default(now()) @map("created_at")
+
+  payment        Payment @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+  order          Order   @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  refundedByUser User?   @relation(fields: [refundedBy], references: [id], onDelete: SetNull)
+
+  @@index([paymentId])
+  @@index([orderId])
+  @@index([status])
+  @@map("refunds")
+}

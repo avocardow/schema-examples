@@ -1,0 +1,34 @@
+// product_variants: SKU-level variants of a product with physical dimensions and option values.
+// See README.md for full design rationale.
+
+model ProductVariant {
+  id                String    @id @default(uuid())
+  productId         String    @map("product_id")
+  shippingProfileId String?   @map("shipping_profile_id")
+  sku               String?   @unique
+  barcode           String?
+  title             String
+  optionValues      Json?     @map("option_values")
+  weightGrams       Int?      @map("weight_grams")
+  heightMm          Int?      @map("height_mm")
+  widthMm           Int?      @map("width_mm")
+  lengthMm          Int?      @map("length_mm")
+  isActive          Boolean   @default(true) @map("is_active")
+  sortOrder         Int       @default(0) @map("sort_order")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @default(now()) @map("updated_at")
+
+  product           Product          @relation(fields: [productId], references: [id], onDelete: Cascade)
+  shippingProfile   ShippingProfile? @relation(fields: [shippingProfileId], references: [id], onDelete: SetNull)
+
+  images            ProductImage[]
+  prices            Price[]
+  wishlistItems     WishlistItem[]
+  cartItems         CartItem[]
+  orderItems        OrderItem[]
+
+  @@index([productId])
+  @@index([barcode])
+  @@index([shippingProfileId])
+  @@map("product_variants")
+}

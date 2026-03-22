@@ -1,0 +1,21 @@
+// prices: Currency-specific pricing for product variants with optional quantity breaks and time windows.
+// See README.md for full design rationale.
+
+model Price {
+  id              String    @id @default(uuid())
+  variantId       String    @map("variant_id")
+  currency        String
+  amount          Int
+  compareAtAmount Int?      @map("compare_at_amount")
+  minQuantity     Int?      @map("min_quantity")
+  startsAt        DateTime? @map("starts_at")
+  endsAt          DateTime? @map("ends_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @default(now()) @map("updated_at")
+
+  variant         ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  @@index([variantId, currency])
+  @@index([startsAt, endsAt])
+  @@map("prices")
+}

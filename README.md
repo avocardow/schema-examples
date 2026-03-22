@@ -45,7 +45,7 @@ See each domain's **Dependencies** section for details.
 
 | Domain                                                               | Status |
 | -------------------------------------------------------------------- | ------ |
-| [E-commerce](./schemas/e-commerce)                                   | 🔲     |
+| [E-commerce](./schemas/e-commerce)                                   | ✅     |
 | [Marketplace (Multi-vendor)](./schemas/marketplace)                  | 🔲     |
 | [Auction](./schemas/auction)                                         | 🔲     |
 | [Subscription / Membership](./schemas/subscription-membership)       | 🔲     |
@@ -172,7 +172,7 @@ See each domain's **Dependencies** section for details.
 | [Event Planning](./schemas/event-planning)                                 | 🔲     |
 | [Voting / Polling / Surveys](./schemas/voting-polling-surveys)             | 🔲     |
 
-**57 domains — 6 complete, 51 in progress**
+**57 domains — 7 complete, 50 in progress**
 
 ## How to Use
 
