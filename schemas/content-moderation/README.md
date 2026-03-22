@@ -14,7 +14,7 @@ Designed from a study of 10 systems: federated social networks (Mastodon, Lemmy)
 - [Schema](#schema)
 
 <details>
-<summary>Schema table list (20 tables)</summary>
+<summary>Schema table list (21 tables)</summary>
 
 - [Content Moderation](#content-moderation)
   - [Overview](#overview)
@@ -49,6 +49,7 @@ Designed from a study of 10 systems: federated social networks (Mastodon, Lemmy)
     - [`moderator_assignments`](#moderator_assignments)
     - [`moderator_performance`](#moderator_performance)
     - [`moderation_action_log`](#moderation_action_log)
+    - [`user_moderation_notes`](#user_moderation_notes)
     - [`blocked_domains`](#blocked_domains)
     - [`blocked_ips`](#blocked_ips)
   - [Relationships](#relationships)
@@ -106,6 +107,7 @@ Designed from a study of 10 systems: federated social networks (Mastodon, Lemmy)
 - `moderator_assignments`
 - `moderator_performance`
 - `moderation_action_log`
+- `user_moderation_notes`
 
 ### Domain & IP Blocking
 
@@ -890,6 +892,33 @@ indexes {
 **Design notes:**
 - `action_type` and `target_type` are strings rather than enums — the audit log should accept any event type without requiring schema migration. This follows Mastodon's polymorphic admin_action_logs pattern.
 
+### `user_moderation_notes`
+
+Internal moderator notes on a user account. Distinct from `report_notes` (which are attached to
+queue items): these capture ongoing context about a user's moderation history — "known ban evader",
+"handle with care", "cooperated with previous warning". Visible only to moderators, not to the user.
+Inspired by Mastodon's `account_moderation_notes`.
+
+```pseudo
+table user_moderation_notes {
+  id                uuid primary_key default auto_generate
+  user_id           uuid not_null references users(id) on_delete cascade
+                                                       -- The user this note is about.
+                                                       -- Cascade: deleting the user removes their moderation notes.
+  author_id         uuid not_null references users(id) on_delete restrict
+                                                       -- The moderator who wrote this note.
+                                                       -- Restrict: don't delete moderators who have notes on file.
+  body              text not_null                       -- The note content.
+  created_at        timestamp default now
+  updated_at        timestamp default now on_update
+
+  indexes {
+    index(user_id)                                     -- "All moderation notes for this user."
+    index(author_id)                                   -- "All notes written by this moderator."
+  }
+}
+```
+
 ### `blocked_domains`
 
 Domain-level blocking for preventing content from specific domains. Supports full domain blocks
@@ -984,6 +1013,8 @@ indexes {
 - `users` → `moderator_assignments` (a moderator has many assignments)
 - `users` → `moderator_performance` (a moderator has many performance records)
 - `users` → `moderation_action_log` (an actor has many log entries, via `actor_id`)
+- `users` → `user_moderation_notes` (a user has many moderation notes, via `user_id`)
+- `users` → `user_moderation_notes` (a moderator writes many notes, via `author_id`)
 - `users` → `moderation_queue_items` (a moderator reviews many items, via `assigned_moderator_id`)
 - `users` → `moderation_queue_items` (a moderator resolves many items, via `resolved_by`)
 - `users` → `user_restrictions` (a moderator imposes many restrictions, via `imposed_by`)
