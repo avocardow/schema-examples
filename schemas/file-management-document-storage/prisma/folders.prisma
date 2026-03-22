@@ -22,6 +22,9 @@ model Folder {
   children    Folder[]      @relation("FolderToFolder")
   creator     User          @relation(fields: [createdBy], references: [id], onDelete: Restrict)
 
+  // Reverse relations
+  permissions FolderPermission[]
+
   @@unique([bucketId, path])
   @@unique([bucketId, parentId, name])
   @@index([parentId])

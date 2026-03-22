@@ -14,7 +14,7 @@ Designed from a study of 24 systems: cloud storage (S3, GCS, Azure, Supabase, Mi
 - [Schema](#schema)
 
 <details>
-<summary>Schema table list (20 tables)</summary>
+<summary>Schema table list (19 tables)</summary>
 
 - [File Management / Document Storage](#file-management--document-storage)
   - [Overview](#overview)
@@ -34,7 +34,6 @@ Designed from a study of 24 systems: cloud storage (S3, GCS, Azure, Supabase, Mi
     - [`storage_buckets`](#storage_buckets)
     - [`storage_quotas`](#storage_quotas)
     - [`folders`](#folders)
-    - [`file_shortcuts`](#file_shortcuts)
     - [`files`](#files)
     - [`file_versions`](#file_versions)
     - [`file_attachments`](#file_attachments)
@@ -45,12 +44,12 @@ Designed from a study of 24 systems: cloud storage (S3, GCS, Azure, Supabase, Mi
     - [`file_metadata_values`](#file_metadata_values)
     - [`file_shares`](#file_shares)
     - [`file_share_links`](#file_share_links)
+    - [`folder_permissions`](#folder_permissions)
     - [`multipart_uploads`](#multipart_uploads)
     - [`multipart_upload_parts`](#multipart_upload_parts)
     - [`file_comments`](#file_comments)
     - [`file_locks`](#file_locks)
     - [`file_activities`](#file_activities)
-    - [`file_favorites`](#file_favorites)
   - [Relationships](#relationships)
     - [One-to-Many](#one-to-many)
     - [One-to-One](#one-to-one)
@@ -78,7 +77,6 @@ Designed from a study of 24 systems: cloud storage (S3, GCS, Azure, Supabase, Mi
 ### Hierarchy
 
 - `folders`
-- `file_shortcuts`
 
 ### Core Files
 
@@ -97,10 +95,11 @@ Designed from a study of 24 systems: cloud storage (S3, GCS, Azure, Supabase, Mi
 - `file_metadata_fields`
 - `file_metadata_values`
 
-### Sharing
+### Sharing & Permissions
 
 - `file_shares`
 - `file_share_links`
+- `folder_permissions`
 
 ### Uploads
 
@@ -115,7 +114,6 @@ Designed from a study of 24 systems: cloud storage (S3, GCS, Azure, Supabase, Mi
 ### Operations
 
 - `file_activities`
-- `file_favorites`
 
 ## Schema
 
@@ -230,41 +228,6 @@ indexes {
                                                  --     or use COALESCE(parent_id, '00000000-...'::uuid).
   index(parent_id)                               -- "All children of this folder" (single-level listing).
   index(bucket_id, depth)                        -- "All root folders in this bucket" (depth = 0).
-}
-```
-
-### `file_shortcuts`
-
-Cross-folder references without file duplication. A shortcut points to a file or folder in
-another location — similar to Google Drive shortcuts or Windows .lnk files. The target continues
-to exist independently; deleting a shortcut does not affect the target. Deleting the target
-cascade-deletes the shortcut — no dangling references.
-
-```pseudo
-table file_shortcuts {
-  id                uuid primary_key default auto_generate
-  folder_id         uuid not_null references folders(id) on_delete cascade
-                                                 -- The folder where this shortcut lives.
-                                                 -- Cascade: deleting the containing folder removes its shortcuts.
-
-  -- What the shortcut points to. Exactly one of target_file_id or target_folder_id must be set.
-  target_type       enum(file, folder) not_null  -- Discriminator for which FK is populated.
-  target_file_id    uuid nullable references files(id) on_delete cascade
-                                                 -- Populated when target_type = 'file'.
-                                                 -- Cascade: shortcut removed when target file is deleted.
-  target_folder_id  uuid nullable references folders(id) on_delete cascade
-                                                 -- Populated when target_type = 'folder'.
-                                                 -- Cascade: shortcut removed when target folder is deleted.
-
-  name              string nullable              -- Override display name. Null = use the target's name.
-  created_by        uuid not_null references users(id) on_delete restrict
-  created_at        timestamp default now
-}
-
-indexes {
-  index(folder_id)                               -- "All shortcuts in this folder."
-  index(target_file_id)                          -- "All shortcuts pointing to this file."
-  index(target_folder_id)                        -- "All shortcuts pointing to this folder."
 }
 ```
 
@@ -706,6 +669,43 @@ indexes {
 }
 ```
 
+### `folder_permissions`
+
+Folder-level access control — persistent records that grant a user a specific permission level
+on a folder. Inspired by Nextcloud's `oc_share`, Django Filer's `FolderPermission`, and
+Alfresco/Nuxeo ACLs. Unlike `file_shares` (which share individual files with external or internal
+recipients), folder permissions define ongoing access rules for the folder hierarchy. Permissions
+cascade to subfolders and files within the folder unless overridden.
+
+```pseudo
+table folder_permissions {
+  id                uuid primary_key default auto_generate
+  folder_id         uuid not_null references folders(id) on_delete cascade
+                                                 -- The folder this permission applies to.
+                                                 -- Cascade: deleting a folder removes its permissions.
+  user_id           uuid not_null references users(id) on_delete cascade
+                                                 -- Who is granted this permission.
+                                                 -- Cascade: deleting a user removes their permissions.
+  permission        enum(view, edit, manage) not_null default view
+                                                 -- Access level: view (read-only), edit (read + write),
+                                                 -- manage (read + write + share + delete).
+  inherited         boolean not_null default false
+                                                 -- Whether this permission was inherited from a parent folder.
+                                                 -- Inherited permissions are auto-created when a subfolder is added.
+                                                 -- Direct (non-inherited) permissions take precedence.
+  granted_by        uuid nullable references users(id) on_delete set_null
+                                                 -- Who granted this permission.
+  created_at        timestamp default now
+  updated_at        timestamp default now on_update
+
+  indexes {
+    composite_unique(folder_id, user_id)         -- One permission per user per folder.
+    index(user_id)                               -- "All folders this user has access to."
+    index(folder_id)                             -- "All users with access to this folder."
+  }
+}
+```
+
 ### `multipart_uploads`
 
 Resumable upload session tracking. Models the lifecycle of a file upload from initiation to
@@ -917,29 +917,6 @@ indexes {
 }
 ```
 
-### `file_favorites`
-
-Per-user file bookmarks (stars). A simple join table that enables "starred files" UIs. Each user
-can favorite any file exactly once. Inspired by Google Drive's starred feature.
-
-```pseudo
-table file_favorites {
-  id                uuid primary_key default auto_generate
-  user_id           uuid not_null references users(id) on_delete cascade
-                                                 -- Who favorited the file.
-                                                 -- Cascade: deleting a user removes all their favorites.
-  file_id           uuid not_null references files(id) on_delete cascade
-                                                 -- The favorited file.
-                                                 -- Cascade: deleting a file removes all its favorites.
-  created_at        timestamp default now
-}
-
-indexes {
-  unique(user_id, file_id)                       -- A user can favorite a file only once.
-  index(file_id)                                 -- "How many users favorited this file?"
-}
-```
-
 ## Relationships
 
 ### One-to-Many
@@ -949,9 +926,6 @@ indexes {
 - `storage_buckets` → `multipart_uploads` (a bucket has many pending uploads)
 - `folders` → `folders` (a folder has many child folders, via `parent_id`)
 - `folders` → `files` (a folder contains many files)
-- `folders` → `file_shortcuts` (a folder contains many shortcuts, via `folder_id`)
-- `files` → `file_shortcuts` (a file is the target of many shortcuts, via `target_file_id`)
-- `folders` → `file_shortcuts` (a folder is the target of many shortcuts, via `target_folder_id`)
 - `files` → `file_versions` (a file has many versions)
 - `files` → `file_attachments` (a file has many attachment records across entities)
 - `files` → `file_variants` (a file has many derived variants)
@@ -960,9 +934,9 @@ indexes {
 - `files` → `file_shares` (a file has many direct shares)
 - `files` → `file_share_links` (a file has many share links)
 - `files` → `file_comments` (a file has many comments)
-- `files` → `file_favorites` (a file is favorited by many users)
 - `folders` → `file_shares` (a folder has many direct shares)
 - `folders` → `file_share_links` (a folder has many share links)
+- `folders` → `folder_permissions` (a folder has many permission grants)
 - `file_comments` → `file_comments` (a comment has many replies, via `parent_id`)
 - `file_tags` → `file_tag_assignments` (a tag is applied to many files)
 - `file_metadata_fields` → `file_metadata_values` (a field has many values across files)
@@ -971,7 +945,6 @@ indexes {
 - `users` → `folders` (a user creates many folders, via `created_by`)
 - `users` → `files` (a user uploads many files, via `uploaded_by`)
 - `users` → `file_versions` (a user creates many versions, via `created_by`)
-- `users` → `file_shortcuts` (a user creates many shortcuts, via `created_by`)
 - `users` → `file_tags` (a user creates many tags, via `created_by`)
 - `users` → `file_tag_assignments` (a user tags many files, via `tagged_by`)
 - `users` → `file_shares` (a user creates many shares, via `shared_by`)
@@ -979,7 +952,7 @@ indexes {
 - `users` → `file_comments` (a user writes many comments, via `author_id`)
 - `users` → `file_locks` (a user holds many locks, via `locked_by`)
 - `users` → `file_activities` (a user performs many actions, via `actor_id`)
-- `users` → `file_favorites` (a user has many favorites)
+- `users` → `folder_permissions` (a user has many folder permissions)
 - `users` → `multipart_uploads` (a user initiates many uploads, via `initiated_by`)
 
 ### One-to-One

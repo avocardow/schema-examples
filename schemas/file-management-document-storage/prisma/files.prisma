@@ -54,8 +54,6 @@ model File {
   shares          FileShare[]
   shareLinks      FileShareLink[]
   comments        FileComment[]
-  favorites       FileFavorite[]
-  shortcuts       FileShortcut[]
   lock            FileLock?
 
   @@index([bucketId, folderId])
