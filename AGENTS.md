@@ -17,14 +17,14 @@ Production-ready database schema examples across formats and domains. Each domai
 **Study a completed domain first.** Read the domain README (pseudo code), then read 2-3 schema files per format to internalize the patterns:
 
 - [Auth / RBAC](./schemas/auth-rbac) — 26 tables, the most comprehensive example
-- [File Management / Document Storage](./schemas/file-management-document-storage) — 20 tables, good example of cross-table references and circular FKs
-- [Notifications System](./schemas/notifications-system) — 20 tables
+- [File Management / Document Storage](./schemas/file-management-document-storage) — good example of cross-table references and circular FKs
+- [Notifications System](./schemas/notifications-system)
 
 Pay attention to: how pseudo code maps to each format, comment conventions, Prisma reverse relations (the `File` model has 19+ reverse relation fields), circular FK handling (SQL uses `ALTER TABLE`, Drizzle uses a comment instead of `.references()`), and enum declarations per format.
 
-**Do not let completed domains influence your table count.** The number of tables in a new domain should be determined entirely by your research — what the domain actually needs. Don't anchor on the table counts of existing domains. Most completed domains happen to have 20 tables — **this is a coincidence, not a target.** If your research identifies 24 tables, implement 24. If it identifies 15, implement 15.
+**Do not let completed domains influence your table count.** The number of tables in a new domain should be determined entirely by your research — what the domain actually needs. Don't anchor on the table counts of existing domains. If your research identifies 24 tables, implement 24. If it identifies 15, implement 15.
 
-**⚠️ Common failure mode:** Agents see that existing domains have 20 tables, then say "I need to refine to 20" and start collapsing well-researched tables to hit that number. This is exactly wrong. Never merge, collapse, or remove tables from your research to reach a specific count. Never add filler tables to inflate the count either. The research output is the table list — do not adjust it.
+**⚠️ Common failure mode:** Agents say "I need to refine to N" and start collapsing well-researched tables to hit a round number. This is exactly wrong. Never merge, collapse, or remove tables from your research to reach a specific count. Never add filler tables to inflate the count either. The research output is the table list — do not adjust it.
 
 ## The Proven Workflow
 
@@ -61,13 +61,13 @@ Write format-agnostic pseudo code in the domain's `README.md`. The table list, t
 
 **Critical: One subagent = one file. Each agent writes exactly ONE schema file.**
 
-A domain with 20 tables × 7 formats = **140 subagents** for implementation. Not 7 (one per format). Not 20 (one per table). **140.** Each agent receives the pseudo code for one table and the conventions for one format, and writes one file. This is the single most important rule — violating it (e.g., giving one agent all 20 tables for a format) produces systematic errors across every file that agent touches.
+A domain with N tables × 7 formats = **N×7 subagents** for implementation. Not 7 (one per format). Not N (one per table). **N×7.** Each agent receives the pseudo code for one table and the conventions for one format, and writes one file. This is the single most important rule — violating it (e.g., giving one agent all tables for a format) produces systematic errors across every file that agent touches.
 
 #### How to Orchestrate
 
 1. **Parse pseudo code.** Extract each table's block from the domain README (between `### N. table_name` headings).
 2. **Build the table list.** For each table, note: which tables it references (for imports) and which reference it (for Prisma reverse relations).
-3. **Batch by format, one file per agent.** Pick a format, then launch one agent per table in that format (e.g., 20 agents for SQL, then 20 for Prisma, etc.). Each agent writes exactly one file. Batch in groups of ~10 if needed for concurrency limits, but never combine multiple tables into one agent.
+3. **Batch by format, one file per agent.** Pick a format, then launch one agent per table in that format (e.g., N agents for SQL, then N for Prisma, etc.). Each agent writes exactly one file. Batch in groups of ~10 if needed for concurrency limits, but never combine multiple tables into one agent.
 4. **Provide complete context.** Each agent receives:
    - Pseudo code for **its single table** (verbatim from README)
    - Format conventions (from `schemas/_template/{format}/README.md`)
@@ -76,8 +76,8 @@ A domain with 20 tables × 7 formats = **140 subagents** for implementation. Not
    - Cross-table references (imports/FKs) and inbound references (Prisma reverse relations)
    - A reference example from a completed domain
 
-**Wrong:** "I've launched 7 agents — one per format — to write all 140 files."
-**Right:** "I'm launching 20 agents for the SQL format — one per table. Then 20 for Prisma..." (×7 formats = 140 total agents.)
+**Wrong:** "I've launched 7 agents — one per format — to write all N×7 files."
+**Right:** "I'm launching N agents for the SQL format — one per table. Then N for Prisma..." (×7 formats = N×7 total agents.)
 
 #### Example Implementation Prompt
 
