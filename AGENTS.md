@@ -24,17 +24,32 @@ Pay attention to: how pseudo code maps to each format, comment conventions, Pris
 
 ## The Proven Workflow
 
-Every domain follows: **research → pseudo code → implement → audit → fix → review → update → commit**.
+Every domain follows these steps **strictly in order**. Do not skip ahead — each step's output is the input for the next.
+
+**research → pseudo code → implement → audit → fix → review → update → commit**
 
 ### Step 1: Research
 
+**Prerequisite:** None. This is always the first step.
+**Output:** A completed `RESEARCH.md` file in the domain directory.
+**Gate:** Do not design any tables, write any pseudo code, or create any schema files until `RESEARCH.md` is fully written with all sections complete.
+
 Write findings to `RESEARCH.md` (gitignored — use `schemas/_template/RESEARCH.md` as your starting structure). Use web search to find official documentation, open-source implementations, and API references. Study at least 5-10 real implementations — examine overlaps, differences, best practices, and industry standards. For each implementation, document what they got right and what could be improved. Also identify relevant standards/specifications (RFCs, industry formats) that inform the schema design. End with a clear consensus recommendation on which patterns to adopt and a decision matrix for every significant design choice.
 
+The table list and table count must emerge from this research — not from preconceptions or other domains' patterns.
+
 ### Step 2: Write Pseudo Code
+
+**Prerequisite:** A completed `RESEARCH.md` exists in the domain directory.
+**Output:** A completed `README.md` with full pseudo code for every table.
+**Gate:** Do not launch any implementation agents until every table's pseudo code block is finalized in the README.
 
 Write format-agnostic pseudo code in the domain's `README.md`. Follow the pseudo code conventions and structure in [CONTRIBUTING.md](./CONTRIBUTING.md). Model the README after a completed domain (e.g., [file-management-document-storage](./schemas/file-management-document-storage/README.md)): overview, dependencies, table list, pseudo code with design notes, relationships diagram, best practices, and formats table.
 
 ### Step 3: Implement — One Agent per File
+
+**Prerequisite:** A completed `README.md` with finalized pseudo code for all tables.
+**Output:** One schema file per table per format (tables × 7 files).
 
 **Critical: One subagent = one file. Each agent writes exactly ONE schema file.**
 
@@ -80,6 +95,9 @@ Reference example:
 
 ### Step 4: Audit — One Agent per Format (7 agents)
 
+**Prerequisite:** All implementation agents have completed. Verify file count = tables × 7 before proceeding.
+**Output:** Structured issue list per format.
+
 Launch **one audit agent per format** (7 total for 7 formats). Unlike implementation, auditing benefits from seeing all files together to catch cross-table inconsistencies. Each reads the full pseudo code + every file in its format directory, checks against the [Audit Checklist](#audit-checklist), and returns structured issues.
 
 #### Example Audit Prompt
@@ -100,13 +118,20 @@ Return: File, Line, Issue, Fix — for every issue. Confirm clean files explicit
 
 ### Step 5: Fix — One Agent per Format (7 agents)
 
+**Prerequisite:** All audit agents have returned their issue lists.
+**Output:** All issues resolved. Zero known issues remaining.
+
 Launch **one fix agent per format** (7 total) with: the audit issues, pseudo code, and format conventions from `_template/{format}/README.md`.
 
 ### Step 6: Manual Deep Review
 
+**Prerequisite:** All fix agents have completed.
+
 Focus on what automated auditing misses: cross-format consistency, subtle convention violations (e.g., `@@map` on Prisma enums, `u32` vs `i32` in SpacetimeDB), edge cases, and adherence to official docs.
 
 ### Step 7: Update & Commit
+
+**Prerequisite:** Deep review is complete and all issues are resolved.
 
 1. Domain README formats table: `🔲 Todo` → `✅ Done` for each format
 2. Root `README.md`: set table count, change `🔲` → `✅`, update domain counter
