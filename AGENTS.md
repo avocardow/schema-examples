@@ -2,6 +2,8 @@
 
 Symlinked as `CLAUDE.md` for Claude Code compatibility.
 
+**This file contains mandatory instructions, not suggestions. Follow each step in order. Do not plan ahead — complete one step, stop, then re-read before starting the next.**
+
 ## Project Overview
 
 Production-ready database schema examples across formats and domains. Each domain's README contains format-agnostic pseudo code — the **single source of truth** — from which all format implementations are derived.
