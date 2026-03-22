@@ -1,0 +1,19 @@
+// file_tag_assignments: Many-to-many join between files and tags with audit trail.
+// See README.md for full design rationale.
+
+model FileTagAssignment {
+  id        String   @id @default(uuid())
+  fileId    String   @map("file_id")
+  tagId     String   @map("tag_id")
+  taggedBy  String   @map("tagged_by")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  file   File    @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  tag    FileTag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  tagger User   @relation(fields: [taggedBy], references: [id], onDelete: Restrict)
+
+  @@unique([fileId, tagId])
+  @@index([tagId])
+  @@index([taggedBy])
+  @@map("file_tag_assignments")
+}

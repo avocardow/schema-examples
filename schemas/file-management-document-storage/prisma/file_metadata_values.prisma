@@ -1,0 +1,23 @@
+// file_metadata_values: Custom metadata values per file — each row stores one field's value for one file.
+// See README.md for full design rationale and field documentation.
+
+model FileMetadataValue {
+  id        String   @id @default(uuid())
+  fileId    String   @map("file_id")
+  fieldId   String   @map("field_id")
+
+  // The actual value, stored as text regardless of field_type.
+  // Application validates against field_type before saving.
+  // Null means "explicitly empty".
+  value     String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  file  File              @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  field FileMetadataField @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+
+  @@unique([fileId, fieldId])
+  @@index([fieldId, value])
+  @@map("file_metadata_values")
+}

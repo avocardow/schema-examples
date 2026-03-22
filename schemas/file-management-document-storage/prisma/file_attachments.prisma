@@ -1,0 +1,25 @@
+// file_attachments: Polymorphic join table — attach files to any entity in any domain.
+// See README.md for full design rationale.
+
+model FileAttachment {
+  id         String   @id @default(uuid())
+  fileId     String   @map("file_id")
+
+  // Polymorphic target: what entity this file is attached to.
+  // Not FKs — the target table depends on the consuming domain.
+  recordType String   @map("record_type") // Entity type (e.g., "products", "users", "posts", "tickets").
+  recordId   String   @map("record_id")   // Entity primary key (UUID).
+
+  name       String   // Attachment slot/purpose (e.g., "avatar", "cover_image", "documents").
+  position   Int      @default(0) @map("position") // Ordering within a slot.
+  createdAt  DateTime @default(now()) @map("created_at")
+                                     // Attachments are immutable links. No updatedAt.
+
+  file File @relation(fields: [fileId], references: [id], onDelete: Cascade)
+
+  @@unique([recordType, recordId, name, fileId])
+  @@index([fileId])
+  @@index([recordType, recordId, name])
+  @@index([recordType, recordId])
+  @@map("file_attachments")
+}

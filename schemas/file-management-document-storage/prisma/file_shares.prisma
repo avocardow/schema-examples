@@ -1,0 +1,48 @@
+// file_shares: Direct access grants to specific users, groups, or organizations.
+// See README.md for full design rationale.
+
+enum FileShareTargetType {
+  file
+  folder
+}
+
+enum FileShareSharedWithType {
+  user
+  group
+  organization
+}
+
+enum FileShareRole {
+  viewer
+  commenter
+  editor
+  co_owner
+}
+
+model FileShare {
+  id             String                   @id @default(uuid())
+  targetType     FileShareTargetType      @map("target_type")
+  targetFileId   String?                  @map("target_file_id")
+  targetFolderId String?                  @map("target_folder_id")
+  sharedBy       String                   @map("shared_by")
+  sharedWithType FileShareSharedWithType  @map("shared_with_type")
+  sharedWithId   String                   @map("shared_with_id") // Polymorphic — not a FK.
+  role           FileShareRole
+  allowReshare   Boolean                  @default(false) @map("allow_reshare")
+  expiresAt      DateTime?                @map("expires_at")
+  acceptedAt     DateTime?                @map("accepted_at")
+  message        String?
+  createdAt      DateTime                 @default(now()) @map("created_at")
+  updatedAt      DateTime                 @default(now()) @updatedAt @map("updated_at")
+
+  targetFile   File?   @relation(fields: [targetFileId], references: [id], onDelete: Cascade)
+  targetFolder Folder? @relation(fields: [targetFolderId], references: [id], onDelete: Cascade)
+  sharer       User    @relation(fields: [sharedBy], references: [id], onDelete: Restrict)
+
+  @@index([targetType, targetFileId])
+  @@index([targetType, targetFolderId])
+  @@index([sharedWithType, sharedWithId])
+  @@index([sharedBy])
+  @@index([expiresAt])
+  @@map("file_shares")
+}

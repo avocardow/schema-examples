@@ -1,0 +1,21 @@
+// file_variants: Thumbnails, resized images, and transformed derivatives of a source file.
+// See README.md for full design rationale.
+
+model FileVariant {
+  id              String   @id @default(uuid())
+  sourceFileId    String   @map("source_file_id")
+  variantKey      String   @map("variant_key") // Variant identifier (e.g., "thumbnail", "small", "medium", "large", "webp").
+  storageKey      String   @unique @map("storage_key") // Path to the variant's bytes.
+  mimeType        String   @map("mime_type") // May differ from source (e.g., JPEG source → WebP variant).
+  width           Int?     // Variant width in pixels. Null for non-image variants.
+  height          Int?     // Variant height in pixels. Null for non-image variants.
+  size            BigInt   // Variant file size in bytes.
+  transformParams Json?    @map("transform_params") // The transformation parameters that produced this variant.
+  createdAt       DateTime @default(now()) @map("created_at")
+  // No updatedAt — variants are immutable.
+
+  sourceFile File @relation(fields: [sourceFileId], references: [id], onDelete: Cascade)
+
+  @@unique([sourceFileId, variantKey])
+  @@map("file_variants")
+}

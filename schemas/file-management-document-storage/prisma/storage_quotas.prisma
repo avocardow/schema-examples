@@ -1,0 +1,27 @@
+// storage_quotas: Per-entity storage limits and usage tracking for users, organizations, or buckets.
+// See README.md for full design rationale.
+
+enum StorageQuotaEntityType {
+  user
+  organization
+  bucket
+}
+
+model StorageQuota {
+  id              String                 @id @default(uuid())
+
+  entityType      StorageQuotaEntityType @map("entity_type")
+  entityId        String                 @map("entity_id") // Polymorphic — no @relation.
+
+  quotaBytes      BigInt                 @map("quota_bytes") // Storage limit in bytes. Enforced at upload time.
+  usedBytes       BigInt                 @default(0) @map("used_bytes") // Cached: total bytes consumed. Updated on upload/delete.
+  fileCount       Int                    @default(0) @map("file_count") // Cached: total file count. Updated on upload/delete.
+  lastComputedAt  DateTime?              @map("last_computed_at") // When usage was last recomputed. Null = never recomputed.
+
+  createdAt       DateTime               @default(now()) @map("created_at")
+  updatedAt       DateTime               @default(now()) @updatedAt @map("updated_at")
+
+  @@unique([entityType, entityId])
+  @@index([entityType])
+  @@map("storage_quotas")
+}

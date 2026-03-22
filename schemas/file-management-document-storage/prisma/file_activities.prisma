@@ -1,0 +1,48 @@
+// file_activities: Audit trail for file and folder operations. Append-only — rows are never updated or deleted.
+// See README.md for full design rationale.
+
+enum FileActivityAction {
+  created
+  uploaded
+  updated
+  renamed
+  moved
+  copied
+  deleted
+  restored
+  shared
+  unshared
+  downloaded
+  locked
+  unlocked
+  commented
+  version_created
+}
+
+enum FileActivityTargetType {
+  file
+  folder
+}
+
+model FileActivity {
+  id          String                 @id @default(uuid())
+  actorId     String                 @map("actor_id")
+
+  action      FileActivityAction
+
+  targetType  FileActivityTargetType @map("target_type")
+  targetId    String                 @map("target_id") // Not a FK — target may be permanently deleted.
+  targetName  String                 @map("target_name") // Denormalized: file/folder name at the time of the action.
+
+  details     Json?                  // Action-specific context (e.g., moved: {from_folder_id, to_folder_id}).
+  ipAddress   String?                @map("ip_address") // Client IP address for security audit.
+  createdAt   DateTime               @default(now()) @map("created_at") // Immutable. Activities are append-only.
+
+  actor       User                   @relation(fields: [actorId], references: [id], onDelete: Restrict)
+
+  @@index([actorId])
+  @@index([targetType, targetId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("file_activities")
+}

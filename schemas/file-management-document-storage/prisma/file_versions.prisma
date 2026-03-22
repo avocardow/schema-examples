@@ -1,0 +1,31 @@
+// file_versions: Immutable version history for files — each row is a point-in-time snapshot with its own storage key.
+// See README.md for full design rationale.
+
+model FileVersion {
+  id              String   @id @default(uuid())
+  fileId          String   @map("file_id")
+  versionNumber   Int      @map("version_number") // Monotonic counter per file: 1, 2, 3, ...
+  storageKey      String   @unique @map("storage_key") // Path to this version's bytes.
+  size            BigInt   @map("size") // This version's file size in bytes.
+  checksumSha256  String?  @map("checksum_sha256") // This version's content hash.
+  mimeType        String   @map("mime_type") // This version's MIME type. May differ between versions.
+  changeSummary   String?  @map("change_summary") // Human-readable description of what changed.
+
+  // Denormalized flag: true for the active version.
+  // Kept in sync with files.current_version_id.
+  isCurrent       Boolean  @default(false) @map("is_current")
+
+  createdBy       String   @map("created_by") // Who uploaded this version.
+  createdAt       DateTime @default(now()) @map("created_at")
+  // No updatedAt — versions are immutable (append-only).
+
+  file            File     @relation("FileVersionFile", fields: [fileId], references: [id], onDelete: Cascade)
+  creator         User     @relation(fields: [createdBy], references: [id], onDelete: Restrict)
+
+  // Reverse relation for File.currentVersion
+  currentVersionOf File? @relation("FileCurrentVersion")
+
+  @@unique([fileId, versionNumber])
+  @@index([fileId, isCurrent])
+  @@map("file_versions")
+}

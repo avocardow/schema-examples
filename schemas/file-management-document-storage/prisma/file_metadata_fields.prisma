@@ -1,0 +1,40 @@
+// file_metadata_fields: Custom metadata field definitions with type information for application-level validation.
+// See README.md for full design rationale and field documentation.
+
+enum FileMetadataFieldType {
+  string
+  integer
+  float
+  boolean
+  date
+  url
+  select
+}
+
+model FileMetadataField {
+  id           String               @id @default(uuid())
+  name         String               @unique // Machine-readable key (e.g., "invoice_number", "project_code").
+  label        String               // Human-readable display name (e.g., "Invoice Number", "Project Code").
+
+  // Determines validation rules applied at the application layer.
+  fieldType    FileMetadataFieldType @map("field_type")
+
+  description  String?              // Explain what this field is for or how to fill it in.
+
+  // If true, every file must have a value for this field.
+  // Enforced at the application layer, not as a DB constraint.
+  isRequired   Boolean              @default(false) @map("is_required")
+
+  defaultValue String?              @map("default_value") // Default value for new files. Stored as text.
+
+  // For select-type fields: array of valid values. Null for non-select types.
+  options      Json?
+
+  createdAt    DateTime             @default(now()) @map("created_at")
+  updatedAt    DateTime             @default(now()) @updatedAt @map("updated_at")
+
+  // Reverse relations
+  values FileMetadataValue[]
+
+  @@map("file_metadata_fields")
+}

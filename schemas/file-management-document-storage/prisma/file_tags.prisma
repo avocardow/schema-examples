@@ -1,0 +1,31 @@
+// file_tags: Tag definitions for organizing files with visibility levels (public, private, system).
+// See README.md for full design rationale.
+
+enum FileTagVisibility {
+  public
+  private
+  system
+}
+
+model FileTag {
+  id          String            @id @default(uuid())
+  name        String            @unique // Tag name (e.g., "important", "reviewed", "needs-update").
+  color       String? // Hex color for UI display (e.g., "#ff5733").
+
+  // public = visible to all users.
+  // private = visible only to the creator.
+  // system = admin-managed, visible to all but only admins can assign.
+  visibility  FileTagVisibility @default(public) @map("visibility")
+
+  description String? // Explain what this tag means or when to use it.
+  createdBy   String            @map("created_by")
+  createdAt   DateTime          @default(now()) @map("created_at")
+
+  creator     User              @relation(fields: [createdBy], references: [id], onDelete: Restrict)
+
+  // Reverse relations
+  assignments FileTagAssignment[]
+
+  @@index([visibility])
+  @@map("file_tags")
+}

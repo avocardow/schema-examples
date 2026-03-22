@@ -1,0 +1,50 @@
+// multipart_uploads: Resumable upload session tracking — lifecycle management from initiation to completion or expiry.
+// See README.md for full design rationale.
+
+enum MultipartUploadStatus {
+  in_progress
+  completing
+  completed
+  aborted
+  expired
+}
+
+enum MultipartUploadType {
+  single
+  multipart
+  resumable
+}
+
+model MultipartUpload {
+  id            String                 @id @default(uuid())
+  bucketId      String                 @map("bucket_id")
+  storageKey    String                 @map("storage_key") // Intended storage path for the completed file.
+  filename      String                 // Intended filename for the completed file.
+  mimeType      String?                @map("mime_type") // Expected MIME type. Nullable: may not be known at initiation.
+  totalSize     BigInt?                @map("total_size") // Expected total size in bytes. Nullable: tus supports Upload-Defer-Length.
+  uploadedSize  BigInt                 @default(0) @map("uploaded_size") // Bytes received so far.
+  partCount     Int                    @default(0) @map("part_count") // Number of parts received so far.
+
+  status        MultipartUploadStatus  @default(in_progress) @map("status")
+  uploadType    MultipartUploadType    @default(single) @map("upload_type")
+  metadata      Json?                  @default("{}") // Upload metadata key-value pairs from the client.
+
+  initiatedBy   String                 @map("initiated_by")
+  expiresAt     DateTime               @map("expires_at") // Server-set expiry for cleanup. Always set.
+
+  createdAt     DateTime               @default(now()) @map("created_at")
+  updatedAt     DateTime               @default(now()) @updatedAt @map("updated_at")
+
+  // Relations
+  bucket        StorageBucket          @relation(fields: [bucketId], references: [id], onDelete: Cascade)
+  initiator     User                   @relation(fields: [initiatedBy], references: [id], onDelete: Restrict)
+
+  // Reverse relations
+  parts         MultipartUploadPart[]
+
+  @@index([bucketId, status])
+  @@index([initiatedBy])
+  @@index([expiresAt, status])
+  @@index([status])
+  @@map("multipart_uploads")
+}

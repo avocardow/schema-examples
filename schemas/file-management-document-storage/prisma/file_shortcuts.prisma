@@ -1,0 +1,28 @@
+// file_shortcuts: Cross-folder references without file duplication — similar to Google Drive shortcuts.
+// See README.md for full design rationale.
+
+enum FileShortcutTargetType {
+  file
+  folder
+}
+
+model FileShortcut {
+  id             String                   @id @default(uuid())
+  folderId       String                   @map("folder_id")
+  targetType     FileShortcutTargetType   @map("target_type")
+  targetFileId   String?                  @map("target_file_id")
+  targetFolderId String?                  @map("target_folder_id")
+  name           String? // Override display name. Null = use the target's name.
+  createdBy      String                   @map("created_by")
+  createdAt      DateTime                 @default(now()) @map("created_at")
+
+  folder       Folder  @relation("shortcutFolder", fields: [folderId], references: [id], onDelete: Cascade)
+  targetFile   File?   @relation(fields: [targetFileId], references: [id], onDelete: Cascade)
+  targetFolder Folder? @relation("shortcutTarget", fields: [targetFolderId], references: [id], onDelete: Cascade)
+  creator      User    @relation(fields: [createdBy], references: [id], onDelete: Restrict)
+
+  @@index([folderId])
+  @@index([targetFileId])
+  @@index([targetFolderId])
+  @@map("file_shortcuts")
+}

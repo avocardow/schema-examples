@@ -1,0 +1,30 @@
+// folders: Folder tree with materialized path for efficient subtree queries.
+// See README.md for full design rationale.
+
+model Folder {
+  id          String   @id @default(uuid())
+  bucketId    String   @map("bucket_id") // Which bucket this folder belongs to.
+  parentId    String?  @map("parent_id") // Parent folder. Null = root-level folder within the bucket.
+  name        String // Display name (e.g., "Documents", "Photos 2024").
+
+  // Materialized path using folder IDs as segments.
+  // Uses UUIDs (not names) so folder renames don't cascade path updates.
+  path        String
+
+  depth       Int      @default(0) @map("depth") // Hierarchy level. 0 = root, 1 = child of root, etc.
+  description String?
+  createdBy   String   @map("created_by")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+
+  bucket      StorageBucket @relation(fields: [bucketId], references: [id], onDelete: Cascade)
+  parent      Folder?       @relation("FolderToFolder", fields: [parentId], references: [id], onDelete: Cascade)
+  children    Folder[]      @relation("FolderToFolder")
+  creator     User          @relation(fields: [createdBy], references: [id], onDelete: Restrict)
+
+  @@unique([bucketId, path])
+  @@unique([bucketId, parentId, name])
+  @@index([parentId])
+  @@index([bucketId, depth])
+  @@map("folders")
+}

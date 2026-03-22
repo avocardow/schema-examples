@@ -1,0 +1,25 @@
+// file_locks: Collaborative file locking to prevent concurrent edits — one lock per file.
+// See README.md for full design rationale.
+
+enum LockType {
+  exclusive
+  shared
+}
+
+model FileLock {
+  id        String    @id @default(uuid())
+  fileId    String    @unique @map("file_id") // Only one lock per file at a time.
+  lockedBy  String    @map("locked_by")
+  lockType  LockType  @default(exclusive) @map("lock_type")
+  reason    String?
+  expiresAt DateTime? @map("expires_at") // Null = indefinite.
+  createdAt DateTime  @default(now()) @map("created_at")
+  // No updatedAt — locks are short-lived; to extend, release and re-acquire.
+
+  file   File @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  locker User @relation(fields: [lockedBy], references: [id], onDelete: Cascade)
+
+  @@index([lockedBy])
+  @@index([expiresAt])
+  @@map("file_locks")
+}

@@ -1,0 +1,68 @@
+// files: Core file entity — metadata about stored bytes (the "blob" in the blob + attachment split).
+// See README.md for full design rationale.
+
+model File {
+  id                String    @id @default(uuid())
+  bucketId          String    @map("bucket_id")
+  folderId          String?   @map("folder_id")
+
+  // Identity and display
+  name              String    // Current display filename (e.g., "Q4 Report.pdf").
+  originalFilename  String    @map("original_filename") // Filename at upload time. Never changes after upload.
+  storageKey        String    @unique @map("storage_key") // Path to bytes in the storage backend. Immutable after upload.
+
+  // File properties
+  mimeType          String    @map("mime_type") // MIME type (e.g., "application/pdf", "image/png").
+  size              BigInt    // File size in bytes. BigInt supports files >2GB.
+  checksumSha256    String?   @map("checksum_sha256") // SHA-256 hash for duplicate detection and integrity verification.
+  etag              String?   // HTTP ETag for cache validation.
+
+  // Versioning: pointer to the current active version.
+  // Null until the first version is explicitly created (versioning may be off for the bucket).
+  currentVersionId  String?   @map("current_version_id")
+
+  // Metadata
+  metadata          Json?     @default("{}") // System-extracted metadata (dimensions, duration, pages, EXIF).
+  userMetadata      Json?     @default("{}") @map("user_metadata") // User-defined key-value pairs.
+
+  // Ownership
+  uploadedBy        String    @map("uploaded_by")
+  isPublic          Boolean   @default(false) @map("is_public")
+
+  // Soft delete
+  deletedAt         DateTime? @map("deleted_at")
+  deletedBy         String?   @map("deleted_by")
+  originalFolderId  String?   @map("original_folder_id")
+
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  // Relations
+  bucket            StorageBucket  @relation(fields: [bucketId], references: [id], onDelete: Cascade)
+  folder            Folder?        @relation("FileFolder", fields: [folderId], references: [id], onDelete: SetNull)
+  currentVersion    FileVersion?   @relation("FileCurrentVersion", fields: [currentVersionId], references: [id], onDelete: SetNull)
+  uploader          User           @relation("FileUploader", fields: [uploadedBy], references: [id], onDelete: Restrict)
+  deleter           User?          @relation("FileDeleter", fields: [deletedBy], references: [id], onDelete: SetNull)
+  originalFolder    Folder?        @relation("FileOriginalFolder", fields: [originalFolderId], references: [id], onDelete: SetNull)
+
+  // Reverse relations
+  versions          FileVersion[]  @relation("FileVersionFile")
+  attachments       FileAttachment[]
+  variants        FileVariant[]
+  tagAssignments  FileTagAssignment[]
+  metadataValues  FileMetadataValue[]
+  shares          FileShare[]
+  shareLinks      FileShareLink[]
+  comments        FileComment[]
+  favorites       FileFavorite[]
+  shortcuts       FileShortcut[]
+  lock            FileLock?
+
+  @@index([bucketId, folderId])
+  @@index([uploadedBy])
+  @@index([mimeType])
+  @@index([deletedAt])
+  @@index([checksumSha256])
+  @@index([bucketId, deletedAt])
+  @@map("files")
+}

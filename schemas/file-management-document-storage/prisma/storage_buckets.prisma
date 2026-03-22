@@ -1,0 +1,32 @@
+// storage_buckets: Logical containers for files with per-bucket configuration and upload constraints.
+// See README.md for full design rationale.
+
+model StorageBucket {
+  id                 String   @id @default(uuid())
+  name               String   @unique // Human-readable bucket name. Used in API paths (e.g., /storage/avatars/).
+  description        String?
+
+  // Controls anonymous read access to files in this bucket.
+  // false = all access requires authentication.
+  // true = files are publicly readable (e.g., CDN-served assets).
+  isPublic           Boolean  @default(false) @map("is_public")
+
+  allowedMimeTypes   String[] @map("allowed_mime_types") // Whitelist of accepted MIME types. Null = all types allowed.
+  maxFileSize        BigInt?  @map("max_file_size") // Maximum file size in bytes. Null = no limit.
+
+  // Whether files in this bucket track version history.
+  versioningEnabled  Boolean  @default(false) @map("versioning_enabled")
+
+  createdBy          String   @map("created_by") // Who created this bucket.
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @default(now()) @updatedAt @map("updated_at")
+
+  creator            User     @relation(fields: [createdBy], references: [id], onDelete: Restrict)
+
+  // Reverse relations
+  folders          Folder[]
+  files            File[]
+  multipartUploads MultipartUpload[]
+
+  @@map("storage_buckets")
+}
