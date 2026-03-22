@@ -24,7 +24,7 @@ Pay attention to: how pseudo code maps to each format, comment conventions, Pris
 
 ## The Proven Workflow
 
-Every domain follows these steps **strictly in order**. Do not skip ahead — each step's output is the input for the next.
+Every domain follows these steps **strictly in order**. Do not skip ahead — each step's output is the input for the next. **After completing each step, stop and re-read this workflow section before proceeding to the next step.** Do not chain steps together in one continuous run.
 
 **research → pseudo code → implement → audit → fix → review → update → commit**
 
@@ -38,17 +38,21 @@ Write findings to `RESEARCH.md` (gitignored — use `schemas/_template/RESEARCH.
 
 The table list and table count must emerge from this research — not from preconceptions or other domains' patterns.
 
+**⛔ STOP after this step.** Confirm `RESEARCH.md` is complete before moving to Step 2. The README.md must not exist yet.
+
 ### Step 2: Write Pseudo Code
 
-**Prerequisite:** A completed `RESEARCH.md` exists in the domain directory.
+**Prerequisite:** A completed `RESEARCH.md` exists in the domain directory. No `README.md` has been written yet.
 **Output:** A completed `README.md` with full pseudo code for every table.
 **Gate:** Do not launch any implementation agents until every table's pseudo code block is finalized in the README.
 
-Write format-agnostic pseudo code in the domain's `README.md`. Follow the pseudo code conventions and structure in [CONTRIBUTING.md](./CONTRIBUTING.md). Model the README after a completed domain (e.g., [file-management-document-storage](./schemas/file-management-document-storage/README.md)): overview, dependencies, table list, pseudo code with design notes, relationships diagram, best practices, and formats table.
+Write format-agnostic pseudo code in the domain's `README.md`. The table list, table count, and table designs must be derived from the research in `RESEARCH.md` — not from general knowledge or patterns in other domains. Follow the pseudo code conventions and structure in [CONTRIBUTING.md](./CONTRIBUTING.md). Model the README after a completed domain (e.g., [file-management-document-storage](./schemas/file-management-document-storage/README.md)): overview, dependencies, table list, pseudo code with design notes, relationships diagram, best practices, and formats table.
+
+**⛔ STOP after this step.** Confirm `README.md` pseudo code is complete for all tables before moving to Step 3. No schema files should exist yet.
 
 ### Step 3: Implement — One Agent per File
 
-**Prerequisite:** A completed `README.md` with finalized pseudo code for all tables.
+**Prerequisite:** Both `RESEARCH.md` and `README.md` exist. The README has finalized pseudo code for all tables. No format directories contain schema files yet.
 **Output:** One schema file per table per format (tables × 7 files).
 
 **Critical: One subagent = one file. Each agent writes exactly ONE schema file.**
@@ -116,6 +120,8 @@ Reference: [paste 1-2 known-good files from a completed domain]
 Return: File, Line, Issue, Fix — for every issue. Confirm clean files explicitly.
 ```
 
+**⛔ STOP after this step.** Review all audit results before proceeding to fixes.
+
 ### Step 5: Fix — One Agent per Format (7 agents)
 
 **Prerequisite:** All audit agents have returned their issue lists.
@@ -123,11 +129,15 @@ Return: File, Line, Issue, Fix — for every issue. Confirm clean files explicit
 
 Launch **one fix agent per format** (7 total) with: the audit issues, pseudo code, and format conventions from `_template/{format}/README.md`.
 
+**⛔ STOP after this step.** Verify all fixes are applied before deep review.
+
 ### Step 6: Manual Deep Review
 
 **Prerequisite:** All fix agents have completed.
 
 Focus on what automated auditing misses: cross-format consistency, subtle convention violations (e.g., `@@map` on Prisma enums, `u32` vs `i32` in SpacetimeDB), edge cases, and adherence to official docs.
+
+**⛔ STOP after this step.** All issues must be resolved before committing.
 
 ### Step 7: Update & Commit
 
