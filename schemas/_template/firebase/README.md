@@ -18,7 +18,7 @@
 2. **Three exports per file**: JSDoc `@typedef`, `createXxx` factory, `xxxConverter`.
 3. **No `id` in factory output** — Firestore assigns the document ID. The converter's `fromFirestore` reads `snapshot.id`.
 4. **Timestamps** — `import { Timestamp } from "firebase/firestore"`. Use `Timestamp.now()` in factories.
-5. **Nullable fields** — Use `?? null` in both the factory and converter. **Non-nullable fields** use bare `data.fieldName` in the converter (no `?? default` fallbacks). The factory CAN use `?? default` for optional parameters, but the converter must trust the stored data.
+5. **Nullable fields** — Use `?? null` in both the factory and converter. **Non-nullable fields** use bare `data.fieldName` in the converter (no `?? default` fallbacks). The factory uses the pseudo code's default value: `?? null` for nullable fields with no default, `?? {}` for `json nullable default {}`, `?? "value"` for fields with a specific default. The converter always uses `?? null` for nullable fields regardless of the pseudo code default.
 6. **FK annotations** — In the JSDoc `@typedef`, annotate foreign key fields with `- FK → collection_name`:
    ```
    * @property {string} userId - FK → users

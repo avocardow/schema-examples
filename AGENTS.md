@@ -176,7 +176,7 @@ Most domains depend on [Auth / RBAC](./schemas/auth-rbac) for `users`. Each form
 - [ ] **Strict spec adherence** — Implement exactly what the pseudo code specifies. No extra validations, constraints, or enum restrictions beyond what's defined. If the pseudo code says `string nullable`, don't add an `enum` constraint even if the values are known.
 - [ ] **Field parity** — Every pseudo code field present, no extra fields
 - [ ] **Nullability** — `nullable` → optional; no `nullable` → required
-- [ ] **Indexes** — All present, no redundant indexes on leading columns of composite unique/index
+- [ ] **Indexes** — All pseudo code indexes present, no redundant indexes on leading columns of composite unique/index, **no extra indexes not in pseudo code** (agents sometimes add plausible indexes like `index(created_by)` that aren't specified — remove them)
 - [ ] **Foreign keys** — Correct references and cascade behavior
 - [ ] **Enums** — Values match pseudo code exactly
 - [ ] **Defaults** — Match pseudo code (`default 0`, `default now`, `default {}`)

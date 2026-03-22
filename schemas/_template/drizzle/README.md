@@ -118,3 +118,4 @@ status: tableStatusEnum("status").notNull().default("active"),
 - **Don't create an index on a column that has `.unique()`** — Drizzle/PostgreSQL creates one automatically.
 - **Don't index the leading column of a composite unique/index separately.**
 - **Timestamp timezone** — Always use `{ withTimezone: true }` to match PostgreSQL `TIMESTAMPTZ`.
+- **pgEnum names must match SQL CREATE TYPE names.** Drizzle and SQL both target PostgreSQL — the first argument to `pgEnum("type_name", [...])` becomes the PostgreSQL enum type. If the SQL file uses `CREATE TYPE report_status AS ENUM (...)`, Drizzle must use `pgEnum("report_status", [...])`, not a different name. Check the SQL file (or pseudo code) for the canonical enum type name.

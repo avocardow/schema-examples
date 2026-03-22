@@ -106,6 +106,21 @@ enum FileStatus {
 }
 ```
 
+## Field Type Mapping
+
+| Pseudo Code | Prisma Type |
+| ----------- | ----------- |
+| `string` | `String` |
+| `integer` | `Int` |
+| `bigint` | `BigInt` |
+| `boolean` | `Boolean` |
+| `decimal` | `Decimal` (NOT `Float` — `Float` is for approximate floating-point; `Decimal` is for exact precision) |
+| `uuid` (FK) | `String` with `@relation` |
+| `json` | `Json` |
+| `timestamp` | `DateTime` |
+| `enum(...)` | Prisma `enum` block |
+| `text[]` | `String[]` |
+
 ## Gotchas
 
 - **Reverse relations are required.** If `FileVersion` has a `file File @relation(...)`, then `File` must have `versions FileVersion[]`.

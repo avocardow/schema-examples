@@ -82,3 +82,5 @@ settings: v.object({
 - No `ON DELETE CASCADE` — handle cascading deletes in your mutation logic
 - No `UNIQUE` constraint in schema — validate uniqueness in mutations or use a unique index
 - `v.optional()` wraps the entire type: `v.optional(v.string())`, not `v.string().optional()`
+- **`index(created_at)` in pseudo code** → `.index("by_creation_time", ["_creationTime"])` in Convex. Since Convex auto-generates `_creationTime` instead of an explicit `createdAt` field, pseudo code indexes on `created_at` must use `_creationTime` as the indexed field.
+- **Unique field indexes** — When pseudo code has `unique(field_name)`, add `.index("by_field_name", ["fieldName"])` to enable mutation-level uniqueness enforcement (e.g., `by_name`, `by_domain`, `by_ip_address`).
