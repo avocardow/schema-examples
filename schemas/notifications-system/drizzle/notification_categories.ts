@@ -25,8 +25,8 @@ export const notificationCategories = pgTable(
     // Users cannot opt out of required categories.
     isRequired: boolean("is_required").notNull().default(false),
 
-    // Default feed: where notifications of this category appear if no category_feeds mapping exists.
-    // Null = no default feed (must be explicitly mapped via notification_category_feeds, or appears in all feeds).
+    // Default feed: where notifications of this category appear.
+    // Null = no default feed (appears in all feeds).
     defaultFeedId: uuid("default_feed_id").references(
       () => notificationFeeds.id,
       { onDelete: "set null" }

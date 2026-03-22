@@ -14,8 +14,8 @@ model NotificationCategory {
   // Users cannot opt out of required categories.
   isRequired    Boolean  @default(false) @map("is_required")
 
-  // Default feed: where notifications appear if no category_feeds mapping exists.
-  // Null = no default feed (must be explicitly mapped via notification_category_feeds).
+  // Default feed: where notifications of this category appear.
+  // Null = no default feed (appears in all feeds).
   defaultFeedId String?  @map("default_feed_id")
 
   createdAt     DateTime @default(now()) @map("created_at")
@@ -26,8 +26,6 @@ model NotificationCategory {
   // Reverse relations
   events             NotificationEvent[]
   templates          NotificationTemplate[]
-  threads            NotificationThread[]
-  categoryFeeds      NotificationCategoryFeed[]
   preferences        NotificationPreference[]
   preferenceDefaults NotificationPreferenceDefault[]
   workflows          NotificationWorkflow[]

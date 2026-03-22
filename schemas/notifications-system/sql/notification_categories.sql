@@ -14,8 +14,8 @@ CREATE TABLE notification_categories (
   -- Users cannot opt out of required categories.
   is_required     BOOLEAN NOT NULL DEFAULT FALSE,
 
-  -- Default feed: where notifications of this category appear if no category_feeds mapping exists.
-  -- Null = no default feed (must be explicitly mapped via notification_category_feeds, or appears in all feeds).
+  -- Default feed: where notifications of this category appear.
+  -- Null = no default feed (appears in all feeds).
   default_feed_id UUID REFERENCES notification_feeds(id) ON DELETE SET NULL,
 
   created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),

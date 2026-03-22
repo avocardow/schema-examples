@@ -12,14 +12,12 @@ Multi-channel notification delivery, preference management, templates, workflows
 - [Schema](#schema)
 
 <details>
-<summary>Schema table list (20 tables)</summary>
+<summary>Schema table list (18 tables)</summary>
 
 - [`notification_events`](#notification_events)
 - [`notifications`](#notifications)
 - [`notification_feeds`](#notification_feeds)
-- [`notification_threads`](#notification_threads)
 - [`notification_categories`](#notification_categories)
-- [`notification_category_feeds`](#notification_category_feeds)
 - [`notification_templates`](#notification_templates)
 - [`notification_template_contents`](#notification_template_contents)
 - [`notification_channels`](#notification_channels)
@@ -52,12 +50,10 @@ Multi-channel notification delivery, preference management, templates, workflows
 - `notification_events`
 - `notifications`
 - `notification_feeds`
-- `notification_threads`
 
 ### Templates & Content
 
 - `notification_categories`
-- `notification_category_feeds`
 - `notification_templates`
 - `notification_template_contents`
 
@@ -113,8 +109,7 @@ table notification_events {
 
   -- Threading: lightweight grouping for related events.
   -- All events with the same thread_key are logically related (e.g., all comments on issue #456).
-  -- Client-side can group notifications by this key. For full threading with per-thread read state,
-  -- see the `notification_threads` table.
+  -- Client-side can group notifications by this key. Group by thread_key to build thread views.
   thread_key      string nullable              -- e.g., "issue:456", "pr:789", "order:123". Free-form string.
 
   -- Workflow: if this event was triggered via a workflow, link it here.
@@ -232,44 +227,6 @@ indexes {
 }
 ```
 
-### `notification_threads`
-
-Thread-level state for grouping related notifications. Provides per-thread read tracking, thread-level
-metadata (title, icon), and efficient "threads with unread" queries. Optional — users who only need
-lightweight grouping use the `thread_key` column on `notification_events` and skip this table. Users
-who want full threading (like GitHub's notification threads) get it here.
-
-```pseudo
-table notification_threads {
-  id              uuid primary_key default auto_generate
-
-  -- Matches notification_events.thread_key. This is the link between the thread
-  -- and its events. All events with this thread_key belong to this thread.
-  thread_key      string unique not_null       -- e.g., "issue:456", "pr:789". Must match the thread_key on events.
-
-  -- Thread metadata: displayed in the thread list UI.
-  title           string nullable              -- e.g., "Fix login bug (#456)". Can be updated as the thread evolves.
-  icon            string nullable              -- Icon URL or icon identifier for the thread.
-  category_id     uuid nullable references notification_categories(id) on_delete set_null
-                                               -- Optional: associate the thread with a category for filtering.
-
-  -- Counter cache: how many notifications exist in this thread.
-  -- Avoids a COUNT(*) query on every thread list render. Updated by your app when notifications are created.
-  -- Inspired by Noticed's notifications_count on events.
-  notification_count integer default 0
-
-  last_activity_at timestamp nullable          -- When the most recent event in this thread occurred. For sorting threads.
-  created_at      timestamp default now
-  updated_at      timestamp default now on_update
-}
-
-indexes {
-  -- unique(thread_key) is already created by the field constraint above.
-  index(category_id)                           -- "All threads in this category."
-  index(last_activity_at)                      -- "Threads sorted by most recent activity."
-}
-```
-
 ### `notification_categories`
 
 Classification of notification types. Categories serve two purposes: (1) organizing notifications
@@ -291,8 +248,8 @@ table notification_categories {
   -- Users cannot opt out of required categories. Your preference evaluation logic must check this.
   is_required     boolean default false
 
-  -- Default feed: where notifications of this category appear if no category_feeds mapping exists.
-  -- Null = no default feed (must be explicitly mapped via notification_category_feeds, or appears in all feeds).
+  -- Default feed: where notifications of this category appear.
+  -- Null = no default feed (appears in all feeds).
   default_feed_id uuid nullable references notification_feeds(id) on_delete set_null
 
   created_at      timestamp default now
@@ -302,25 +259,6 @@ table notification_categories {
 indexes {
   -- unique(slug) is already created by the field constraint above.
   index(is_required)                           -- "List all required categories" (for preference UI: grey out these toggles).
-}
-```
-
-### `notification_category_feeds`
-
-Many-to-many join between categories and feeds. Determines which notification types appear in which
-UI surfaces. A "comment" notification can appear in both the "general" feed and the "activity" feed.
-If you only have one feed, you don't need this table — use `notification_categories.default_feed_id`.
-
-```pseudo
-table notification_category_feeds {
-  category_id     uuid not_null references notification_categories(id) on_delete cascade
-  feed_id         uuid not_null references notification_feeds(id) on_delete cascade
-
-  primary_key(category_id, feed_id)            -- Composite PK. No separate id column needed.
-}
-
-indexes {
-  index(feed_id)                               -- "Which categories appear in this feed?" (reverse lookup).
 }
 ```
 
@@ -944,7 +882,6 @@ indexes {
 - `notification_workflows` → `notification_workflow_runs` (a workflow has many execution runs)
 - `notification_events` → `notification_workflow_runs` (an event triggers a workflow run)
 - `notification_workflows` → `notification_events` (a workflow is referenced by many events, via `workflow_id`)
-- `notification_categories` → `notification_threads` (a category has many threads, via `category_id`)
 - `users` → `notifications` (a user receives many notifications, via polymorphic `recipient_type` + `recipient_id`)
 - `users` → `device_tokens` (a user has many device tokens)
 - `users` → `notification_preferences` (a user has many preferences)
@@ -953,7 +890,6 @@ indexes {
 
 ### Many-to-Many (via junction tables)
 
-- `notification_categories` ↔ `notification_feeds` (through `notification_category_feeds`)
 - `users` ↔ `notification_topics` (through `notification_subscriptions`)
 
 ## Best Practices

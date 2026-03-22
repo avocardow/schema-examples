@@ -15,8 +15,8 @@ const notificationCategoriesSchema = new mongoose.Schema(
     // Users cannot opt out of required categories.
     is_required: { type: Boolean, required: true, default: false },
 
-    // Default feed: where notifications of this category appear if no category_feeds mapping exists.
-    // Null = no default feed (must be explicitly mapped via notification_category_feeds, or appears in all feeds).
+    // Default feed: where notifications of this category appear.
+    // Null = no default feed (appears in all feeds).
     default_feed_id: { type: mongoose.Schema.Types.ObjectId, ref: "NotificationFeed" },
   },
   {

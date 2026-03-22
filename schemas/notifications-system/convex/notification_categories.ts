@@ -15,8 +15,8 @@ export const notification_categories = defineTable({
   // Security alerts, billing failures, legal notices, and account lockouts should be is_required=true.
   isRequired: v.boolean(),
 
-  // Default feed: where notifications of this category appear if no category_feeds mapping exists.
-  // Null = no default feed (must be explicitly mapped via notification_category_feeds, or appears in all feeds).
+  // Default feed: where notifications of this category appear.
+  // Null = no default feed (appears in all feeds).
   defaultFeedId: v.optional(v.id("notification_feeds")),
 
   updatedAt: v.number(),
