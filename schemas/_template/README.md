@@ -1,3 +1,7 @@
+<!-- After copying this template, delete the README.md files from each format subdirectory -->
+<!-- (convex/README.md, sql/README.md, etc.). Those are implementation guides that live only in _template/. -->
+<!-- Completed domains contain only schema files in their format directories. -->
+
 # {Domain Name}
 
 > Brief one-line description of what this domain covers.

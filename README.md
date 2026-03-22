@@ -184,74 +184,42 @@ See each domain's **Dependencies** section for details.
 
 ## Quick Start for New Domains
 
-Copy the template directory to get started:
-
 ```bash
 cp -r schemas/_template schemas/{your-domain-name}
+find schemas/{your-domain-name} -path "*/*/README.md" -delete  # Remove format guide READMEs
 ```
 
-The template includes a README structure, research document, and format subdirectories with implementation guides. See [CONTRIBUTING.md](./CONTRIBUTING.md) for the full workflow.
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for the full workflow and format conventions.
 
 ## Project Structure
 
 ```
 schemas/
-├── _template/                 # Copy this to start a new domain
-│   ├── README.md              # Domain README template (pseudo code structure)
-│   ├── RESEARCH.md            # Research document template
-│   ├── convex/README.md       # Convex implementation guide
-│   ├── sql/README.md          # PostgreSQL implementation guide
-│   ├── prisma/README.md       # Prisma implementation guide
-│   ├── mongodb/README.md      # MongoDB/Mongoose implementation guide
-│   ├── drizzle/README.md      # Drizzle implementation guide
-│   ├── spacetimedb/README.md  # SpacetimeDB implementation guide
-│   └── firebase/README.md     # Firebase/Firestore implementation guide
+├── _template/           # Copy this to start a new domain
+│   ├── README.md        # Domain README template
+│   ├── RESEARCH.md      # Research document template
+│   └── {format}/README.md  # Format-specific implementation guides (7 formats)
 ├── {domain}/
-│   ├── README.md              # Pseudo code (source of truth), relationships, best practices
-│   ├── RESEARCH.md            # Local research notes (gitignored)
-│   ├── convex/
-│   │   ├── users.ts
-│   │   ├── sessions.ts
-│   │   └── ...
-│   ├── sql/
-│   │   ├── users.sql
-│   │   ├── sessions.sql
-│   │   └── ...
-│   ├── prisma/
-│   │   ├── users.prisma
-│   │   ├── sessions.prisma
-│   │   └── ...
-│   ├── mongodb/
-│   │   ├── users.js
-│   │   ├── sessions.js
-│   │   └── ...
-│   ├── drizzle/
-│   │   ├── users.ts
-│   │   ├── sessions.ts
-│   │   └── ...
-│   ├── spacetimedb/
-│   │   ├── users.rs
-│   │   ├── sessions.rs
-│   │   └── ...
-│   └── firebase/
-│       ├── users.js
-│       ├── sessions.js
-│       └── ...
+│   ├── README.md        # Pseudo code (source of truth)
+│   ├── convex/*.ts      # Convex schemas (one file per table)
+│   ├── sql/*.sql        # PostgreSQL schemas
+│   ├── prisma/*.prisma  # Prisma schemas
+│   ├── mongodb/*.js     # Mongoose schemas
+│   ├── drizzle/*.ts     # Drizzle schemas
+│   ├── spacetimedb/*.rs # SpacetimeDB schemas
+│   └── firebase/*.js    # Firestore schemas
 └── ...
 ```
 
-**One file per table.** This makes it easy to copy exactly what you need and supports a future CLI tool.
+**One file per table** — easy to copy exactly what you need.
 
 ## Contributing
 
-We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for the full process, format conventions, and guidelines.
+We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for the full process, [AGENTS.md](./AGENTS.md) for AI agent workflow.
 
-The short version:
-
-- The domain README's pseudo code is the **source of truth** for all format implementations
-- Follow the workflow: research → pseudo code → implement → audit → fix → final review → update → commit
-- Each format has specific conventions — check CONTRIBUTING.md or the `_template/{format}/README.md` guides
-- See [AGENTS.md](./AGENTS.md) for AI agent workflow instructions and common pitfalls
+- Pseudo code in the domain README is the **source of truth**
+- Workflow: research → pseudo code → implement → audit → fix → review → update → commit
+- Format guides: `schemas/_template/{format}/README.md`
 
 ## License
 

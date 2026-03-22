@@ -48,38 +48,24 @@ table example {
 
 Create **one file per table per format** (not monolithic schema files). This enables cherry-picking individual tables and supports a future CLI tool.
 
-Each format directory contains files named after the table:
-```
-schemas/{domain}/
-├── convex/users.ts
-├── convex/sessions.ts
-├── sql/users.sql
-├── sql/sessions.sql
-├── prisma/users.prisma
-├── ...
-```
-
 Implement from the pseudo code, not from another format's implementation. Each format should be idiomatic — see [Format Conventions](#format-conventions) below, or the detailed implementation guides in `schemas/_template/{format}/README.md`.
 
-> **For AI agents**: Use one subagent per table file (tables × formats = total agents). Do NOT have one agent write the same table across all formats or all tables in one format — this causes context-switching errors. See [AGENTS.md](./AGENTS.md) for the full workflow.
+> **For AI agents**: Use one subagent per table file (tables × formats = total agents). See [AGENTS.md](./AGENTS.md) for the full orchestration workflow.
 
 ### 4. Audit
 
-After implementation, cross-check every format file against the pseudo code. Run one audit pass per format (7 total), checking:
+After implementation, cross-check every format file against the pseudo code. Run one audit pass per format, checking:
 
-- **Field parity** — Every pseudo code field is present, no extra fields
+- **Field parity** — Every pseudo code field present, no extra fields
 - **Nullability** — `nullable` → optional; no `nullable` → required
-- **Indexes** — All indexes present with correct fields; no redundant indexes on leading columns of composite unique/indexes
-- **Foreign keys** — Correct references and cascade behavior (`cascade`, `set_null`, `restrict`)
-- **Enums** — All values match pseudo code exactly
-- **Defaults** — Default values match
-- **Timestamps** — Only present when pseudo code includes them
-- **Naming** — Follows format's naming convention
-- **Format idioms** — Uses format-specific patterns correctly
+- **Indexes** — All present; no redundant indexes on leading columns of composite unique/indexes
+- **Foreign keys** — Correct references and cascade behavior
+- **Enums** — Values match pseudo code exactly
+- **Defaults, timestamps, naming, format idioms** — All correct per format conventions
 
 ### 5. Fix
 
-After auditing, fix all identified issues. Run one fix pass per format (7 total) with the compiled audit results.
+Fix all identified issues — one fix pass per format with the compiled audit results.
 
 ### 6. Final review
 
@@ -90,236 +76,122 @@ Manual deep review for issues that automated auditing misses:
 
 ## Format Conventions
 
-Each format has specific patterns. Follow these exactly for consistency across the project.
+Each format has specific patterns. Follow these exactly for consistency. For comprehensive guides with file templates, type mappings, and gotchas, see `schemas/_template/{format}/README.md`.
 
 ### Convex (TypeScript)
 
-- **Auto fields**: Convex provides `_id` and `_creationTime` automatically. **Omit `id` and `createdAt`** from the schema definition.
-- **References**: Use `v.id("table_name")` for foreign keys (not `v.string()`).
-- **Timestamps**: Use `v.number()` for timestamps (Unix epoch). Convex does not have a Timestamp type.
-- **Nullable**: Use `v.optional(...)` for nullable fields.
-- **`updatedAt`**: Only include if the pseudo code has `updated_at`.
-- **Indexes**: Chain `.index("by_field", ["field"])` on the table definition.
-- **Enums**: Use `v.union(v.literal("a"), v.literal("b"))`.
-- **File pattern**: `defineTable({...}).index(...)`.
-
-```typescript
-// Example: convex/sessions.ts
-import { defineTable } from "convex/server";
-import { v } from "convex/values";
-
-export const sessions = defineTable({
-  userId: v.id("users"),
-  tokenHash: v.string(),
-  expiresAt: v.number(),
-  // no createdAt — Convex provides _creationTime
-}).index("by_user_id", ["userId"]);
-```
+- **Auto fields**: Convex provides `_id` and `_creationTime` automatically. **Omit `id` and `createdAt`**.
+- **References**: `v.id("table_name")` (not `v.string()`).
+- **Timestamps**: `v.number()` (Unix epoch). No native Date type.
+- **Nullable**: `v.optional(...)`.
+- **Enums**: `v.union(v.literal("a"), v.literal("b"))`.
+- **Indexes**: `.index("by_field", ["field"])` chained on the table definition.
 
 ### SQL (PostgreSQL)
 
 - **Dialect**: PostgreSQL. Use `TIMESTAMPTZ`, `JSONB`, `TEXT[]`, `gen_random_uuid()`.
-- **Enums**: `CREATE TYPE ... AS ENUM (...)` before the table that uses them.
+- **Enums**: `CREATE TYPE ... AS ENUM (...)` before the table.
 - **UUIDs**: `UUID PRIMARY KEY DEFAULT gen_random_uuid()`.
 - **Naming**: `snake_case` for everything.
 - **Indexes**: Separate `CREATE INDEX` statements after the table.
-- **Comments**: Include notes for Supabase/SQLite differences where relevant.
 
 ### Prisma (Prisma DSL)
 
-- **Field names**: `camelCase` with `@map("snake_case")` for the database column.
-- **Model mapping**: `@@map("table_name")` at the bottom of each model.
+- **Field names**: `camelCase` with `@map("snake_case")`.
+- **Model mapping**: `@@map("table_name")` on every model.
 - **Relations**: Explicit `@relation(fields: [...], references: [...], onDelete: ...)`.
-- **IDs**: `String @id @default(uuid())` for most tables. `BigInt @id @default(autoincrement())` only for `refresh_tokens`.
-- **Enums**: Separate `enum` blocks with PascalCase names.
-- **DateTime**: `DateTime` type with `@default(now())`.
-- **Nullable**: `Type?` syntax.
-
-```prisma
-model Session {
-  id        String   @id @default(uuid())
-  userId    String   @map("user_id")
-  tokenHash String   @unique @map("token_hash")
-  expiresAt DateTime @map("expires_at")
-  createdAt DateTime @default(now()) @map("created_at")
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("sessions")
-}
-```
+- **Reverse relations**: Required on the "one" side of one-to-many. Named relations when multiple FKs target the same model.
+- **Enums**: Separate `enum` blocks, PascalCase names. **No `@@map` on enums.**
+- **DateTime**: `@default(now())` on both `createdAt` and `updatedAt`.
 
 ### MongoDB / Mongoose (JavaScript)
 
 - **Module system**: CommonJS (`require` / `module.exports`).
-- **Foreign keys**: `{ type: mongoose.Schema.Types.ObjectId, ref: "ModelName" }`.
-- **Timestamps**: Use the `timestamps` option: `{ createdAt: "created_at", updatedAt: "updated_at" }`. Set `updatedAt: false` when the pseudo code has no `updated_at`.
-- **Nullable uniques**: Add `sparse: true` on optional unique fields to allow multiple nulls.
-- **Required**: `required: true` on all non-nullable fields (except `_id` and timestamp fields managed by Mongoose).
-- **Naming**: `snake_case` for field names (matches the database).
-- **Indexes**: `schema.index({ field: 1 })` after schema definition.
+- **References**: `{ type: mongoose.Schema.Types.ObjectId, ref: "ModelName" }`.
+- **Timestamps**: `{ createdAt: "created_at", updatedAt: "updated_at" }`. Set `updatedAt: false` when no `updated_at`.
+- **Nullable uniques**: `sparse: true`.
+- **Required**: `required: true` on all non-nullable fields.
+- **Naming**: `snake_case`.
 
 ### Drizzle (TypeScript)
 
-- **Property names**: `camelCase` in JavaScript, `snake_case` strings for column names.
-- **Imports**: `pgTable`, `uuid`, `text`, etc. from `"drizzle-orm/pg-core"`. The `sql` helper from `"drizzle-orm"`.
-- **References**: `.references(() => otherTable.id, { onDelete: "cascade" })` — use real imports, not `import type`.
-- **Timestamps**: `timestamp("column_name", { withTimezone: true })`.
-- **Arrays**: `text("column_name").array()` with `.default(sql\`'{}'\`)` for empty array defaults.
-- **Indexes**: Defined in the table's callback: `(table) => [index("idx_name").on(table.field)]`.
-
-```typescript
-import { pgTable, uuid, text, timestamp, index } from "drizzle-orm/pg-core";
-import { users } from "./users";
-
-export const sessions = pgTable(
-  "sessions",
-  {
-    id: uuid("id").primaryKey().defaultRandom(),
-    userId: uuid("user_id")
-      .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
-    tokenHash: text("token_hash").unique().notNull(),
-    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  },
-  (table) => [
-    index("idx_sessions_user_id").on(table.userId),
-  ]
-);
-```
+- **Naming**: `camelCase` properties, `snake_case` column name strings.
+- **Imports**: Real table imports (not `import type`). `sql` helper from `"drizzle-orm"`.
+- **References**: `.references(() => otherTable.id, { onDelete: "cascade" })`.
+- **Timestamps**: `timestamp("col", { withTimezone: true })`.
+- **Arrays**: `.default(sql\`'{}'\`)` (not `.default({})`).
+- **Bigint**: `{ mode: "number" }` unless value exceeds `MAX_SAFE_INTEGER`.
 
 ### SpacetimeDB (Rust)
 
-- **UUIDs**: Use `String` (SpacetimeDB has no native UUID type). Comment `// UUID` next to PK fields.
-- **Timestamps**: `spacetimedb::Timestamp`.
-- **Primary key**: `#[primary_key]` on `pub id: String` for all tables. The **only** exception is `refresh_tokens`, which uses `pub id: u64` with `#[auto_inc]`.
-- **Indexes**: Inline `#[index(btree)]` on the field. Do **not** create separate index helper tables.
-- **Unique**: `#[unique]` on the field.
+- **UUIDs**: `String` with `// UUID` comment. No native UUID type.
+- **Integers**: `i32`/`i64` (signed). **Not** `u32`/`u64` for standard columns.
+- **Primary key**: `#[primary_key] pub id: String`. Exception: `refresh_tokens` uses `u64` + `#[auto_inc]`.
+- **Indexes**: `#[index(btree)]` inline. `#[unique]` for unique fields.
 - **Nullable**: `Option<T>`.
-- **Enums**: Separate `#[derive(SpacetimeType, Clone)]` enum with `pub` variants and `// type: String` comment.
-- **Foreign keys**: Comment `// FK → table.id (cascade delete)` since SpacetimeDB doesn't enforce FKs.
-- **Struct naming**: `PascalCase` singular (e.g., `Session`, `User`).
-
-```rust
-use spacetimedb::Timestamp;
-
-#[spacetimedb::table(name = sessions, public)]
-pub struct Session {
-    #[primary_key]
-    pub id: String, // UUID
-
-    #[index(btree)]
-    pub user_id: String, // FK → users.id (cascade delete)
-
-    #[unique]
-    pub token_hash: String,
-
-    pub expires_at: Timestamp,
-    pub created_at: Timestamp,
-}
-```
+- **Foreign keys**: Comment only: `// FK → table.id (cascade delete)`.
+- **Enums**: `#[derive(SpacetimeType, Clone)]` with `// type: String` comment.
 
 ### Firebase / Firestore (JavaScript)
 
 - **Module system**: ES modules (`import` / `export`).
-- **Field names**: `camelCase` (Firestore convention).
-- **Timestamps**: `import { Timestamp } from "firebase/firestore"`. Use `Timestamp.now()` in factories.
-- **File pattern**: Each file exports three things:
-  1. **`@typedef {Object} XxxDocument`** — JSDoc type definition for the document.
-  2. **`createXxx(fields)`** — Factory function that returns a plain object for `setDoc`/`addDoc`. Sets `createdAt`/`updatedAt` to `Timestamp.now()`.
-  3. **`xxxConverter`** — Firestore data converter with `toFirestore`/`fromFirestore` methods.
-- **Nullable fields**: Use `?? null` in both the factory and converter.
+- **Field names**: `camelCase`.
+- **File exports**: JSDoc `@typedef`, `createXxx` factory, `xxxConverter`.
+- **Timestamps**: `Timestamp.now()` from `firebase/firestore`.
+- **Nullable**: `?? null` in both factory and converter.
 - **Enums**: `export const ENUM_NAME = /** @type {const} */ ({...})`.
-- **No `id` in factory output**: The document ID is assigned by Firestore. The converter's `fromFirestore` reads `snapshot.id`.
+- **No `id`** in factory output — Firestore assigns it; converter reads `snapshot.id`.
 
-```javascript
-import { Timestamp } from "firebase/firestore";
+## Enum Mapping Across Formats
 
-/** @typedef {Object} SessionDocument ... */
+When pseudo code defines `enum(active, inactive)`:
 
-export function createSession(fields) {
-  return {
-    userId:    fields.userId,
-    tokenHash: fields.tokenHash,
-    expiresAt: fields.expiresAt,
-    createdAt: Timestamp.now(),
-  };
-}
-
-export const sessionConverter = {
-  toFirestore(doc) { return { ...doc }; },
-  fromFirestore(snapshot, options) {
-    const data = snapshot.data(options);
-    return { id: snapshot.id, ...data };
-  },
-};
-```
+| Format      | Pattern |
+| ----------- | ------- |
+| Convex      | `v.union(v.literal("active"), v.literal("inactive"))` |
+| SQL         | `CREATE TYPE status AS ENUM ('active', 'inactive');` |
+| Prisma      | `enum Status { active inactive }` (PascalCase name, **no `@@map`**) |
+| MongoDB     | `{ type: String, enum: ["active", "inactive"] }` |
+| Drizzle     | `pgEnum("status", ["active", "inactive"])` |
+| SpacetimeDB | `pub enum Status { Active, Inactive }` with `#[derive(SpacetimeType, Clone)]` |
+| Firebase    | `export const STATUS = /** @type {const} */ ({ ACTIVE: "active", INACTIVE: "inactive" })` |
 
 ## Adding a New Format
 
-If you want to add a new format to the project:
-
-1. **Document the format's conventions** — Add a section to this file under [Format Conventions](#format-conventions) with the same level of detail as the existing formats. Cover: module system, naming conventions, ID/PK patterns, timestamps, references/FKs, nullable handling, indexes, and a minimal example.
-
-2. **Add a template implementation guide** — Create `schemas/_template/{format}/README.md` following the same structure as the existing format guides (quick reference table, key rules, file template, type mappings, indexes, gotchas).
-
-3. **Update [AGENTS.md](./AGENTS.md)** — Add the format to the Common Pitfalls section, File Naming table, and Dependencies Between Domains section.
-
-4. **Implement for all completed domains** — A new format must be added to every domain that has a ✅ status. Partial coverage is not acceptable. Implement from each domain's README pseudo code.
-
-5. **Update every domain README** — Add a row to the Formats table in each completed domain's README.
-
-6. **Update the root README** — Add the format to the Formats table at the top.
-
-7. **One file per table** — Follow the same pattern: one file per table, named after the table.
+1. **Document conventions** — Add a section under [Format Conventions](#format-conventions) above.
+2. **Add template guide** — Create `schemas/_template/{format}/README.md` (quick reference, key rules, file template, type mappings, gotchas).
+3. **Update [AGENTS.md](./AGENTS.md)** — Add to edge case handling and any format-specific notes.
+4. **Implement for all completed domains** — Must cover every ✅ domain. No partial coverage.
+5. **Update READMEs** — Add format row to every completed domain's Formats table and the root README Formats table.
+6. **One file per table** — Same pattern as all other formats.
 
 ## Adding a New Domain
 
-1. **Copy the template**: `cp -r schemas/_template schemas/{domain-name}/`
-2. **Research first** — Fill out `RESEARCH.md` (gitignored) studying real-world products and services in the domain. Study at least 5-10 real implementations.
-3. **Write the README** — Follow the template structure. Must include:
-   - Overview
-   - Dependencies (which other domains this one references)
-   - Table of Contents with all tables
-   - Pseudo code for every table (this is the source of truth)
-   - Relationships section
-   - Best Practices section
-   - Formats table (all 🔲 Todo until implemented)
-4. **Implement all formats** — Follow the process: pseudo code → implement → audit → fix → final review. See each format's `_template/{format}/README.md` for detailed implementation guides.
-5. **Update the root README** — Add the domain to the appropriate category table with the correct table count and status
+1. **Copy template**: `cp -r schemas/_template schemas/{domain-name}/`
+2. **Delete format guide READMEs** from the copy — `find schemas/{domain-name} -path "*/*/README.md" -delete`. Keep top-level `README.md` and `RESEARCH.md`.
+3. **Research** — Fill out `RESEARCH.md` studying 5-10+ real implementations.
+4. **Write README** — Follow template structure: overview, dependencies, table list, pseudo code (source of truth), relationships, best practices, formats table (`🔲 Todo`).
+5. **Implement** — Pseudo code → implement → audit → fix → final review. See `_template/{format}/README.md` for guides.
+6. **Update root README** — Table count and ✅ status.
 
-See [AGENTS.md](./AGENTS.md) for the proven AI-assisted workflow (1 agent per file for implementation, 1 agent per format for auditing).
+See [AGENTS.md](./AGENTS.md) for the AI-assisted workflow (1 agent per file, 1 audit agent per format).
 
 ## Comments in Schema Files
 
-- **Keep**: Security-relevant notes, design-context comments (e.g., "Hashed — never store plaintext"), and brief field descriptions that add value beyond the field name.
-- **Remove**: Provider attribution (e.g., "From Supabase pattern"), implementation guidance (e.g., "Use bcrypt here"), and verbose explanations already in the README.
-- **First line**: Always a brief comment describing the table's purpose.
-- **Second/third line**: `// See README.md for full design rationale.` (link back to the source of truth).
+- **First line**: Brief comment describing the table's purpose.
+- **Second line**: `// See README.md for full design rationale.`
+- **Keep**: Security notes, design context, field descriptions that add value.
+- **Remove**: Provider attribution, implementation guidance, verbose explanations.
 
 ## Pull Requests
 
-- One domain per PR (all 7 formats together), or one format across one domain
-- Include a description of what you added or changed
-- Ensure your schema compiles/validates where applicable (Prisma, Drizzle, Convex, SpacetimeDB can be validated)
-- The pseudo code in the domain README is the **source of truth** — if your format implementation differs, explain why in the PR description
+- One domain per PR (all formats together), or one format across one domain
+- Ensure schemas compile/validate where applicable (Prisma, Drizzle, Convex, SpacetimeDB)
+- Pseudo code is the source of truth — explain any deviations in the PR description
 
 ## Code of Conduct
 
 Be kind, be helpful, be constructive. We're all here to learn and share knowledge.
-
-## Common Pitfalls
-
-Lessons learned from implementing completed domains:
-
-- **Prisma enum `@@map`** — Don't add `@@map` to Prisma enum blocks. Only models get `@@map`.
-- **Redundant indexes** — Don't index a single column that's already the leading column of a composite unique or composite index. The composite covers single-column lookups.
-- **Prisma reverse relations** — Every `@relation` on the "many" side needs a corresponding array field on the "one" side (e.g., `files File[]`).
-- **Drizzle array defaults** — Use `.default(sql\`'{}'\`)`, not `.default({})`. The latter generates invalid SQL.
-- **SpacetimeDB integer types** — Use `i32`/`i64` (signed), not `u32`/`u64` (unsigned), for standard database columns.
-- **Prisma `@default(now())`** — Add to both `createdAt` and `updatedAt` fields. Prisma's `@updatedAt` is a client annotation, not a schema default.
-- **Drizzle bigint mode** — Use `{ mode: "number" }` for bigint fields unless the value exceeds `Number.MAX_SAFE_INTEGER`.
 
 ## Questions?
 
