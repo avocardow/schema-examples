@@ -1,0 +1,15 @@
+// post_categories: Many-to-many join linking posts to their assigned categories.
+// See README.md for full design rationale.
+
+model PostCategory {
+  id         String    @id @default(uuid())
+  postId     String    @map("post_id")
+  categoryId String    @map("category_id")
+
+  post       Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  category   Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, categoryId])
+  @@index([categoryId])
+  @@map("post_categories")
+}

@@ -1,0 +1,20 @@
+// post_revisions: Immutable content snapshots for version history and rollback support.
+// See README.md for full design rationale.
+
+model PostRevision {
+  id             String    @id @default(uuid())
+  postId         String    @map("post_id")
+  revisionNumber Int       @map("revision_number")
+  title          String
+  content        String?
+  excerpt        String?
+  createdBy      String    @map("created_by")
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  post           Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  creator        User      @relation(fields: [createdBy], references: [id], onDelete: Restrict)
+
+  @@unique([postId, revisionNumber])
+  @@index([postId, createdAt])
+  @@map("post_revisions")
+}

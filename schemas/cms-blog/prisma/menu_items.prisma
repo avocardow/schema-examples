@@ -1,0 +1,35 @@
+// menu_items: Hierarchical navigation entries supporting post, category, and custom URL links.
+// See README.md for full design rationale.
+
+enum MenuItemLinkType {
+  post
+  category
+  custom
+}
+
+model MenuItem {
+  id             String           @id @default(uuid())
+  menuId         String           @map("menu_id")
+  parentId       String?          @map("parent_id")
+  label          String
+  linkType       MenuItemLinkType @map("link_type")
+  linkPostId     String?          @map("link_post_id")
+  linkCategoryId String?          @map("link_category_id")
+  linkUrl        String?          @map("link_url")
+  openInNewTab   Boolean          @default(false) @map("open_in_new_tab")
+  sortOrder      Int              @default(0) @map("sort_order")
+  isActive       Boolean          @default(true) @map("is_active")
+  createdAt      DateTime         @default(now()) @map("created_at")
+  updatedAt      DateTime         @default(now()) @map("updated_at")
+
+  menu           Menu             @relation(fields: [menuId], references: [id], onDelete: Cascade)
+  parent         MenuItem?        @relation("MenuItemParent", fields: [parentId], references: [id], onDelete: Cascade)
+  children       MenuItem[]       @relation("MenuItemParent")
+  linkPost       Post?            @relation("MenuItemPost", fields: [linkPostId], references: [id], onDelete: Cascade)
+  linkCategory   Category?        @relation("MenuItemCategory", fields: [linkCategoryId], references: [id], onDelete: Cascade)
+
+  @@index([menuId, parentId, sortOrder])
+  @@index([linkPostId])
+  @@index([linkCategoryId])
+  @@map("menu_items")
+}

@@ -1,0 +1,17 @@
+// tags: Flat taxonomy for flexible content labeling.
+// See README.md for full design rationale.
+
+model Tag {
+  id          String    @id @default(uuid())
+  name        String
+  slug        String    @unique
+  description String?
+  isActive    Boolean   @default(true) @map("is_active")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @default(now()) @map("updated_at")
+
+  postTags    PostTag[]
+
+  @@index([isActive])
+  @@map("tags")
+}

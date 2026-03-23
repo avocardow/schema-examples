@@ -1,0 +1,17 @@
+// series_items: Ordered join linking posts to a series with position tracking.
+// See README.md for full design rationale.
+
+model SeriesItem {
+  id        String  @id @default(uuid())
+  seriesId  String  @map("series_id")
+  postId    String  @map("post_id")
+  sortOrder Int     @default(0) @map("sort_order")
+
+  series    Series  @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+  post      Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([seriesId, postId])
+  @@index([postId])
+  @@index([seriesId, sortOrder])
+  @@map("series_items")
+}

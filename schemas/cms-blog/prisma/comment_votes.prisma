@@ -1,0 +1,17 @@
+// comment_votes: User voting on comments to surface quality contributions.
+// See README.md for full design rationale.
+
+model CommentVote {
+  id        String    @id @default(uuid())
+  commentId String    @map("comment_id")
+  userId    String    @map("user_id")
+  value     Int
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  comment   Comment   @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([commentId, userId])
+  @@index([userId])
+  @@map("comment_votes")
+}

@@ -1,0 +1,63 @@
+// posts: Core content entity supporting posts and pages with publishing workflow and SEO metadata.
+// See README.md for full design rationale.
+
+enum PostType {
+  post
+  page
+}
+
+enum PostStatus {
+  draft
+  scheduled
+  published
+  archived
+}
+
+enum PostVisibility {
+  public
+  private
+  password_protected
+}
+
+model Post {
+  id               String          @id @default(uuid())
+  type             PostType        @default(post)
+  title            String
+  slug             String          @unique
+  excerpt          String?
+  content          String?
+  featuredImageUrl  String?        @map("featured_image_url")
+  status           PostStatus      @default(draft)
+  visibility       PostVisibility  @default(public)
+  password         String?
+  isFeatured       Boolean         @default(false) @map("is_featured")
+  allowComments    Boolean         @default(true) @map("allow_comments")
+  metaTitle        String?         @map("meta_title")
+  metaDescription  String?         @map("meta_description")
+  ogImageUrl       String?         @map("og_image_url")
+  publishedAt      DateTime?       @map("published_at")
+  createdBy        String          @map("created_by")
+  updatedBy        String?         @map("updated_by")
+  createdAt        DateTime        @default(now()) @map("created_at")
+  updatedAt        DateTime        @default(now()) @map("updated_at")
+
+  creator          User            @relation("PostCreator", fields: [createdBy], references: [id], onDelete: Restrict)
+  updater          User?           @relation("PostUpdater", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  postRevisions    PostRevision[]
+  postCategories   PostCategory[]
+  postTags         PostTag[]
+  postAuthors      PostAuthor[]
+  postMeta         PostMeta[]
+  postSlugHistories PostSlugHistory[]
+  seriesItems      SeriesItem[]
+  comments         Comment[]
+  postReactions    PostReaction[]
+  menuItems        MenuItem[]      @relation("MenuItemPost")
+
+  @@index([status, publishedAt])
+  @@index([type, status])
+  @@index([createdBy])
+  @@index([isFeatured])
+  @@map("posts")
+}

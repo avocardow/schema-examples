@@ -1,0 +1,13 @@
+// post_slug_history: Historical slug records enabling permanent redirects after slug changes.
+// See README.md for full design rationale.
+
+model PostSlugHistory {
+  id        String    @id @default(uuid())
+  postId    String    @map("post_id")
+  slug      String    @unique
+  changedAt DateTime  @default(now()) @map("changed_at")
+
+  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  @@index([postId])
+  @@map("post_slug_history")
+}

@@ -1,6 +1,6 @@
 # Schema Examples
 
-A growing collection of production-ready database schema examples across multiple formats — with explanations and best practices. Seven domains complete (auth, notifications, file management, i18n, analytics, content moderation, e-commerce), with 50 more planned.
+A growing collection of production-ready database schema examples across multiple formats — with explanations and best practices. Eight domains complete (auth, notifications, file management, i18n, analytics, content moderation, e-commerce, CMS/blog), with 49 more planned.
 
 **Copy. Learn. Contribute. Ship.**
 
@@ -65,7 +65,7 @@ See each domain's **Dependencies** section for details.
 
 | Domain                                                               | Tables | Status |
 | -------------------------------------------------------------------- | -----: | ------ |
-| [CMS / Blog](./schemas/cms-blog)                                     |        | 🔲     |
+| [CMS / Blog](./schemas/cms-blog)                                     |     18 | ✅     |
 | [Media Streaming](./schemas/media-streaming)                         |        | 🔲     |
 | [Podcast Platform](./schemas/podcast-platform)                       |        | 🔲     |
 | [Digital Asset Management (DAM)](./schemas/digital-asset-management) |        | 🔲     |

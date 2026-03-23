@@ -1,0 +1,15 @@
+// post_meta: Flexible key-value metadata storage for extending post attributes.
+// See README.md for full design rationale.
+
+model PostMeta {
+  id        String  @id @default(uuid())
+  postId    String  @map("post_id")
+  metaKey   String  @map("meta_key")
+  metaValue String? @map("meta_value")
+
+  post      Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, metaKey])
+  @@index([metaKey])
+  @@map("post_meta")
+}

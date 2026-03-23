@@ -1,0 +1,24 @@
+// post_authors: Many-to-many join linking posts to authors with role and ordering.
+// See README.md for full design rationale.
+
+enum PostAuthorRole {
+  author
+  contributor
+  editor
+  guest
+}
+
+model PostAuthor {
+  id        String          @id @default(uuid())
+  postId    String          @map("post_id")
+  authorId  String          @map("author_id")
+  sortOrder Int             @default(0) @map("sort_order")
+  role      PostAuthorRole  @default(author)
+
+  post      Post            @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author    Author          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, authorId])
+  @@index([authorId])
+  @@map("post_authors")
+}
