@@ -43,6 +43,7 @@ table example {
 - `references table(field) on_delete cascade|set_null|restrict` for foreign keys
 - `indexes { }` block after the table for indexes
 - `unique(field)` / `index(field)` / `composite_unique(field1, field2)` in the indexes block
+- When a composite unique/index covers a single-column index via leading column, **document it** with a comment: `-- composite_unique(a, b) covers index(a) via leading column.` This tells implementers to omit the redundant index.
 - Comments after `--` explain design decisions
 
 ### 3. Implement across all formats

@@ -183,6 +183,17 @@ When tables reference each other (e.g., `files ↔ file_versions`):
 - **Prisma**: Handles circular refs natively — declare both relations normally
 - **Convex/MongoDB/SpacetimeDB/Firebase**: No circular issue (runtime resolution, lazy refs, comment-only FKs, or string IDs)
 
+### Self-Referencing Foreign Keys
+
+When a table references itself (e.g., `posts.reply_to_id → posts.id`), this is NOT the same as a circular FK. Self-references work normally in all formats:
+
+- **SQL**: Inline `REFERENCES` works — the table already exists by the time the FK is evaluated
+- **Drizzle**: Arrow function self-reference works: `.references(() => posts.id, { onDelete: "set null" })`
+- **Prisma**: Named self-relations work normally: `@relation("PostReply", fields: [replyToId], references: [id])` with a reverse `replies Post[] @relation("PostReply")`
+- **All other formats**: No special handling needed
+
+Do **not** use the circular FK workarounds (ALTER TABLE, comment-only) for self-references.
+
 ### Forward Foreign Keys (SQL)
 
 When table A references table B, but B's `.sql` file is loaded *after* A alphabetically (e.g., `events.sql` references `sessions` from `sessions.sql`), the inline `REFERENCES` will fail because the target table doesn't exist yet. Use `ALTER TABLE` instead:
@@ -244,7 +255,9 @@ Common dependencies: `users` (auth-rbac), `files` (file-management), `locales` (
 - [ ] **Naming** — Follows format convention (camelCase, snake_case, PascalCase)
 - [ ] **Format idioms** — See `schemas/_template/{format}/README.md` for gotchas
 - [ ] **Comments** — Follows [Comment Conventions](#comment-conventions)
-- [ ] **Edge cases** — Circular FKs, reverse relations, cross-domain refs (see above)
+- [ ] **Convex exports** — Use named exports (`export const tableName = defineTable(...)`) not `export default`
+- [ ] **Prisma id field** — Do not add `@map("id")` on the `id` field — it's redundant (column is already `id`)
+- [ ] **Edge cases** — Circular FKs, self-referencing FKs, reverse relations, cross-domain refs (see above)
 
 ## File Naming
 
