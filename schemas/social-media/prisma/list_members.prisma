@@ -1,0 +1,16 @@
+// list_members: Users added to curated lists for timeline filtering.
+// See README.md for full design rationale.
+
+model ListMember {
+  id        String   @id @default(uuid())
+  listId    String   @map("list_id")
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  list List @relation(fields: [listId], references: [id], onDelete: Cascade)
+  user User @relation("ListMemberUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([listId, userId])
+  @@index([userId])
+  @@map("list_members")
+}

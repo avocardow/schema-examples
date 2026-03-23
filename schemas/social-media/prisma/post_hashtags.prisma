@@ -1,0 +1,16 @@
+// post_hashtags: Junction table linking posts to hashtags.
+// See README.md for full design rationale.
+
+model PostHashtag {
+  id        String   @id @default(uuid())
+  postId    String   @map("post_id")
+  hashtagId String   @map("hashtag_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  post    Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  hashtag Hashtag @relation(fields: [hashtagId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, hashtagId])
+  @@index([hashtagId, createdAt])
+  @@map("post_hashtags")
+}

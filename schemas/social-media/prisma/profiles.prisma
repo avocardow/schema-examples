@@ -1,0 +1,26 @@
+// profiles: User profile information including display name, bio, and social stats.
+// See README.md for full design rationale.
+
+model Profile {
+  id             String   @id @default(uuid())
+  userId         String   @unique @map("user_id")
+  displayName    String?  @map("display_name")
+  bio            String?  @map("bio")
+  avatarFileId   String?  @map("avatar_file_id")
+  bannerFileId   String?  @map("banner_file_id")
+  website        String?  @map("website")
+  location       String?  @map("location")
+  isPrivate      Boolean  @default(false) @map("is_private")
+  followerCount  Int      @default(0) @map("follower_count")
+  followingCount Int      @default(0) @map("following_count")
+  postCount      Int      @default(0) @map("post_count")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @default(now()) @map("updated_at")
+
+  user       User  @relation("ProfileUser", fields: [userId], references: [id], onDelete: Cascade)
+  avatarFile File? @relation("ProfileAvatar", fields: [avatarFileId], references: [id], onDelete: SetNull)
+  bannerFile File? @relation("ProfileBanner", fields: [bannerFileId], references: [id], onDelete: SetNull)
+
+  @@index([isPrivate])
+  @@map("profiles")
+}

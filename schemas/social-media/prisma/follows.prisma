@@ -1,0 +1,18 @@
+// follows: Follower-following relationships between users with notification preferences.
+// See README.md for full design rationale.
+
+model Follow {
+  id          String   @id @default(uuid())
+  followerId  String   @map("follower_id")
+  followingId String   @map("following_id")
+  notify      Boolean  @default(false) @map("notify")
+  showReposts Boolean  @default(true) @map("show_reposts")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  follower  User @relation("FollowFollower", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("FollowFollowing", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@index([followingId])
+  @@map("follows")
+}

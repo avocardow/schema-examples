@@ -1,0 +1,42 @@
+// post_reports: User-submitted reports on posts for content moderation.
+// See README.md for full design rationale.
+
+enum PostReportReason {
+  spam
+  harassment
+  hate_speech
+  violence
+  misinformation
+  nsfw
+  other
+}
+
+enum PostReportStatus {
+  pending
+  reviewed
+  resolved
+  dismissed
+}
+
+model PostReport {
+  id          String           @id @default(uuid())
+  postId      String           @map("post_id")
+  reporterId  String           @map("reporter_id")
+  reason      PostReportReason @map("reason")
+  description String?          @map("description")
+  status      PostReportStatus @default(pending) @map("status")
+  reviewedBy  String?          @map("reviewed_by")
+  reviewedAt  DateTime?        @map("reviewed_at")
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @default(now()) @map("updated_at")
+
+  post     Post  @relation(fields: [postId], references: [id], onDelete: Cascade)
+  reporter User  @relation("PostReportReporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  reviewer User? @relation("PostReportReviewer", fields: [reviewedBy], references: [id], onDelete: SetNull)
+
+  @@unique([postId, reporterId])
+  @@index([status])
+  @@index([reporterId])
+  @@index([reviewedBy])
+  @@map("post_reports")
+}

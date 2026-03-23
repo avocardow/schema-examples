@@ -1,0 +1,17 @@
+// poll_votes: Individual votes cast by users on poll options.
+// See README.md for full design rationale.
+
+model PollVote {
+  id          String   @id @default(uuid())
+  pollId      String   @map("poll_id")
+  userId      String   @map("user_id")
+  optionIndex Int      @map("option_index")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  poll Poll @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  user User @relation("PollVoteUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([pollId, userId, optionIndex])
+  @@index([userId])
+  @@map("poll_votes")
+}

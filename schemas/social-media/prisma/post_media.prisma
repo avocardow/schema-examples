@@ -1,0 +1,27 @@
+// post_media: Media attachments linked to posts with ordering and metadata.
+// See README.md for full design rationale.
+
+enum PostMediaType {
+  image
+  video
+  gif
+}
+
+model PostMedia {
+  id        String        @id @default(uuid())
+  postId    String        @map("post_id")
+  fileId    String        @map("file_id")
+  mediaType PostMediaType @map("media_type")
+  width     Int?          @map("width")
+  height    Int?          @map("height")
+  altText   String?       @map("alt_text")
+  position  Int           @default(0) @map("position")
+  createdAt DateTime      @default(now()) @map("created_at")
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  file File @relation("PostMediaFile", fields: [fileId], references: [id], onDelete: Restrict)
+
+  @@index([postId, position])
+  @@index([fileId])
+  @@map("post_media")
+}

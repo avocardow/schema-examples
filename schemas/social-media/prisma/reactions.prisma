@@ -1,0 +1,25 @@
+// reactions: User reactions on posts with multiple reaction types.
+// See README.md for full design rationale.
+
+enum ReactionType {
+  like
+  love
+  celebrate
+  insightful
+  funny
+}
+
+model Reaction {
+  id        String       @id @default(uuid())
+  postId    String       @map("post_id")
+  userId    String       @map("user_id")
+  type      ReactionType @map("type")
+  createdAt DateTime     @default(now()) @map("created_at")
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation("ReactionUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId, type])
+  @@index([userId])
+  @@map("reactions")
+}

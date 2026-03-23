@@ -1,0 +1,23 @@
+// polls: Polls attached to posts with configurable options and closing behavior.
+// See README.md for full design rationale.
+
+model Poll {
+  id             String    @id @default(uuid())
+  authorId       String    @map("author_id")
+  allowsMultiple Boolean   @default(false) @map("allows_multiple")
+  options        Json      @map("options")
+  voteCount      Int       @default(0) @map("vote_count")
+  voterCount     Int       @default(0) @map("voter_count")
+  closesAt       DateTime? @map("closes_at")
+  isClosed       Boolean   @default(false) @map("is_closed")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @default(now()) @map("updated_at")
+
+  author User       @relation("PollAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  posts  Post[]
+  votes  PollVote[]
+
+  @@index([authorId])
+  @@index([closesAt])
+  @@map("polls")
+}

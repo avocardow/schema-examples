@@ -1,0 +1,19 @@
+// lists: User-curated lists for organizing followed accounts into groups.
+// See README.md for full design rationale.
+
+model List {
+  id          String   @id @default(uuid())
+  ownerId     String   @map("owner_id")
+  name        String   @map("name")
+  description String?  @map("description")
+  isPrivate   Boolean  @default(true) @map("is_private")
+  memberCount Int      @default(0) @map("member_count")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @map("updated_at")
+
+  owner   User         @relation("ListOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members ListMember[]
+
+  @@index([ownerId])
+  @@map("lists")
+}
