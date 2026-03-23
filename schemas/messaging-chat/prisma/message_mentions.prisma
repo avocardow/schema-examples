@@ -1,0 +1,23 @@
+// message_mentions: @mentions within messages targeting users or channels.
+// See README.md for full design rationale.
+
+enum MentionType {
+  user
+  channel
+  all
+}
+
+model MessageMention {
+  id              String      @id @default(uuid())
+  messageId       String      @map("message_id")
+  mentionedUserId String?     @map("mentioned_user_id")
+  mentionType     MentionType @default(user) @map("mention_type")
+  createdAt       DateTime    @default(now()) @map("created_at")
+
+  message       Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  mentionedUser User?   @relation("MentionedUser", fields: [mentionedUserId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, mentionedUserId, mentionType])
+  @@index([mentionedUserId])
+  @@map("message_mentions")
+}

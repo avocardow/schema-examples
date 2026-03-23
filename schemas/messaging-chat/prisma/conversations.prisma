@@ -1,0 +1,35 @@
+// conversations: Top-level container for direct messages, group chats, and channels.
+// See README.md for full design rationale and field documentation.
+
+enum ConversationType {
+  direct
+  group
+  channel
+}
+
+model Conversation {
+  id            String           @id @default(uuid())
+  type          ConversationType @map("type")
+  name          String?
+  description   String?
+  slug          String?          @unique
+  isPrivate     Boolean          @default(false) @map("is_private")
+  isArchived    Boolean          @default(false) @map("is_archived")
+  lastMessageAt DateTime?        @map("last_message_at")
+  messageCount  Int              @default(0) @map("message_count")
+  createdBy     String           @map("created_by")
+  createdAt     DateTime         @default(now()) @map("created_at")
+  updatedAt     DateTime         @default(now()) @map("updated_at")
+
+  creator        User                    @relation("ConversationCreator", fields: [createdBy], references: [id], onDelete: Restrict)
+  participants   ConversationParticipant[]
+  messages       Message[]
+  pinnedMessages PinnedMessage[]
+  invites        ConversationInvite[]
+
+  @@index([type])
+  @@index([isPrivate, type])
+  @@index([createdBy])
+  @@index([lastMessageAt])
+  @@map("conversations")
+}

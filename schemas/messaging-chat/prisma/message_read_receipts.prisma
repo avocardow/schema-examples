@@ -1,0 +1,18 @@
+// message_read_receipts: Per-message delivery and read tracking.
+// See README.md for full design rationale.
+
+model MessageReadReceipt {
+  id          String    @id @default(uuid())
+  messageId   String    @map("message_id")
+  userId      String    @map("user_id")
+  deliveredAt DateTime? @map("delivered_at")
+  readAt      DateTime? @map("read_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId])
+  @@index([userId, readAt])
+  @@map("message_read_receipts")
+}

@@ -1,0 +1,43 @@
+// messages: Individual messages within conversations with threading support.
+// See README.md for full design rationale.
+
+enum MessageContentType {
+  text
+  system
+  deleted
+}
+
+model Message {
+  id              String             @id @default(uuid()) @map("id")
+  conversationId  String             @map("conversation_id")
+  senderId        String?            @map("sender_id")
+  content         String?            @map("content")
+  contentType     MessageContentType @default(text) @map("content_type")
+  parentMessageId String?            @map("parent_message_id")
+  replyCount      Int                @default(0) @map("reply_count")
+  lastReplyAt     DateTime?          @map("last_reply_at")
+  isEdited        Boolean            @default(false) @map("is_edited")
+  editedAt        DateTime?          @map("edited_at")
+  expiresAt       DateTime?          @map("expires_at")
+  createdAt       DateTime           @default(now()) @map("created_at")
+  updatedAt       DateTime           @default(now()) @map("updated_at")
+
+  conversation      Conversation           @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender            User?                  @relation("MessageSender", fields: [senderId], references: [id], onDelete: SetNull)
+  parentMessage     Message?               @relation("MessageThread", fields: [parentMessageId], references: [id], onDelete: SetNull)
+  replies           Message[]              @relation("MessageThread")
+  attachments       MessageAttachment[]
+  reactions         MessageReaction[]
+  mentions          MessageMention[]
+  pinnedMessages    PinnedMessage[]
+  bookmarkedMessages BookmarkedMessage[]
+  readReceipts      MessageReadReceipt[]
+  reports           MessageReport[]
+
+  @@index([conversationId, createdAt])
+  @@index([senderId])
+  @@index([parentMessageId])
+  @@index([conversationId, parentMessageId])
+  @@index([expiresAt])
+  @@map("messages")
+}

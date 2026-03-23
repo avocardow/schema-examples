@@ -1,0 +1,18 @@
+// pinned_messages: Messages pinned to conversations for quick reference.
+// See README.md for full design rationale.
+
+model PinnedMessage {
+  id             String   @id @default(uuid())
+  conversationId String   @map("conversation_id")
+  messageId      String   @map("message_id")
+  pinnedBy       String   @map("pinned_by")
+  pinnedAt       DateTime @default(now()) @map("pinned_at")
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  message      Message      @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  pinner       User         @relation("PinnedBy", fields: [pinnedBy], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, messageId])
+  @@index([conversationId, pinnedAt])
+  @@map("pinned_messages")
+}

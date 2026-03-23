@@ -1,0 +1,17 @@
+// bookmarked_messages: Per-user saved messages for quick reference.
+// See README.md for full design rationale.
+
+model BookmarkedMessage {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  messageId String   @map("message_id")
+  note      String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, messageId])
+  @@index([userId, createdAt])
+  @@map("bookmarked_messages")
+}

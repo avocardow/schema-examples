@@ -1,0 +1,20 @@
+// message_attachments: File references attached to messages.
+// See README.md for full design rationale.
+
+model MessageAttachment {
+  id        String   @id @default(uuid()) @map("id")
+  messageId String   @map("message_id")
+  fileId    String   @map("file_id")
+  fileName  String   @map("file_name")
+  fileSize  BigInt   @map("file_size")
+  mimeType  String   @map("mime_type")
+  position  Int      @default(0) @map("position")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  file    File    @relation(fields: [fileId], references: [id], onDelete: Restrict)
+
+  @@index([messageId])
+  @@index([fileId])
+  @@map("message_attachments")
+}

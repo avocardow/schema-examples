@@ -1,0 +1,42 @@
+// message_reports: User-submitted reports for message moderation.
+// See README.md for full design rationale.
+
+enum MessageReportReason {
+  spam
+  harassment
+  hate_speech
+  violence
+  misinformation
+  nsfw
+  other
+}
+
+enum MessageReportStatus {
+  pending
+  reviewed
+  resolved
+  dismissed
+}
+
+model MessageReport {
+  id          String              @id @default(uuid())
+  messageId   String              @map("message_id")
+  reporterId  String              @map("reporter_id")
+  reason      MessageReportReason
+  description String?
+  status      MessageReportStatus @default(pending)
+  reviewedBy  String?             @map("reviewed_by")
+  reviewedAt  DateTime?           @map("reviewed_at")
+  createdAt   DateTime            @default(now()) @map("created_at")
+  updatedAt   DateTime            @default(now()) @map("updated_at")
+
+  message  Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  reporter User    @relation("ReportCreator", fields: [reporterId], references: [id], onDelete: Cascade)
+  reviewer User?   @relation("ReportReviewer", fields: [reviewedBy], references: [id], onDelete: SetNull)
+
+  @@unique([messageId, reporterId])
+  @@index([status])
+  @@index([reporterId])
+  @@index([reviewedBy])
+  @@map("message_reports")
+}

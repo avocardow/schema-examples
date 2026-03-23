@@ -1,6 +1,6 @@
 # Schema Examples
 
-A growing collection of production-ready database schema examples across multiple formats — with explanations and best practices. Eight domains complete (auth, notifications, file management, i18n, analytics, content moderation, e-commerce, CMS/blog), with 49 more planned.
+A growing collection of production-ready database schema examples across multiple formats — with explanations and best practices. Nine domains complete (auth, notifications, file management, i18n, analytics, content moderation, e-commerce, CMS/blog, messaging/chat), with 48 more planned.
 
 **Copy. Learn. Contribute. Ship.**
 
@@ -57,7 +57,7 @@ See each domain's **Dependencies** section for details.
 | Domain                                                           | Tables | Status |
 | ---------------------------------------------------------------- | -----: | ------ |
 | [Social Media](./schemas/social-media)                           |        | 🔲     |
-| [Messaging / Chat](./schemas/messaging-chat)                     |        | 🔲     |
+| [Messaging / Chat](./schemas/messaging-chat)                     |     12 | ✅     |
 | [Video Conferencing](./schemas/video-conferencing)               |        | 🔲     |
 | [Email / Campaign Marketing](./schemas/email-campaign-marketing) |        | 🔲     |
 
@@ -172,7 +172,7 @@ See each domain's **Dependencies** section for details.
 | [Event Planning](./schemas/event-planning)                                 |        | 🔲     |
 | [Voting / Polling / Surveys](./schemas/voting-polling-surveys)             |        | 🔲     |
 
-**57 domains — 7 complete, 50 planned**
+**57 domains — 9 complete, 48 planned**
 
 ## How to Use
 
