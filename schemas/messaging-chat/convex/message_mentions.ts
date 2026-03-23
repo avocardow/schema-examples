@@ -4,7 +4,7 @@
 import { defineTable } from "convex/server";
 import { v } from "convex/values";
 
-export default defineTable({
+export const messageMentions = defineTable({
   messageId: v.id("messages"),
   mentionedUserId: v.optional(v.id("users")),
   mentionType: v.union(v.literal("user"), v.literal("channel"), v.literal("all")),

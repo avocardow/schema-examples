@@ -4,7 +4,7 @@
 import { defineTable } from "convex/server";
 import { v } from "convex/values";
 
-export default defineTable({
+export const userPresence = defineTable({
   userId: v.id("users"),
   status: v.union(
     v.literal("online"),

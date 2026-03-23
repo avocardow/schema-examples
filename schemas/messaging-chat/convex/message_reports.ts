@@ -4,7 +4,7 @@
 import { defineTable } from "convex/server";
 import { v } from "convex/values";
 
-export default defineTable({
+export const messageReports = defineTable({
   messageId: v.id("messages"),
   reporterId: v.id("users"),
   reason: v.union(
@@ -28,7 +28,6 @@ export default defineTable({
   updatedAt: v.number(),
 })
   .index("by_status", ["status"])
-  .index("by_message_id", ["messageId"])
   .index("by_reporter_id", ["reporterId"])
   .index("by_reviewed_by", ["reviewedBy"])
   .index("by_message_id_and_reporter_id", ["messageId", "reporterId"]);

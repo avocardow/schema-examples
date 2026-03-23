@@ -31,6 +31,7 @@ model ConversationParticipant {
   user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([conversationId, userId])
+  @@index([userId])
   @@index([userId, lastReadAt])
   @@map("conversation_participants")
 }

@@ -276,9 +276,8 @@ table message_reactions {
 }
 
 indexes {
-  index(message_id)                            -- "All reactions on this message" (for rendering reaction counts).
   index(user_id)                               -- "All reactions by this user" (for user cleanup on deletion).
-  -- composite_unique(message_id, user_id, emoji) is already indexed.
+  -- index(message_id) is covered by composite_unique(message_id, user_id, emoji) via leading column.
 }
 ```
 
@@ -485,10 +484,9 @@ table message_reports {
 
 indexes {
   index(status)                                -- "All pending reports" — the moderation queue.
-  index(message_id)                            -- "All reports for this message" (check if multiply reported).
   index(reporter_id)                           -- "All reports by this user" (detect report abuse).
   index(reviewed_by)                           -- "Reports reviewed by this moderator."
-  -- composite_unique(message_id, reporter_id) covers leading columns.
+  -- index(message_id) is covered by composite_unique(message_id, reporter_id) via leading column.
 }
 ```
 

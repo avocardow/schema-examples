@@ -4,7 +4,7 @@
 import { defineTable } from "convex/server";
 import { v } from "convex/values";
 
-export default defineTable({
+export const pinnedMessages = defineTable({
   conversationId: v.id("conversations"),
   messageId: v.id("messages"),
   pinnedBy: v.id("users"),

@@ -2,7 +2,7 @@
 // See README.md for full design rationale.
 
 model MessageAttachment {
-  id        String   @id @default(uuid()) @map("id")
+  id        String   @id @default(uuid())
   messageId String   @map("message_id")
   fileId    String   @map("file_id")
   fileName  String   @map("file_name")

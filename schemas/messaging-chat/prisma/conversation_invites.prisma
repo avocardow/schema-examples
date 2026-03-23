@@ -9,7 +9,7 @@ enum ConversationInviteStatus {
 }
 
 model ConversationInvite {
-  id             String                   @id @default(uuid()) @map("id")
+  id             String                   @id @default(uuid())
   conversationId String                   @map("conversation_id")
   inviterId      String                   @map("inviter_id")
   inviteeId      String                   @map("invitee_id")

@@ -8,7 +8,7 @@ enum MessageContentType {
 }
 
 model Message {
-  id              String             @id @default(uuid()) @map("id")
+  id              String             @id @default(uuid())
   conversationId  String             @map("conversation_id")
   senderId        String?            @map("sender_id")
   content         String?            @map("content")

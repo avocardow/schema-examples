@@ -4,7 +4,7 @@
 import { defineTable } from "convex/server";
 import { v } from "convex/values";
 
-export default defineTable({
+export const conversationParticipants = defineTable({
   conversationId: v.id("conversations"),
   userId: v.id("users"),
   role: v.union(
