@@ -1,0 +1,21 @@
+// pipeline_stages: Ordered stages within a pipeline representing deal progression.
+// See README.md for full design rationale and field documentation.
+
+model PipelineStage {
+  id             String   @id @default(uuid())
+  pipelineId     String   @map("pipeline_id")
+  name           String
+  position       Int      @default(0)
+  winProbability Int?     @map("win_probability")
+  isClosedWon    Boolean  @default(false) @map("is_closed_won")
+  isClosedLost   Boolean  @default(false) @map("is_closed_lost")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @default(now()) @map("updated_at")
+
+  pipeline Pipeline @relation(fields: [pipelineId], references: [id], onDelete: Cascade)
+
+  deals Deal[]
+
+  @@index([pipelineId, position])
+  @@map("pipeline_stages")
+}

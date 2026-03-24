@@ -1,0 +1,37 @@
+// custom_fields: User-defined fields extending contacts, companies, deals, or leads.
+// See README.md for full design rationale and field documentation.
+
+enum CrmEntityType {
+  contact
+  company
+  deal
+  lead
+}
+
+enum CustomFieldType {
+  text
+  number
+  date
+  select
+  multi_select
+  checkbox
+  url
+}
+
+model CustomField {
+  id          String          @id @default(uuid())
+  entityType  CrmEntityType   @map("entity_type")
+  name        String
+  fieldType   CustomFieldType @map("field_type")
+  description String?
+  isRequired  Boolean         @default(false) @map("is_required")
+  position    Int             @default(0)
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @default(now()) @map("updated_at")
+
+  options CustomFieldOption[]
+  values  CustomFieldValue[]
+
+  @@index([entityType, position])
+  @@map("custom_fields")
+}

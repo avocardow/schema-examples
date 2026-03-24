@@ -1,0 +1,35 @@
+// activities: Logged interactions (calls, emails, meetings) with contacts, companies, or deals.
+// See README.md for full design rationale and field documentation.
+
+enum ActivityType {
+  call
+  email
+  meeting
+}
+
+model Activity {
+  id          String       @id @default(uuid())
+  type        ActivityType
+  subject     String
+  description String?
+  occurredAt  DateTime     @map("occurred_at")
+  duration    Int?
+  contactId   String?      @map("contact_id")
+  companyId   String?      @map("company_id")
+  dealId      String?      @map("deal_id")
+  ownerId     String       @map("owner_id")
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @default(now()) @map("updated_at")
+
+  contact Contact? @relation("ActivityContact", fields: [contactId], references: [id], onDelete: SetNull)
+  company Company? @relation("ActivityCompany", fields: [companyId], references: [id], onDelete: SetNull)
+  deal    Deal?    @relation("ActivityDeal", fields: [dealId], references: [id], onDelete: SetNull)
+  owner   User     @relation("ActivityOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@index([contactId, occurredAt])
+  @@index([companyId, occurredAt])
+  @@index([dealId, occurredAt])
+  @@index([ownerId])
+  @@index([type])
+  @@map("activities")
+}

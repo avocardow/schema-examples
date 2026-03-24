@@ -1,0 +1,35 @@
+// companies: Organizations your business sells to or partners with.
+// See README.md for full design rationale and field documentation.
+
+model Company {
+  id             String   @id @default(uuid())
+  name           String
+  domain         String?  @unique
+  industry       String?
+  employeeCount  Int?     @map("employee_count")
+  annualRevenue  Decimal? @map("annual_revenue")
+  phone          String?
+  addressStreet  String?  @map("address_street")
+  addressCity    String?  @map("address_city")
+  addressState   String?  @map("address_state")
+  addressCountry String?  @map("address_country")
+  addressZip     String?  @map("address_zip")
+  website        String?
+  description    String?
+  ownerId        String?  @map("owner_id")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @default(now()) @map("updated_at")
+
+  owner User? @relation("CompanyOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+
+  contactCompanies ContactCompany[]
+  deals            Deal[]           @relation("DealCompany")
+  activities       Activity[]       @relation("ActivityCompany")
+  tasks            Task[]           @relation("TaskCompany")
+  notes            Note[]           @relation("NoteCompany")
+  companyTags      CompanyTag[]
+
+  @@index([ownerId])
+  @@index([industry])
+  @@map("companies")
+}

@@ -1,0 +1,46 @@
+// deals: Revenue opportunities tracked through pipeline stages to close.
+// See README.md for full design rationale and field documentation.
+
+enum DealPriority {
+  low
+  medium
+  high
+}
+
+model Deal {
+  id                String       @id @default(uuid())
+  name              String
+  pipelineId        String       @map("pipeline_id")
+  stageId           String?      @map("stage_id")
+  value             Decimal?
+  currency          String       @default("USD")
+  expectedCloseDate String?      @map("expected_close_date")
+  closedAt          DateTime?    @map("closed_at")
+  lostReason        String?      @map("lost_reason")
+  priority          DealPriority @default(medium)
+  ownerId           String?      @map("owner_id")
+  companyId         String?      @map("company_id")
+  contactId         String?      @map("contact_id")
+  createdAt         DateTime     @default(now()) @map("created_at")
+  updatedAt         DateTime     @default(now()) @map("updated_at")
+
+  pipeline Pipeline       @relation(fields: [pipelineId], references: [id], onDelete: Restrict)
+  stage    PipelineStage? @relation(fields: [stageId], references: [id], onDelete: SetNull)
+  owner    User?          @relation("DealOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  company  Company?       @relation("DealCompany", fields: [companyId], references: [id], onDelete: SetNull)
+  contact  Contact?       @relation("DealPrimaryContact", fields: [contactId], references: [id], onDelete: SetNull)
+
+  dealContacts DealContact[]
+  activities   Activity[]    @relation("ActivityDeal")
+  tasks        Task[]        @relation("TaskDeal")
+  notes        Note[]        @relation("NoteDeal")
+  dealTags     DealTag[]
+
+  @@index([pipelineId, stageId])
+  @@index([ownerId])
+  @@index([companyId])
+  @@index([contactId])
+  @@index([expectedCloseDate])
+  @@index([closedAt])
+  @@map("deals")
+}

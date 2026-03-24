@@ -1,0 +1,18 @@
+// pipelines: Sales pipelines that organize deals through sequential stages.
+// See README.md for full design rationale and field documentation.
+
+model Pipeline {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  isDefault   Boolean  @default(false) @map("is_default")
+  position    Int      @default(0)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @map("updated_at")
+
+  stages PipelineStage[]
+  deals  Deal[]
+
+  @@index([position])
+  @@map("pipelines")
+}

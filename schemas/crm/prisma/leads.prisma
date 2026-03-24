@@ -1,0 +1,40 @@
+// leads: Inbound or outbound prospects not yet converted to contacts.
+// See README.md for full design rationale and field documentation.
+
+// Uses ContactSource from contacts.prisma
+
+enum LeadStatus {
+  new
+  contacted
+  qualified
+  unqualified
+  converted
+}
+
+model Lead {
+  id                 String         @id @default(uuid())
+  firstName          String         @map("first_name")
+  lastName           String         @map("last_name")
+  email              String         @unique
+  phone              String?
+  companyName        String?        @map("company_name")
+  title              String?
+  source             ContactSource?
+  status             LeadStatus     @default(new)
+  convertedAt        DateTime?      @map("converted_at")
+  convertedContactId String?        @map("converted_contact_id")
+  ownerId            String?        @map("owner_id")
+  notes              String?
+  createdAt          DateTime       @default(now()) @map("created_at")
+  updatedAt          DateTime       @default(now()) @map("updated_at")
+
+  convertedContact Contact? @relation("ConvertedContact", fields: [convertedContactId], references: [id], onDelete: SetNull)
+  owner            User?    @relation("LeadOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+
+  leadNotes Note[] @relation("NoteLead")
+
+  @@index([status])
+  @@index([ownerId])
+  @@index([source])
+  @@map("leads")
+}

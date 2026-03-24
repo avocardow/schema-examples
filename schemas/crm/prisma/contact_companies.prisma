@@ -1,0 +1,18 @@
+// contact_companies: Junction table linking contacts to companies with role metadata.
+// See README.md for full design rationale and field documentation.
+
+model ContactCompany {
+  id        String   @id @default(uuid())
+  contactId String   @map("contact_id")
+  companyId String   @map("company_id")
+  role      String?
+  isPrimary Boolean  @default(false) @map("is_primary")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  contact Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([contactId, companyId])
+  @@index([companyId])
+  @@map("contact_companies")
+}

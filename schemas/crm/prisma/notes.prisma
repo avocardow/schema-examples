@@ -1,0 +1,27 @@
+// notes: Free-text notes attached to contacts, companies, deals, or leads.
+// See README.md for full design rationale and field documentation.
+
+model Note {
+  id        String   @id @default(uuid())
+  content   String
+  contactId String?  @map("contact_id")
+  companyId String?  @map("company_id")
+  dealId    String?  @map("deal_id")
+  leadId    String?  @map("lead_id")
+  createdBy String   @map("created_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  contact Contact? @relation("NoteContact", fields: [contactId], references: [id], onDelete: Cascade)
+  company Company? @relation("NoteCompany", fields: [companyId], references: [id], onDelete: Cascade)
+  deal    Deal?    @relation("NoteDeal", fields: [dealId], references: [id], onDelete: Cascade)
+  lead    Lead?    @relation("NoteLead", fields: [leadId], references: [id], onDelete: Cascade)
+  creator User     @relation("NoteCreator", fields: [createdBy], references: [id], onDelete: Cascade)
+
+  @@index([contactId])
+  @@index([companyId])
+  @@index([dealId])
+  @@index([leadId])
+  @@index([createdBy])
+  @@map("notes")
+}

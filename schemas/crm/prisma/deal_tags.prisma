@@ -1,0 +1,16 @@
+// deal_tags: Junction table linking deals to tags.
+// See README.md for full design rationale and field documentation.
+
+model DealTag {
+  id        String   @id @default(uuid())
+  dealId    String   @map("deal_id")
+  tagId     String   @map("tag_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  deal Deal @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([dealId, tagId])
+  @@index([tagId])
+  @@map("deal_tags")
+}

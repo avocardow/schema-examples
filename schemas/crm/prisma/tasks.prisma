@@ -1,0 +1,38 @@
+// tasks: Action items assigned to users, optionally linked to contacts, companies, or deals.
+// See README.md for full design rationale and field documentation.
+
+// Uses DealPriority from deals.prisma
+
+enum TaskStatus {
+  todo
+  in_progress
+  completed
+  cancelled
+}
+
+model Task {
+  id          String       @id @default(uuid())
+  title       String
+  description String?
+  dueDate     String?      @map("due_date")
+  priority    DealPriority @default(medium)
+  status      TaskStatus   @default(todo)
+  completedAt DateTime?    @map("completed_at")
+  contactId   String?      @map("contact_id")
+  companyId   String?      @map("company_id")
+  dealId      String?      @map("deal_id")
+  ownerId     String       @map("owner_id")
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @default(now()) @map("updated_at")
+
+  contact Contact? @relation("TaskContact", fields: [contactId], references: [id], onDelete: SetNull)
+  company Company? @relation("TaskCompany", fields: [companyId], references: [id], onDelete: SetNull)
+  deal    Deal?    @relation("TaskDeal", fields: [dealId], references: [id], onDelete: SetNull)
+  owner   User     @relation("TaskOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@index([ownerId, status])
+  @@index([dueDate])
+  @@index([contactId])
+  @@index([dealId])
+  @@map("tasks")
+}

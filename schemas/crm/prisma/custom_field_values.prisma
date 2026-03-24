@@ -1,0 +1,17 @@
+// custom_field_values: Stored values for custom fields on specific entity instances.
+// See README.md for full design rationale and field documentation.
+
+model CustomFieldValue {
+  id            String   @id @default(uuid())
+  customFieldId String   @map("custom_field_id")
+  entityId      String   @map("entity_id")
+  value         String
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @default(now()) @map("updated_at")
+
+  customField CustomField @relation(fields: [customFieldId], references: [id], onDelete: Cascade)
+
+  @@unique([customFieldId, entityId])
+  @@index([entityId])
+  @@map("custom_field_values")
+}

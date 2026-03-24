@@ -1,0 +1,38 @@
+// custom_fields: User-defined field definitions for CRM entities.
+// See README.md for full design rationale.
+
+use spacetimedb::Timestamp;
+
+#[derive(SpacetimeType, Clone)]
+pub enum CrmEntityType {
+    Contact, // type: String
+    Company,
+    Deal,
+    Lead,
+}
+
+#[derive(SpacetimeType, Clone)]
+pub enum CustomFieldType {
+    Text, // type: String
+    Number,
+    Date,
+    Select,
+    MultiSelect,
+    Checkbox,
+    Url,
+}
+
+#[spacetimedb::table(name = custom_fields, public)]
+pub struct CustomField {
+    #[primary_key]
+    pub id: String, // UUID
+    #[index(btree)]
+    pub entity_type: CrmEntityType,
+    pub name: String,
+    pub field_type: CustomFieldType,
+    pub description: Option<String>,
+    pub is_required: bool,
+    pub position: i32,
+    pub created_at: Timestamp,
+    pub updated_at: Timestamp,
+}

@@ -1,0 +1,16 @@
+// company_tags: Junction table linking companies to tags.
+// See README.md for full design rationale and field documentation.
+
+model CompanyTag {
+  id        String   @id @default(uuid())
+  companyId String   @map("company_id")
+  tagId     String   @map("tag_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  tag     Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, tagId])
+  @@index([tagId])
+  @@map("company_tags")
+}

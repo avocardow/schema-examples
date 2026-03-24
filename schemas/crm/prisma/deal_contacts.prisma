@@ -1,0 +1,25 @@
+// deal_contacts: Junction table linking deals to contacts with stakeholder roles.
+// See README.md for full design rationale and field documentation.
+
+enum DealContactRole {
+  decision_maker
+  champion
+  influencer
+  end_user
+  other
+}
+
+model DealContact {
+  id        String          @id @default(uuid())
+  dealId    String          @map("deal_id")
+  contactId String          @map("contact_id")
+  role      DealContactRole @default(other)
+  createdAt DateTime        @default(now()) @map("created_at")
+
+  deal    Deal    @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  contact Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@unique([dealId, contactId])
+  @@index([contactId])
+  @@map("deal_contacts")
+}
