@@ -1,4 +1,4 @@
-// activities: Logged interactions such as calls, emails, and meetings.
+// activities: Logged interactions such as calls, emails, meetings, and leads.
 // See README.md for full design rationale.
 
 use spacetimedb::Timestamp;
@@ -26,6 +26,8 @@ pub struct Activity {
     pub company_id: Option<String>, // UUID — FK → companies.id (set null)
     #[index(btree)]
     pub deal_id: Option<String>, // UUID — FK → deals.id (set null)
+    #[index(btree)]
+    pub lead_id: Option<String>, // UUID — FK → leads.id (set null)
     #[index(btree)]
     pub owner_id: String, // UUID — FK → users.id (cascade delete)
     pub created_at: Timestamp,

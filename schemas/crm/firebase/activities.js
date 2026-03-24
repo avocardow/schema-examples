@@ -1,4 +1,4 @@
-// activities: logged interactions (calls, emails, meetings) tied to CRM entities.
+// activities: logged interactions (calls, emails, meetings) tied to CRM entities (contacts, companies, deals, leads).
 // See README.md for full design rationale.
 
 import { Timestamp } from "firebase/firestore";
@@ -20,6 +20,7 @@ export const ACTIVITY_TYPES = /** @type {const} */ ({
  * @property {string | null} contactId - FK → contacts
  * @property {string | null} companyId - FK → companies
  * @property {string | null} dealId - FK → deals
+ * @property {string | null} leadId - FK → leads
  * @property {string} ownerId - FK → users
  * @property {import("firebase/firestore").Timestamp} createdAt
  * @property {import("firebase/firestore").Timestamp} updatedAt
@@ -39,6 +40,7 @@ export function createActivity(fields) {
     contactId: fields.contactId ?? null,
     companyId: fields.companyId ?? null,
     dealId: fields.dealId ?? null,
+    leadId: fields.leadId ?? null,
     ownerId: fields.ownerId,
     createdAt: Timestamp.now(),
     updatedAt: Timestamp.now(),
@@ -61,6 +63,7 @@ export const activityConverter = {
       contactId: data.contactId ?? null,
       companyId: data.companyId ?? null,
       dealId: data.dealId ?? null,
+      leadId: data.leadId ?? null,
       ownerId: data.ownerId,
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
@@ -75,5 +78,6 @@ export const activityConverter = {
  *   - companyId ASC, occurredAt DESC
  *   - dealId ASC, occurredAt DESC
  *   - ownerId ASC, occurredAt DESC
+ *   - leadId ASC, occurredAt DESC
  *   - type ASC, occurredAt DESC
  */

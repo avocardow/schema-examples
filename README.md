@@ -76,7 +76,7 @@ See each domain's **Dependencies** section for details.
 | Domain                                                             | Tables | Status |
 | ------------------------------------------------------------------ | -----: | ------ |
 | [SaaS / Multi-tenant](./schemas/saas-multi-tenant)                 |        | 🔲     |
-| [CRM](./schemas/crm)                                               |     18 | ✅     |
+| [CRM](./schemas/crm)                                               |     19 | ✅     |
 | [Project Management](./schemas/project-management)                 |     18 | ✅     |
 | [HR / Payroll](./schemas/hr-payroll)                               |        | 🔲     |
 | [Helpdesk / Customer Support](./schemas/helpdesk-customer-support) |        | 🔲     |

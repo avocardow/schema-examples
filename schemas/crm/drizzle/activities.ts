@@ -1,10 +1,11 @@
-// activities: calls, emails, and meetings logged against contacts, companies, or deals.
+// activities: calls, emails, and meetings logged against contacts, companies, deals, or leads.
 // See README.md for full design rationale.
 
 import { pgTable, pgEnum, uuid, text, integer, timestamp, index } from "drizzle-orm/pg-core";
 import { contacts } from "./contacts";
 import { companies } from "./companies";
 import { deals } from "./deals";
+import { leads } from "./leads";
 import { users } from "./users";
 
 export const activityTypeEnum = pgEnum("activity_type", [
@@ -25,6 +26,7 @@ export const activities = pgTable(
     contactId: uuid("contact_id").references(() => contacts.id, { onDelete: "set null" }),
     companyId: uuid("company_id").references(() => companies.id, { onDelete: "set null" }),
     dealId: uuid("deal_id").references(() => deals.id, { onDelete: "set null" }),
+    leadId: uuid("lead_id").references(() => leads.id, { onDelete: "set null" }),
     ownerId: uuid("owner_id").notNull().references(() => users.id, { onDelete: "cascade" }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
@@ -33,6 +35,7 @@ export const activities = pgTable(
     index("idx_activities_contact_occurred").on(table.contactId, table.occurredAt),
     index("idx_activities_company_occurred").on(table.companyId, table.occurredAt),
     index("idx_activities_deal_occurred").on(table.dealId, table.occurredAt),
+    index("idx_activities_lead_occurred").on(table.leadId, table.occurredAt),
     index("idx_activities_owner_id").on(table.ownerId),
     index("idx_activities_type").on(table.type),
   ]

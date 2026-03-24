@@ -1,0 +1,29 @@
+// deal_activities: Append-only audit trail of deal changes for pipeline analytics.
+// See README.md for full design rationale and field documentation.
+
+enum DealActivityAction {
+  created
+  updated
+  stage_changed
+  won
+  lost
+  reopened
+}
+
+model DealActivity {
+  id        String             @id @default(uuid())
+  dealId    String             @map("deal_id")
+  userId    String?            @map("user_id")
+  action    DealActivityAction
+  field     String?
+  oldValue  String?            @map("old_value")
+  newValue  String?            @map("new_value")
+  createdAt DateTime           @default(now()) @map("created_at")
+
+  deal Deal  @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  user User? @relation("DealActivityUser", fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([dealId, createdAt])
+  @@index([userId])
+  @@map("deal_activities")
+}

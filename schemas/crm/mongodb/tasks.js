@@ -1,4 +1,4 @@
-// tasks: Action items assigned to users with priority and status tracking.
+// tasks: Action items assigned to users, leads, or deals with priority and status tracking.
 // See README.md for full design rationale.
 
 const mongoose = require("mongoose");
@@ -24,6 +24,7 @@ const tasksSchema = new mongoose.Schema(
     contact_id: { type: mongoose.Schema.Types.ObjectId, ref: "Contact", default: null },
     company_id: { type: mongoose.Schema.Types.ObjectId, ref: "Company", default: null },
     deal_id: { type: mongoose.Schema.Types.ObjectId, ref: "Deal", default: null },
+    lead_id: { type: mongoose.Schema.Types.ObjectId, ref: "Lead", default: null },
     owner_id: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   },
   { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } }
@@ -33,5 +34,7 @@ tasksSchema.index({ owner_id: 1, status: 1 });
 tasksSchema.index({ due_date: 1 });
 tasksSchema.index({ contact_id: 1 });
 tasksSchema.index({ deal_id: 1 });
+tasksSchema.index({ company_id: 1 });
+tasksSchema.index({ lead_id: 1 });
 
 module.exports = mongoose.model("Task", tasksSchema);

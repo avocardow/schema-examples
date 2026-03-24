@@ -31,7 +31,9 @@ model Lead {
   convertedContact Contact? @relation("ConvertedContact", fields: [convertedContactId], references: [id], onDelete: SetNull)
   owner            User?    @relation("LeadOwner", fields: [ownerId], references: [id], onDelete: SetNull)
 
-  leadNotes Note[] @relation("NoteLead")
+  leadNotes      Note[]     @relation("NoteLead")
+  leadActivities Activity[] @relation("ActivityLead")
+  leadTasks      Task[]     @relation("TaskLead")
 
   @@index([status])
   @@index([ownerId])

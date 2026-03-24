@@ -1,4 +1,4 @@
-// tasks: actionable to-do items assigned to owners and linked to CRM entities.
+// tasks: actionable to-do items assigned to owners and linked to CRM entities (contacts, companies, deals, leads).
 // See README.md for full design rationale.
 
 // Uses DEAL_PRIORITIES from deals.js (redefined here as TASK_PRIORITIES for self-containment).
@@ -30,6 +30,7 @@ export const TASK_STATUSES = /** @type {const} */ ({
  * @property {string | null} contactId - FK → contacts
  * @property {string | null} companyId - FK → companies
  * @property {string | null} dealId - FK → deals
+ * @property {string | null} leadId - FK → leads
  * @property {string} ownerId - FK → users
  * @property {import("firebase/firestore").Timestamp} createdAt
  * @property {import("firebase/firestore").Timestamp} updatedAt
@@ -50,6 +51,7 @@ export function createTask(fields) {
     contactId: fields.contactId ?? null,
     companyId: fields.companyId ?? null,
     dealId: fields.dealId ?? null,
+    leadId: fields.leadId ?? null,
     ownerId: fields.ownerId,
     createdAt: Timestamp.now(),
     updatedAt: Timestamp.now(),
@@ -73,6 +75,7 @@ export const taskConverter = {
       contactId: data.contactId ?? null,
       companyId: data.companyId ?? null,
       dealId: data.dealId ?? null,
+      leadId: data.leadId ?? null,
       ownerId: data.ownerId,
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
@@ -87,5 +90,6 @@ export const taskConverter = {
  *   - contactId ASC, createdAt DESC
  *   - companyId ASC, createdAt DESC
  *   - dealId ASC, createdAt DESC
+ *   - leadId ASC, createdAt DESC
  *   - status ASC, dueDate ASC
  */

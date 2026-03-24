@@ -34,7 +34,8 @@ model Deal {
   activities   Activity[]    @relation("ActivityDeal")
   tasks        Task[]        @relation("TaskDeal")
   notes        Note[]        @relation("NoteDeal")
-  dealTags     DealTag[]
+  dealTags       DealTag[]
+  dealActivities DealActivity[]
 
   @@index([pipelineId, stageId])
   @@index([ownerId])

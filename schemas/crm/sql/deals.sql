@@ -1,7 +1,6 @@
 -- deals: Revenue opportunities tracked through pipeline stages to close.
 -- See README.md for full design rationale.
 
--- Shared enum: also used by tasks.sql.
 CREATE TYPE deal_priority AS ENUM ('low', 'medium', 'high');
 
 CREATE TABLE deals (

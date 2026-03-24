@@ -1,4 +1,4 @@
-// activities: logged interactions such as calls, emails, and meetings.
+// activities: logged interactions such as calls, emails, and meetings linked to contacts, companies, leads, or deals.
 // See README.md for full design rationale.
 
 import { defineTable } from "convex/server";
@@ -13,6 +13,7 @@ export const activities = defineTable({
   contactId: v.optional(v.id("contacts")),
   companyId: v.optional(v.id("companies")),
   dealId: v.optional(v.id("deals")),
+  leadId: v.optional(v.id("leads")),
   ownerId: v.id("users"),
   updatedAt: v.number(),
 })
@@ -20,4 +21,5 @@ export const activities = defineTable({
   .index("by_company_id_and_occurred_at", ["companyId", "occurredAt"])
   .index("by_deal_id_and_occurred_at", ["dealId", "occurredAt"])
   .index("by_owner_id", ["ownerId"])
-  .index("by_type", ["type"]);
+  .index("by_type", ["type"])
+  .index("by_lead_id_and_occurred_at", ["leadId", "occurredAt"]);

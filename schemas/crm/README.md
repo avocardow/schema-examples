@@ -26,7 +26,7 @@ Key design decisions:
 - [Schema](#schema)
 
 <details>
-<summary>Schema table list (18 tables)</summary>
+<summary>Schema table list (19 tables)</summary>
 
 - [`contacts`](#1-contacts)
 - [`companies`](#2-companies)
@@ -43,9 +43,10 @@ Key design decisions:
 - [`contact_tags`](#13-contact_tags)
 - [`company_tags`](#14-company_tags)
 - [`deal_tags`](#15-deal_tags)
-- [`custom_fields`](#16-custom_fields)
-- [`custom_field_options`](#17-custom_field_options)
-- [`custom_field_values`](#18-custom_field_values)
+- [`deal_activities`](#16-deal_activities)
+- [`custom_fields`](#17-custom_fields)
+- [`custom_field_options`](#18-custom_field_options)
+- [`custom_field_values`](#19-custom_field_values)
 
 </details>
 
@@ -91,6 +92,9 @@ Key design decisions:
 - `contact_tags` — Junction: contacts ↔ tags
 - `company_tags` — Junction: companies ↔ tags
 - `deal_tags` — Junction: deals ↔ tags
+
+### Audit Trail
+- `deal_activities` — Append-only log of deal changes for pipeline analytics and sales velocity tracking
 
 ### Custom Fields
 - `custom_fields` — Field definitions per entity type (text, number, date, select, etc.)
@@ -398,6 +402,7 @@ table activities {
   contact_id      uuid nullable references contacts(id) on_delete set_null
   company_id      uuid nullable references companies(id) on_delete set_null
   deal_id         uuid nullable references deals(id) on_delete set_null
+  lead_id         uuid nullable references leads(id) on_delete set_null
 
   owner_id        uuid not_null references users(id) on_delete cascade
                                                -- User who logged the activity.
@@ -409,6 +414,7 @@ table activities {
     index(contact_id, occurred_at)             -- "Activities for this contact, most recent first."
     index(company_id, occurred_at)             -- "Activities for this company, most recent first."
     index(deal_id, occurred_at)                -- "Activities for this deal, most recent first."
+    index(lead_id, occurred_at)                -- "Activities for this lead, most recent first."
     index(owner_id)                            -- "Activities logged by this user."
     index(type)                                -- "All calls" or "all meetings."
   }
@@ -416,7 +422,7 @@ table activities {
 ```
 
 **Design notes:**
-- Activities are not polymorphic in the anti-pattern sense — they have explicit nullable FKs to each entity type. An activity can be linked to a contact AND a company AND a deal simultaneously.
+- Activities are not polymorphic in the anti-pattern sense — they have explicit nullable FKs to each entity type. An activity can be linked to a contact AND a company AND a deal AND a lead simultaneously.
 - `occurred_at` is when the activity actually happened (not when it was logged). It's a timestamp because activities happen at specific moments.
 - `duration` is in minutes (not seconds) — appropriate granularity for sales activities.
 
@@ -438,6 +444,7 @@ table tasks {
   contact_id      uuid nullable references contacts(id) on_delete set_null
   company_id      uuid nullable references companies(id) on_delete set_null
   deal_id         uuid nullable references deals(id) on_delete set_null
+  lead_id         uuid nullable references leads(id) on_delete set_null
 
   owner_id        uuid not_null references users(id) on_delete cascade
                                                -- User responsible for this task.
@@ -449,7 +456,9 @@ table tasks {
     index(owner_id, status)                    -- "Open tasks for this user."
     index(due_date)                            -- "Tasks due by this date."
     index(contact_id)                          -- "Tasks related to this contact."
+    index(company_id)                          -- "Tasks related to this company."
     index(deal_id)                             -- "Tasks related to this deal."
+    index(lead_id)                             -- "Tasks related to this lead."
   }
 }
 ```
@@ -571,7 +580,43 @@ table deal_tags {
 }
 ```
 
-### 16. custom_fields
+### 16. deal_activities
+
+Append-only audit trail of all changes to deals. Records who changed what, when, and the old/new values. Essential for pipeline analytics — sales velocity (time in each stage), conversion rates between stages, forecast accuracy, and rep activity reporting. Follows the Salesforce OpportunityHistory and HubSpot deal property change tracking pattern.
+
+```pseudo
+table deal_activities {
+  id              uuid primary_key default auto_generate
+  deal_id         uuid not_null references deals(id) on_delete cascade
+  user_id         uuid nullable references users(id) on_delete set_null
+                                               -- Who performed the action. Null if user was deleted or system-generated.
+  action          enum(created, updated, stage_changed, won, lost, reopened) not_null
+                                               -- created = deal was created.
+                                               -- updated = a field was changed (value, close date, owner, etc.).
+                                               -- stage_changed = deal moved to a different pipeline stage.
+                                               -- won = deal was marked as closed-won.
+                                               -- lost = deal was marked as closed-lost.
+                                               -- reopened = closed deal was reopened.
+  field           string nullable              -- Which field changed (e.g., "stage", "value", "owner"). Null for non-update actions.
+  old_value       string nullable              -- Previous value as string. Null for "created" or when not applicable.
+  new_value       string nullable              -- New value as string.
+
+  created_at      timestamp default now
+
+  indexes {
+    index(deal_id, created_at)                 -- "Activity feed for this deal, newest first."
+    index(user_id)                             -- "All deal activity by this user."
+  }
+}
+```
+
+**Design notes:**
+- This is an append-only table — rows are never updated or deleted (except via cascade when the deal is deleted).
+- `stage_changed` is distinct from `updated` to enable targeted pipeline velocity queries without filtering by `field = 'stage'`.
+- `old_value` and `new_value` are stored as strings for uniformity (stage names, monetary values, user names, etc.).
+- Key analytics enabled: time-in-stage (diff between consecutive `stage_changed` entries), win/loss rates per stage, deal velocity trends, and rep performance tracking.
+
+### 17. custom_fields
 
 Field definitions for custom data on CRM entities. Each custom field is scoped to an entity type (contact, company, deal, or lead) and has a name, type, and optional configuration. Custom fields allow teams to capture domain-specific data without schema changes. Every major CRM supports this pattern.
 
@@ -600,7 +645,7 @@ table custom_fields {
 - `field_type` determines validation and UI rendering. `select` and `multi_select` have predefined options in `custom_field_options`.
 - `is_required` is enforced at the application level.
 
-### 17. custom_field_options
+### 18. custom_field_options
 
 Predefined options for `select` and `multi_select` custom fields. Each option has a display value, optional color, and ordering.
 
@@ -620,7 +665,7 @@ table custom_field_options {
 }
 ```
 
-### 18. custom_field_values
+### 19. custom_field_values
 
 Actual values stored for custom fields on specific entity records. Uses the EAV (Entity-Attribute-Value) pattern — one row per field per entity record. The `entity_id` references the record's UUID (contact, company, deal, or lead), and `entity_type` is derived from the custom field's `entity_type`.
 
@@ -663,6 +708,8 @@ companies          1 ──── * deals                  (one company has many
 companies          1 ──── * activities             (one company has many activities)
 companies          1 ──── * notes                  (one company has many notes)
 companies          1 ──── * company_tags           (one company has many tags)
+leads              1 ──── * activities             (one lead has many activities)
+leads              1 ──── * tasks                  (one lead has many tasks)
 leads              1 ──── * notes                  (one lead has many notes)
 leads              1 ──── 0..1 contacts            (one lead converts to one contact)
 pipelines          1 ──── * pipeline_stages        (one pipeline has many stages)
@@ -673,6 +720,7 @@ deals              1 ──── * activities             (one deal has many ac
 deals              1 ──── * tasks                  (one deal has many tasks)
 deals              1 ──── * notes                  (one deal has many notes)
 deals              1 ──── * deal_tags              (one deal has many tags)
+deals              1 ──── * deal_activities         (one deal has many activity records)
 tags               1 ──── * contact_tags           (one tag on many contacts)
 tags               1 ──── * company_tags           (one tag on many companies)
 tags               1 ──── * deal_tags              (one tag on many deals)
@@ -685,6 +733,7 @@ users              1 ──── * deals                  (one user owns many d
 users              1 ──── * activities             (one user logs many activities)
 users              1 ──── * tasks                  (one user owns many tasks)
 users              1 ──── * notes                  (one user creates many notes)
+users              1 ──── * deal_activities         (one user generates many deal activity records)
 ```
 
 ## Best Practices
@@ -696,7 +745,9 @@ users              1 ──── * notes                  (one user creates man
 - **Deduplication**: Use `contacts.email` and `companies.domain` as natural dedup keys. Merge duplicates at the application level.
 - **Custom field validation**: Validate `custom_field_values.value` at the application level based on `custom_fields.field_type`. The database stores all values as strings.
 - **Tag management**: Tags are global and reusable. Use junction tables for type-safe assignment. Consider auto-complete in the UI to prevent tag proliferation.
-- **Owner assignment**: Round-robin or weighted distribution of `owner_id` across sales reps. Track owner changes in an audit log if needed.
+- **Owner assignment**: Round-robin or weighted distribution of `owner_id` across sales reps. Owner changes are tracked in `deal_activities`.
+- **Sales velocity**: Use `deal_activities` with `action = stage_changed` to measure time-in-stage. Diff consecutive `created_at` timestamps for the same deal to compute stage duration. Aggregate across deals for pipeline velocity metrics.
+- **Deal activity logging**: Write to `deal_activities` whenever a deal field changes. Use `stage_changed` for stage moves (enables targeted velocity queries), `won`/`lost` for closures, and `updated` for other field changes. The application writes these as side effects of deal mutations.
 - **Soft deletes**: Consider adding `archived_at` to contacts, companies, and deals for recoverability. The current schema uses hard deletes with cascade for simplicity.
 - **Access control**: Reference the Auth / RBAC domain for user permissions. Consider record-level visibility rules (e.g., "private to owner" vs. "visible to team").
 

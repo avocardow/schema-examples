@@ -1,7 +1,11 @@
-// tasks: Action items assigned to users, optionally linked to contacts, companies, or deals.
+// tasks: Action items assigned to users, optionally linked to contacts, companies, deals, or leads.
 // See README.md for full design rationale and field documentation.
 
-// Uses DealPriority from deals.prisma
+enum TaskPriority {
+  low
+  medium
+  high
+}
 
 enum TaskStatus {
   todo
@@ -15,12 +19,13 @@ model Task {
   title       String
   description String?
   dueDate     String?      @map("due_date")
-  priority    DealPriority @default(medium)
+  priority    TaskPriority @default(medium)
   status      TaskStatus   @default(todo)
   completedAt DateTime?    @map("completed_at")
   contactId   String?      @map("contact_id")
   companyId   String?      @map("company_id")
   dealId      String?      @map("deal_id")
+  leadId      String?      @map("lead_id")
   ownerId     String       @map("owner_id")
   createdAt   DateTime     @default(now()) @map("created_at")
   updatedAt   DateTime     @default(now()) @map("updated_at")
@@ -28,11 +33,14 @@ model Task {
   contact Contact? @relation("TaskContact", fields: [contactId], references: [id], onDelete: SetNull)
   company Company? @relation("TaskCompany", fields: [companyId], references: [id], onDelete: SetNull)
   deal    Deal?    @relation("TaskDeal", fields: [dealId], references: [id], onDelete: SetNull)
+  lead    Lead?    @relation("TaskLead", fields: [leadId], references: [id], onDelete: SetNull)
   owner   User     @relation("TaskOwner", fields: [ownerId], references: [id], onDelete: Cascade)
 
   @@index([ownerId, status])
   @@index([dueDate])
   @@index([contactId])
+  @@index([companyId])
   @@index([dealId])
+  @@index([leadId])
   @@map("tasks")
 }
