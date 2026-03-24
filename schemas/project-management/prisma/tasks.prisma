@@ -1,0 +1,67 @@
+// tasks: Core work items with hierarchy, status tracking, and rich metadata.
+// See README.md for full design rationale and field documentation.
+
+enum TaskType {
+  task
+  bug
+  story
+  epic
+}
+
+enum TaskPriority {
+  none
+  urgent
+  high
+  medium
+  low
+}
+
+model Task {
+  id             String       @id @default(uuid())
+  projectId      String       @map("project_id")
+  taskListId     String?      @map("task_list_id")
+  parentId       String?      @map("parent_id")
+  statusId       String?      @map("status_id")
+  milestoneId    String?      @map("milestone_id")
+  number         Int
+  title          String
+  description    String?
+  type           TaskType     @default(task)
+  priority       TaskPriority @default(none)
+  dueDate        String?      @map("due_date")
+  startDate      String?      @map("start_date")
+  estimatePoints Int?         @map("estimate_points")
+  position       Int          @default(0)
+  completedAt    DateTime?    @map("completed_at")
+  createdBy      String       @map("created_by")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @default(now()) @map("updated_at")
+
+  project   Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  taskList  TaskList?      @relation(fields: [taskListId], references: [id], onDelete: SetNull)
+  parent    Task?          @relation("TaskParent", fields: [parentId], references: [id], onDelete: Cascade)
+  status    ProjectStatus? @relation(fields: [statusId], references: [id], onDelete: SetNull)
+  milestone Milestone?     @relation(fields: [milestoneId], references: [id], onDelete: SetNull)
+  creator   User           @relation("TaskCreator", fields: [createdBy], references: [id], onDelete: Restrict)
+
+  subtasks            Task[]             @relation("TaskParent")
+  assignees           TaskAssignee[]
+  taskLabels          TaskLabel[]
+  dependenciesAsSource TaskDependency[]  @relation("TaskDependencySource")
+  dependenciesAsTarget TaskDependency[]  @relation("TaskDependencyTarget")
+  customFieldValues   CustomFieldValue[]
+  comments            TaskComment[]
+  attachments         TaskAttachment[]
+  timeEntries         TimeEntry[]
+  activities          TaskActivity[]
+
+  @@unique([projectId, number])
+  @@index([projectId, statusId])
+  @@index([taskListId, position])
+  @@index([parentId])
+  @@index([milestoneId])
+  @@index([type])
+  @@index([dueDate])
+  @@index([createdBy])
+  @@map("tasks")
+}

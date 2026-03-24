@@ -1,0 +1,19 @@
+// task_lists: Ordered groupings of tasks within a project for organization.
+// See README.md for full design rationale and field documentation.
+
+model TaskList {
+  id          String   @id @default(uuid())
+  projectId   String   @map("project_id")
+  name        String
+  description String?
+  position    Int      @default(0)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @map("updated_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  tasks Task[]
+
+  @@index([projectId, position])
+  @@map("task_lists")
+}

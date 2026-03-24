@@ -1,0 +1,20 @@
+// labels: Project-scoped categorical tags that can be applied to tasks.
+// See README.md for full design rationale and field documentation.
+
+model Label {
+  id          String   @id @default(uuid())
+  projectId   String   @map("project_id")
+  name        String
+  color       String?
+  description String?
+  position    Int      @default(0)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @map("updated_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  taskLabels TaskLabel[]
+
+  @@unique([projectId, name])
+  @@map("labels")
+}

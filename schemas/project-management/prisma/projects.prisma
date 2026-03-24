@@ -1,0 +1,35 @@
+// projects: Top-level container for tasks, members, and all project configuration.
+// See README.md for full design rationale and field documentation.
+
+enum ProjectVisibility {
+  public
+  private
+}
+
+model Project {
+  id          String            @id @default(uuid())
+  name        String
+  key         String            @unique
+  description String?
+  icon        String?
+  color       String?
+  visibility  ProjectVisibility @default(public)
+  taskCount   Int               @default(0) @map("task_count")
+  createdBy   String            @map("created_by")
+  createdAt   DateTime          @default(now()) @map("created_at")
+  updatedAt   DateTime          @default(now()) @map("updated_at")
+
+  creator User @relation("ProjectCreator", fields: [createdBy], references: [id], onDelete: Restrict)
+
+  projectMembers ProjectMember[]
+  statuses       ProjectStatus[]
+  taskLists      TaskList[]
+  tasks          Task[]
+  labels         Label[]
+  milestones     Milestone[]
+  customFields   CustomField[]
+  views          TaskView[]
+
+  @@index([createdBy])
+  @@map("projects")
+}

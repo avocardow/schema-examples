@@ -1,0 +1,20 @@
+// task_attachments: Files and media uploaded to tasks.
+// See README.md for full design rationale and field documentation.
+
+model TaskAttachment {
+  id         String   @id @default(uuid())
+  taskId     String   @map("task_id")
+  uploadedBy String?  @map("uploaded_by")
+  fileName   String   @map("file_name")
+  fileUrl    String   @map("file_url")
+  fileSize   Int?     @map("file_size")
+  mimeType   String?  @map("mime_type")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  task     Task  @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  uploader User? @relation("TaskAttachmentUploader", fields: [uploadedBy], references: [id], onDelete: SetNull)
+
+  @@index([taskId])
+  @@index([uploadedBy])
+  @@map("task_attachments")
+}

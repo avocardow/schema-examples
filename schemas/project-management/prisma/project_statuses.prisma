@@ -1,0 +1,30 @@
+// project_statuses: Configurable workflow statuses scoped to each project.
+// See README.md for full design rationale and field documentation.
+
+enum StatusCategory {
+  backlog
+  unstarted
+  started
+  completed
+  cancelled
+}
+
+model ProjectStatus {
+  id        String         @id @default(uuid())
+  projectId String         @map("project_id")
+  name      String
+  color     String?
+  category  StatusCategory
+  position  Int            @default(0)
+  isDefault Boolean        @default(false) @map("is_default")
+  createdAt DateTime       @default(now()) @map("created_at")
+  updatedAt DateTime       @default(now()) @map("updated_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  tasks Task[]
+
+  @@index([projectId, position])
+  @@index([projectId, category])
+  @@map("project_statuses")
+}

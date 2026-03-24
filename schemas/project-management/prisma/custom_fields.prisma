@@ -1,0 +1,32 @@
+// custom_fields: User-defined fields that extend task metadata per project.
+// See README.md for full design rationale and field documentation.
+
+enum CustomFieldType {
+  text
+  number
+  date
+  select
+  multi_select
+  checkbox
+  url
+}
+
+model CustomField {
+  id          String          @id @default(uuid())
+  projectId   String          @map("project_id")
+  name        String
+  fieldType   CustomFieldType @map("field_type")
+  description String?
+  isRequired  Boolean         @default(false) @map("is_required")
+  position    Int             @default(0)
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @default(now()) @map("updated_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  options CustomFieldOption[]
+  values  CustomFieldValue[]
+
+  @@index([projectId, position])
+  @@map("custom_fields")
+}

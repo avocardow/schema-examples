@@ -1,0 +1,24 @@
+// task_dependencies: Directed relationships between tasks for ordering and blocking.
+// See README.md for full design rationale and field documentation.
+
+enum DependencyType {
+  blocks
+  is_blocked_by
+  relates_to
+  duplicates
+}
+
+model TaskDependency {
+  id          String         @id @default(uuid())
+  taskId      String         @map("task_id")
+  dependsOnId String         @map("depends_on_id")
+  type        DependencyType
+  createdAt   DateTime       @default(now()) @map("created_at")
+
+  task      Task @relation("TaskDependencySource", fields: [taskId], references: [id], onDelete: Cascade)
+  dependsOn Task @relation("TaskDependencyTarget", fields: [dependsOnId], references: [id], onDelete: Cascade)
+
+  @@unique([taskId, dependsOnId, type])
+  @@index([dependsOnId])
+  @@map("task_dependencies")
+}

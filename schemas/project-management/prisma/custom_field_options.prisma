@@ -1,0 +1,16 @@
+// custom_field_options: Predefined choices for select and multi-select custom fields.
+// See README.md for full design rationale and field documentation.
+
+model CustomFieldOption {
+  id            String   @id @default(uuid())
+  customFieldId String   @map("custom_field_id")
+  value         String
+  color         String?
+  position      Int      @default(0)
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  customField CustomField @relation(fields: [customFieldId], references: [id], onDelete: Cascade)
+
+  @@index([customFieldId, position])
+  @@map("custom_field_options")
+}

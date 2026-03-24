@@ -1,0 +1,33 @@
+// task_activities: Audit log of changes and events on tasks.
+// See README.md for full design rationale and field documentation.
+
+enum ActivityAction {
+  created
+  updated
+  commented
+  assigned
+  unassigned
+  labeled
+  unlabeled
+  moved
+  archived
+  restored
+}
+
+model TaskActivity {
+  id        String         @id @default(uuid())
+  taskId    String         @map("task_id")
+  userId    String?        @map("user_id")
+  action    ActivityAction
+  field     String?
+  oldValue  String?        @map("old_value")
+  newValue  String?        @map("new_value")
+  createdAt DateTime       @default(now()) @map("created_at")
+
+  task Task  @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user User? @relation("TaskActivityActor", fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([taskId, createdAt])
+  @@index([userId])
+  @@map("task_activities")
+}

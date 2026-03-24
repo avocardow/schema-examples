@@ -1,0 +1,32 @@
+// task_views: Saved view configurations for filtering, sorting, and displaying tasks.
+// See README.md for full design rationale and field documentation.
+
+enum ViewLayout {
+  list
+  board
+  calendar
+  timeline
+}
+
+model TaskView {
+  id          String     @id @default(uuid())
+  projectId   String     @map("project_id")
+  createdBy   String     @map("created_by")
+  name        String
+  description String?
+  layout      ViewLayout @default(list)
+  filters     Json?
+  sortBy      Json?      @map("sort_by")
+  groupBy     String?    @map("group_by")
+  isShared    Boolean    @default(false) @map("is_shared")
+  position    Int        @default(0)
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @default(now()) @map("updated_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  creator User    @relation("TaskViewCreator", fields: [createdBy], references: [id], onDelete: Cascade)
+
+  @@index([projectId, position])
+  @@index([createdBy])
+  @@map("task_views")
+}

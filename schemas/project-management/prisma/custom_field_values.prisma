@@ -1,0 +1,18 @@
+// custom_field_values: Stores the actual value of a custom field for a specific task.
+// See README.md for full design rationale and field documentation.
+
+model CustomFieldValue {
+  id            String   @id @default(uuid())
+  taskId        String   @map("task_id")
+  customFieldId String   @map("custom_field_id")
+  value         String
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @default(now()) @map("updated_at")
+
+  task        Task        @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  customField CustomField @relation(fields: [customFieldId], references: [id], onDelete: Cascade)
+
+  @@unique([taskId, customFieldId])
+  @@index([customFieldId])
+  @@map("custom_field_values")
+}

@@ -1,0 +1,22 @@
+// task_assignees: Links users to tasks with a specific assignment role.
+// See README.md for full design rationale and field documentation.
+
+enum AssigneeRole {
+  assignee
+  reviewer
+}
+
+model TaskAssignee {
+  id        String       @id @default(uuid())
+  taskId    String       @map("task_id")
+  userId    String       @map("user_id")
+  role      AssigneeRole @default(assignee)
+  createdAt DateTime     @default(now()) @map("created_at")
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user User @relation("TaskAssigneeUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([taskId, userId])
+  @@index([userId])
+  @@map("task_assignees")
+}
