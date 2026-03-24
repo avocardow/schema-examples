@@ -1,0 +1,39 @@
+// services: Bookable service definitions with duration, pricing, and capacity constraints.
+// See README.md for full design rationale and field documentation.
+
+model Service {
+  id            String   @id @default(uuid())
+  categoryId    String?  @map("category_id")
+  name          String
+  slug          String   @unique
+  description   String?
+  duration      Int
+  bufferBefore  Int      @default(0) @map("buffer_before")
+  bufferAfter   Int      @default(0) @map("buffer_after")
+  price         Decimal?
+  currency      String?
+  maxAttendees  Int      @default(1) @map("max_attendees")
+  minAttendees  Int      @default(1) @map("min_attendees")
+  minNotice     Int      @default(0) @map("min_notice")
+  maxAdvance    Int      @default(43200) @map("max_advance")
+  slotInterval  Int?     @map("slot_interval")
+  isActive      Boolean  @default(true) @map("is_active")
+  isPrivate     Boolean  @default(false) @map("is_private")
+  color         String?
+  createdBy     String   @map("created_by")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @default(now()) @map("updated_at")
+
+  category         ServiceCategory?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  creator          User              @relation("ServiceCreator", fields: [createdBy], references: [id], onDelete: Restrict)
+  addons           ServiceAddon[]
+  providerServices ProviderService[]
+  customFields     CustomField[]
+  bookingServices  BookingService[]
+  waitlistEntries  WaitlistEntry[]
+
+  @@index([categoryId])
+  @@index([isActive, isPrivate])
+  @@index([createdBy])
+  @@map("services")
+}

@@ -1,6 +1,6 @@
 # Schema Examples
 
-A growing collection of production-ready database schema examples across multiple formats — with explanations and best practices. Ten domains complete (auth, notifications, file management, i18n, analytics, content moderation, e-commerce, CMS/blog, messaging/chat, social media), with 47 more planned.
+A growing collection of production-ready database schema examples across multiple formats — with explanations and best practices. Eleven domains complete (auth, notifications, file management, i18n, analytics, content moderation, e-commerce, CMS/blog, messaging/chat, social media, booking/scheduling), with 46 more planned.
 
 **Copy. Learn. Contribute. Ship.**
 
@@ -86,7 +86,7 @@ See each domain's **Dependencies** section for details.
 
 | Domain                                                               | Tables | Status |
 | -------------------------------------------------------------------- | -----: | ------ |
-| [Booking / Scheduling](./schemas/booking-scheduling)                 |        | 🔲     |
+| [Booking / Scheduling](./schemas/booking-scheduling)                 |     17 | ✅     |
 | [Event Management / Ticketing](./schemas/event-management-ticketing) |        | 🔲     |
 
 ### Healthcare & Wellness

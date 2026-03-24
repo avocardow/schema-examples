@@ -1,0 +1,29 @@
+// booking_attendees: Individual participants in a group or multi-attendee booking.
+// See README.md for full design rationale and field documentation.
+
+enum AttendeeStatus {
+  confirmed
+  cancelled
+  no_show
+}
+
+model BookingAttendee {
+  id          String         @id @default(uuid())
+  bookingId   String         @map("booking_id")
+  userId      String?        @map("user_id")
+  name        String
+  email       String
+  phone       String?
+  status      AttendeeStatus @default(confirmed)
+  cancelledAt DateTime?      @map("cancelled_at")
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @default(now()) @map("updated_at")
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  user    User?   @relation("AttendeeUser", fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([bookingId])
+  @@index([userId])
+  @@index([email])
+  @@map("booking_attendees")
+}

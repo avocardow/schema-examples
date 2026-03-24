@@ -1,0 +1,17 @@
+// provider_locations: Junction table linking providers to the locations where they work.
+// See README.md for full design rationale and field documentation.
+
+model ProviderLocation {
+  id         String   @id @default(uuid())
+  providerId String   @map("provider_id")
+  locationId String   @map("location_id")
+  isPrimary  Boolean  @default(false) @map("is_primary")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  provider Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  location Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, locationId])
+  @@index([locationId])
+  @@map("provider_locations")
+}

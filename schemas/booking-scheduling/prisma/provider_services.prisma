@@ -1,0 +1,19 @@
+// provider_services: Junction table linking providers to the services they offer, with optional custom pricing.
+// See README.md for full design rationale and field documentation.
+
+model ProviderService {
+  id             String   @id @default(uuid())
+  providerId     String   @map("provider_id")
+  serviceId      String   @map("service_id")
+  customPrice    Decimal? @map("custom_price")
+  customDuration Int?     @map("custom_duration")
+  isActive       Boolean  @default(true) @map("is_active")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  provider Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  service  Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, serviceId])
+  @@index([serviceId])
+  @@map("provider_services")
+}

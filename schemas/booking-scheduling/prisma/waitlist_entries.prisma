@@ -1,0 +1,37 @@
+// waitlist_entries: Queue of customers waiting for availability on a specific service, date, and provider.
+// See README.md for full design rationale and field documentation.
+
+enum WaitlistStatus {
+  waiting
+  notified
+  booked
+  expired
+  cancelled
+}
+
+model WaitlistEntry {
+  id             String         @id @default(uuid())
+  serviceId      String         @map("service_id")
+  providerId     String?        @map("provider_id")
+  customerId     String         @map("customer_id")
+  locationId     String?        @map("location_id")
+  preferredDate  String         @map("preferred_date")
+  preferredStart String?        @map("preferred_start")
+  preferredEnd   String?        @map("preferred_end")
+  status         WaitlistStatus @default(waiting)
+  notifiedAt     DateTime?      @map("notified_at")
+  expiresAt      DateTime?      @map("expires_at")
+  notes          String?
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @default(now()) @map("updated_at")
+
+  service  Service   @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  provider Provider? @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  customer User      @relation("WaitlistCustomer", fields: [customerId], references: [id], onDelete: Cascade)
+  location Location? @relation(fields: [locationId], references: [id], onDelete: SetNull)
+
+  @@index([serviceId, preferredDate, status])
+  @@index([customerId, status])
+  @@index([status, notifiedAt])
+  @@map("waitlist_entries")
+}

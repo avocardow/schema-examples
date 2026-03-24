@@ -1,0 +1,18 @@
+// schedule_overrides: Date-specific availability exceptions that override regular schedule rules.
+// See README.md for full design rationale and field documentation.
+
+model ScheduleOverride {
+  id           String   @id @default(uuid())
+  scheduleId   String   @map("schedule_id")
+  overrideDate String   @map("override_date")
+  startTime    String?  @map("start_time")
+  endTime      String?  @map("end_time")
+  isAvailable  Boolean  @default(true) @map("is_available")
+  reason       String?
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  schedule Schedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+
+  @@index([scheduleId, overrideDate])
+  @@map("schedule_overrides")
+}

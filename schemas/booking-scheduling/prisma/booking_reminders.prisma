@@ -1,0 +1,33 @@
+// booking_reminders: Scheduled notification records for upcoming booking reminders to customers or providers.
+// See README.md for full design rationale and field documentation.
+
+enum ReminderTarget {
+  customer
+  provider
+  all
+}
+
+enum ReminderStatus {
+  pending
+  sent
+  failed
+  cancelled
+}
+
+model BookingReminder {
+  id            String         @id @default(uuid())
+  bookingId     String         @map("booking_id")
+  remindAt      DateTime       @map("remind_at")
+  type          ReminderTarget @default(customer)
+  offsetMinutes Int            @map("offset_minutes")
+  status        ReminderStatus @default(pending)
+  sentAt        DateTime?      @map("sent_at")
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @default(now()) @map("updated_at")
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@index([bookingId])
+  @@index([status, remindAt])
+  @@map("booking_reminders")
+}

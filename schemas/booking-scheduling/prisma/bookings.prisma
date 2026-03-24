@@ -1,0 +1,70 @@
+// bookings: Core appointment records linking customers, providers, and time slots with lifecycle tracking.
+// See README.md for full design rationale and field documentation.
+
+enum BookingStatus {
+  pending
+  confirmed
+  completed
+  cancelled
+  declined
+  no_show
+}
+
+enum BookingSource {
+  online
+  manual
+  api
+  import
+}
+
+enum BookingPaymentStatus {
+  not_required
+  pending
+  paid
+  refunded
+  partially_refunded
+}
+
+model Booking {
+  id                 String        @id @default(uuid())
+  providerId         String        @map("provider_id")
+  locationId         String?       @map("location_id")
+  customerId         String        @map("customer_id")
+  scheduleId         String?       @map("schedule_id")
+  startTime          DateTime      @map("start_time")
+  endTime            DateTime      @map("end_time")
+  timezone           String
+  status             BookingStatus @default(pending)
+  cancelledBy        String?       @map("cancelled_by")
+  cancellationReason String?       @map("cancellation_reason")
+  cancelledAt        DateTime?     @map("cancelled_at")
+  customerNotes      String?       @map("customer_notes")
+  providerNotes      String?       @map("provider_notes")
+  source             BookingSource @default(online)
+  paymentStatus      BookingPaymentStatus @default(not_required) @map("payment_status")
+  recurrenceGroupId  String?              @map("recurrence_group_id")
+  recurrenceRule     String?              @map("recurrence_rule")
+  confirmedAt        DateTime?     @map("confirmed_at")
+  completedAt        DateTime?     @map("completed_at")
+  createdAt          DateTime      @default(now()) @map("created_at")
+  updatedAt          DateTime      @default(now()) @map("updated_at")
+
+  provider    Provider   @relation(fields: [providerId], references: [id], onDelete: Restrict)
+  location    Location?  @relation(fields: [locationId], references: [id], onDelete: SetNull)
+  customer    User       @relation("BookingCustomer", fields: [customerId], references: [id], onDelete: Restrict)
+  schedule    Schedule?  @relation(fields: [scheduleId], references: [id], onDelete: SetNull)
+  cancelledByUser User?  @relation("BookingCancelledBy", fields: [cancelledBy], references: [id], onDelete: SetNull)
+
+  attendees        BookingAttendee[]
+  bookingServices  BookingService[]
+  customFieldAnswers BookingCustomFieldAnswer[]
+  reminders        BookingReminder[]
+
+  @@index([providerId, startTime])
+  @@index([customerId, startTime])
+  @@index([status])
+  @@index([startTime, endTime])
+  @@index([locationId])
+  @@index([recurrenceGroupId])
+  @@map("bookings")
+}

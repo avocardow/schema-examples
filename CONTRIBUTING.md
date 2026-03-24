@@ -44,6 +44,7 @@ table example {
 - `indexes { }` block after the table for indexes
 - `unique(field)` / `index(field)` / `composite_unique(field1, field2)` in the indexes block
 - When a composite unique/index covers a single-column index via leading column, **document it** with a comment: `-- composite_unique(a, b) covers index(a) via leading column.` This tells implementers to omit the redundant index.
+- **Date-only and time-only fields**: Use `string` (not `timestamp`) for values that represent a calendar date (`"2025-03-15"`) or a clock time (`"09:00"`) without a specific moment in time. These are interpreted in a contextual timezone (e.g., the schedule's timezone), not UTC. All formats store these as plain strings/TEXT. Reserve `timestamp` for absolute moments in time (UTC).
 - Comments after `--` explain design decisions
 
 ### 3. Implement across all formats

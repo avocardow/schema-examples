@@ -1,0 +1,20 @@
+// schedules: Named availability templates that define when a provider can accept bookings.
+// See README.md for full design rationale and field documentation.
+
+model Schedule {
+  id         String   @id @default(uuid())
+  providerId String   @map("provider_id")
+  name       String
+  timezone   String
+  isDefault  Boolean  @default(false) @map("is_default")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @default(now()) @map("updated_at")
+
+  provider  Provider           @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  rules     ScheduleRule[]
+  overrides ScheduleOverride[]
+  bookings  Booking[]
+
+  @@index([providerId, isDefault])
+  @@map("schedules")
+}

@@ -1,0 +1,17 @@
+// booking_custom_field_answers: Customer-submitted responses to custom intake form fields for a booking.
+// See README.md for full design rationale and field documentation.
+
+model BookingCustomFieldAnswer {
+  id            String   @id @default(uuid())
+  bookingId     String   @map("booking_id")
+  customFieldId String   @map("custom_field_id")
+  value         String
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  booking     Booking     @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  customField CustomField @relation(fields: [customFieldId], references: [id], onDelete: Cascade)
+
+  @@unique([bookingId, customFieldId])
+  @@index([customFieldId])
+  @@map("booking_custom_field_answers")
+}

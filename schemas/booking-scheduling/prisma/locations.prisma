@@ -1,0 +1,37 @@
+// locations: Physical or virtual venues where services are delivered.
+// See README.md for full design rationale and field documentation.
+
+enum LocationType {
+  physical
+  virtual
+}
+
+model Location {
+  id            String       @id @default(uuid())
+  name          String
+  slug          String       @unique
+  type          LocationType @default(physical)
+  description   String?
+  addressLine1  String?      @map("address_line1")
+  addressLine2  String?      @map("address_line2")
+  city          String?
+  state         String?
+  postalCode    String?      @map("postal_code")
+  country       String?
+  virtualUrl    String?      @map("virtual_url")
+  timezone      String
+  phone         String?
+  email         String?
+  isActive      Boolean      @default(true) @map("is_active")
+  position      Int          @default(0)
+  createdAt     DateTime     @default(now()) @map("created_at")
+  updatedAt     DateTime     @default(now()) @map("updated_at")
+
+  providerLocations ProviderLocation[]
+  bookings          Booking[]
+  waitlistEntries   WaitlistEntry[]
+
+  @@index([type])
+  @@index([isActive, position])
+  @@map("locations")
+}

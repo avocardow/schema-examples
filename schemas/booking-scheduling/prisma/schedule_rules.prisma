@@ -1,0 +1,16 @@
+// schedule_rules: Recurring weekly availability windows within a schedule (e.g., Monday 9am-5pm).
+// See README.md for full design rationale and field documentation.
+
+model ScheduleRule {
+  id         String   @id @default(uuid())
+  scheduleId String   @map("schedule_id")
+  dayOfWeek  Int      @map("day_of_week")
+  startTime  String   @map("start_time")
+  endTime    String   @map("end_time")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  schedule Schedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+
+  @@index([scheduleId, dayOfWeek])
+  @@map("schedule_rules")
+}

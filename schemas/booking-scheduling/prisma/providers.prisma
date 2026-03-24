@@ -1,0 +1,29 @@
+// providers: Staff members or practitioners who deliver services and accept bookings.
+// See README.md for full design rationale and field documentation.
+
+model Provider {
+  id          String   @id @default(uuid())
+  userId      String   @unique @map("user_id")
+  displayName String   @map("display_name")
+  bio         String?
+  avatarUrl   String?  @map("avatar_url")
+  timezone    String
+  phone       String?
+  email       String?
+  isActive    Boolean  @default(true) @map("is_active")
+  isAccepting Boolean  @default(true) @map("is_accepting")
+  position    Int      @default(0)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @map("updated_at")
+
+  user              User               @relation("ProviderUser", fields: [userId], references: [id], onDelete: Cascade)
+  providerServices  ProviderService[]
+  providerLocations ProviderLocation[]
+  schedules         Schedule[]
+  bookings          Booking[]
+  waitlistEntries   WaitlistEntry[]
+
+  @@index([isActive, isAccepting])
+  @@index([isActive, position])
+  @@map("providers")
+}
