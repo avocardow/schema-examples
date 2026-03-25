@@ -1,0 +1,21 @@
+// webhook_messages: Stores inbound/outbound webhook event payloads awaiting delivery to registered endpoints.
+// See README.md for full design rationale and field documentation.
+
+model WebhookMessage {
+  id             String   @id @default(uuid())
+  organizationId String   @map("organization_id")
+  eventTypeId    String   @map("event_type_id")
+  eventId        String   @map("event_id")
+  payload        Json
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  organization Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  eventType    WebhookEventType @relation(fields: [eventTypeId], references: [id], onDelete: Restrict)
+
+  webhookDeliveryAttempts WebhookDeliveryAttempt[]
+
+  @@index([organizationId, createdAt])
+  @@index([eventTypeId])
+  @@index([eventId])
+  @@map("webhook_messages")
+}

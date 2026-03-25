@@ -1,0 +1,31 @@
+// tenant_integrations: External service integrations connected by organizations with credentials and sync tracking.
+// See README.md for full design rationale and field documentation.
+
+enum TenantIntegrationStatus {
+  active
+  inactive
+  error
+}
+
+model TenantIntegration {
+  id                   String                  @id @default(uuid())
+  organizationId       String                  @map("organization_id")
+  integrationId        String                  @map("integration_id")
+  status               TenantIntegrationStatus @default(active)
+  encryptedCredentials Json?                   @map("encrypted_credentials")
+  config               Json?
+  connectedBy          String                  @map("connected_by")
+  lastSyncedAt         DateTime?               @map("last_synced_at")
+  errorMessage         String?                 @map("error_message")
+  createdAt            DateTime                @default(now()) @map("created_at")
+  updatedAt            DateTime                @default(now()) @updatedAt @map("updated_at")
+
+  organization    Organization          @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  integration     IntegrationDefinition @relation(fields: [integrationId], references: [id], onDelete: Restrict)
+  connectedByUser User                  @relation(fields: [connectedBy], references: [id], onDelete: Restrict)
+
+  @@unique([organizationId, integrationId])
+  @@index([integrationId])
+  @@index([status])
+  @@map("tenant_integrations")
+}

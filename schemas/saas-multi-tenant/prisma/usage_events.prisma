@@ -1,0 +1,21 @@
+// usage_events: Tracks per-organization feature consumption for metered billing and usage analytics.
+// See README.md for full design rationale and field documentation.
+
+model UsageEvent {
+  id              String   @id @default(uuid())
+  organizationId  String   @map("organization_id")
+  featureId       String   @map("feature_id")
+  quantity        Int      @default(1)
+  userId          String?  @map("user_id")
+  metadata        Json?
+  idempotencyKey  String?  @map("idempotency_key")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  feature      Feature      @relation(fields: [featureId], references: [id], onDelete: Cascade)
+  user         User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, featureId, createdAt])
+  @@index([idempotencyKey])
+  @@map("usage_events")
+}

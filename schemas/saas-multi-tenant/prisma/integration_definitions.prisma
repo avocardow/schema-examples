@@ -1,0 +1,28 @@
+// integration_definitions: Defines the catalogue of available third-party integrations and their authentication methods.
+// See README.md for full design rationale and field documentation.
+
+enum AuthMethod {
+  oauth2
+  api_key
+  webhook
+  none
+}
+
+model IntegrationDefinition {
+  id           String     @id @default(uuid())
+  key          String     @unique
+  name         String
+  description  String?
+  iconUrl      String?    @map("icon_url")
+  authMethod   AuthMethod @map("auth_method")
+  configSchema Json?      @map("config_schema")
+  isEnabled    Boolean    @default(true) @map("is_enabled")
+  sortOrder    Int        @default(0) @map("sort_order")
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @default(now()) @updatedAt @map("updated_at")
+
+  tenantIntegrations TenantIntegration[]
+
+  @@index([isEnabled])
+  @@map("integration_definitions")
+}

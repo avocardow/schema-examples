@@ -1,0 +1,22 @@
+// tenant_branding: Per-tenant visual branding and support contact configuration.
+// See README.md for full design rationale and field documentation.
+
+model TenantBranding {
+  id              String   @id @default(uuid())
+  organizationId  String   @unique @map("organization_id")
+  logoUrl         String?  @map("logo_url")
+  logoDarkUrl     String?  @map("logo_dark_url")
+  faviconUrl      String?  @map("favicon_url")
+  primaryColor    String?  @map("primary_color")
+  accentColor     String?  @map("accent_color")
+  backgroundColor String?  @map("background_color")
+  customCss       String?  @map("custom_css")
+  supportEmail    String?  @map("support_email")
+  supportUrl      String?  @map("support_url")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @default(now()) @updatedAt @map("updated_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@map("tenant_branding")
+}

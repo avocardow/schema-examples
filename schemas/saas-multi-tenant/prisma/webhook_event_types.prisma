@@ -1,0 +1,18 @@
+// webhook_event_types: Defines the catalogue of event types that can trigger webhook deliveries.
+// See README.md for full design rationale and field documentation.
+
+model WebhookEventType {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  name        String
+  description String?
+  isEnabled   Boolean  @default(true) @map("is_enabled")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+
+  webhookEndpointEventTypes WebhookEndpointEventType[]
+  webhookMessages           WebhookMessage[]
+
+  @@index([isEnabled])
+  @@map("webhook_event_types")
+}

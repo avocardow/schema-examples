@@ -1,0 +1,31 @@
+// webhook_delivery_attempts: Records each delivery attempt for a webhook message to an endpoint, tracking status and retry scheduling.
+// See README.md for full design rationale and field documentation.
+
+enum WebhookDeliveryAttemptStatus {
+  pending
+  success
+  failed
+}
+
+model WebhookDeliveryAttempt {
+  id             String                        @id @default(uuid())
+  messageId      String                        @map("message_id")
+  endpointId     String                        @map("endpoint_id")
+  attemptNumber  Int                           @default(1) @map("attempt_number")
+  status         WebhookDeliveryAttemptStatus   @default(pending)
+  httpStatus     Int?                          @map("http_status")
+  responseBody   String?                       @map("response_body")
+  errorMessage   String?                       @map("error_message")
+  attemptedAt    DateTime?                     @map("attempted_at")
+  durationMs     Int?                          @map("duration_ms")
+  nextRetryAt    DateTime?                     @map("next_retry_at")
+  createdAt      DateTime                      @default(now()) @map("created_at")
+
+  message  WebhookMessage  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  endpoint WebhookEndpoint @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+
+  @@index([messageId, attemptNumber])
+  @@index([endpointId, createdAt])
+  @@index([status, nextRetryAt])
+  @@map("webhook_delivery_attempts")
+}

@@ -1,0 +1,16 @@
+// webhook_endpoint_event_types: Join table linking webhook endpoints to the event types they subscribe to.
+// See README.md for full design rationale and field documentation.
+
+model WebhookEndpointEventType {
+  id          String   @id @default(uuid())
+  endpointId  String   @map("endpoint_id")
+  eventTypeId String   @map("event_type_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  endpoint  WebhookEndpoint  @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+  eventType WebhookEventType @relation(fields: [eventTypeId], references: [id], onDelete: Cascade)
+
+  @@unique([endpointId, eventTypeId])
+  @@index([eventTypeId])
+  @@map("webhook_endpoint_event_types")
+}

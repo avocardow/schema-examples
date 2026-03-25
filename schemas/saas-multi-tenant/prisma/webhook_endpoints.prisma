@@ -1,0 +1,31 @@
+// webhook_endpoints: Registered webhook URLs for organizations with status tracking and failure monitoring.
+// See README.md for full design rationale and field documentation.
+
+enum WebhookEndpointStatus {
+  active
+  paused
+  disabled
+}
+
+model WebhookEndpoint {
+  id             String                 @id @default(uuid())
+  organizationId String                 @map("organization_id")
+  url            String
+  description    String?
+  signingSecret  String                 @map("signing_secret")
+  status         WebhookEndpointStatus  @default(active)
+  failureCount   Int                    @default(0) @map("failure_count")
+  lastSuccessAt  DateTime?              @map("last_success_at")
+  lastFailureAt  DateTime?              @map("last_failure_at")
+  createdAt      DateTime               @default(now()) @map("created_at")
+  updatedAt      DateTime               @default(now()) @updatedAt @map("updated_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  webhookEndpointEventTypes WebhookEndpointEventType[]
+  webhookDeliveryAttempts   WebhookDeliveryAttempt[]
+
+  @@index([organizationId])
+  @@index([status])
+  @@map("webhook_endpoints")
+}
