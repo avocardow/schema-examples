@@ -1,0 +1,13 @@
+// tags: Freeform labels for cross-cutting ticket classification and filtering.
+// See README.md for full design rationale and field documentation.
+
+model Tag {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  color     String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  ticketTags TicketTag[]
+
+  @@map("tags")
+}

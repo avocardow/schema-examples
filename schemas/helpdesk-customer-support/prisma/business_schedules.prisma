@@ -1,0 +1,17 @@
+// business_schedules: Operating-hours templates that SLA timers run against.
+// See README.md for full design rationale and field documentation.
+
+model BusinessSchedule {
+  id        String   @id @default(uuid())
+  name      String
+  timezone  String
+  isDefault Boolean  @default(false) @map("is_default")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  entries     BusinessScheduleEntry[]
+  holidays    BusinessScheduleHoliday[]
+  slaPolicies SlaPolicy[]
+
+  @@map("business_schedules")
+}

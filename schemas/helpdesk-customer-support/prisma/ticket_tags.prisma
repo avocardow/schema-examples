@@ -1,0 +1,16 @@
+// ticket_tags: Junction associating tags with tickets for multi-label classification.
+// See README.md for full design rationale and field documentation.
+
+model TicketTag {
+  id        String   @id @default(uuid())
+  ticketId  String   @map("ticket_id")
+  tagId     String   @map("tag_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([ticketId, tagId])
+  @@index([tagId])
+  @@map("ticket_tags")
+}

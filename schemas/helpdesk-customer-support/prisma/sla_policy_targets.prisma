@@ -1,0 +1,17 @@
+// sla_policy_targets: Per-priority time limits within an SLA policy.
+// See README.md for full design rationale and field documentation.
+
+model SlaPolicyTarget {
+  id                   String @id @default(uuid())
+  slaPolicyId          String @map("sla_policy_id")
+  priorityId           String @map("priority_id")
+  firstResponseMinutes Int?   @map("first_response_minutes")
+  nextResponseMinutes  Int?   @map("next_response_minutes")
+  resolutionMinutes    Int?   @map("resolution_minutes")
+
+  slaPolicy SlaPolicy      @relation(fields: [slaPolicyId], references: [id], onDelete: Cascade)
+  priority  TicketPriority @relation(fields: [priorityId], references: [id], onDelete: Cascade)
+
+  @@unique([slaPolicyId, priorityId])
+  @@map("sla_policy_targets")
+}

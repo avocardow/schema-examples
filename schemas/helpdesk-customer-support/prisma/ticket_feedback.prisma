@@ -1,0 +1,23 @@
+// ticket_feedback: Post-resolution satisfaction rating and comment from the customer.
+// See README.md for full design rationale and field documentation.
+
+enum FeedbackRating {
+  good
+  bad
+}
+
+model TicketFeedback {
+  id          String         @id @default(uuid())
+  ticketId    String         @unique @map("ticket_id")
+  rating      FeedbackRating
+  comment     String?
+  createdById String         @map("created_by_id")
+  createdAt   DateTime       @default(now()) @map("created_at")
+
+  ticket    Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  createdBy User   @relation(fields: [createdById], references: [id], onDelete: Restrict)
+
+  @@index([rating])
+  @@index([createdById])
+  @@map("ticket_feedback")
+}

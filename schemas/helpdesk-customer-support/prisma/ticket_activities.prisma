@@ -1,0 +1,33 @@
+// ticket_activities: Append-only audit trail of ticket changes for accountability and SLA debugging.
+// See README.md for full design rationale and field documentation.
+
+enum TicketActivityAction {
+  created
+  updated
+  status_changed
+  priority_changed
+  assigned
+  escalated
+  reopened
+  resolved
+  closed
+  sla_breached
+}
+
+model TicketActivity {
+  id        String               @id @default(uuid())
+  ticketId  String               @map("ticket_id")
+  userId    String?              @map("user_id")
+  action    TicketActivityAction
+  field     String?
+  oldValue  String?              @map("old_value")
+  newValue  String?              @map("new_value")
+  createdAt DateTime             @default(now()) @map("created_at")
+
+  ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  user   User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([ticketId, createdAt])
+  @@index([userId])
+  @@map("ticket_activities")
+}

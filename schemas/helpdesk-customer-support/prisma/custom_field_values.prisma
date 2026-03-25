@@ -1,0 +1,16 @@
+// custom_field_values: Stored answers for custom fields on specific tickets.
+// See README.md for full design rationale and field documentation.
+
+model CustomFieldValue {
+  id            String @id @default(uuid())
+  customFieldId String @map("custom_field_id")
+  ticketId      String @map("ticket_id")
+  value         String?
+
+  customField CustomField @relation(fields: [customFieldId], references: [id], onDelete: Cascade)
+  ticket      Ticket      @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@unique([customFieldId, ticketId])
+  @@index([ticketId])
+  @@map("custom_field_values")
+}

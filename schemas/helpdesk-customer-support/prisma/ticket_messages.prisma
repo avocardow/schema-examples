@@ -1,0 +1,36 @@
+// ticket_messages: Threaded replies, internal notes, and system events on a ticket.
+// See README.md for full design rationale and field documentation.
+
+enum TicketMessageType {
+  reply
+  note
+  customer_message
+  system
+}
+
+enum TicketMessageChannel {
+  email
+  web
+  api
+  system
+}
+
+model TicketMessage {
+  id        String               @id @default(uuid())
+  ticketId  String               @map("ticket_id")
+  senderId  String?              @map("sender_id")
+  type      TicketMessageType
+  body      String
+  isPrivate Boolean              @default(false) @map("is_private")
+  channel   TicketMessageChannel @default(web)
+  createdAt DateTime             @default(now()) @map("created_at")
+
+  ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  sender User?  @relation(fields: [senderId], references: [id], onDelete: SetNull)
+
+  attachments TicketAttachment[]
+
+  @@index([ticketId, createdAt])
+  @@index([senderId])
+  @@map("ticket_messages")
+}

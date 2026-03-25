@@ -1,0 +1,16 @@
+// ticket_followers: Agents subscribed to ticket updates for visibility without assignment.
+// See README.md for full design rationale and field documentation.
+
+model TicketFollower {
+  id        String   @id @default(uuid())
+  ticketId  String   @map("ticket_id")
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([ticketId, userId])
+  @@index([userId])
+  @@map("ticket_followers")
+}

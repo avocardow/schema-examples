@@ -1,0 +1,20 @@
+// canned_responses: Pre-written reply templates agents insert into ticket messages.
+// See README.md for full design rationale and field documentation.
+
+model CannedResponse {
+  id          String   @id @default(uuid())
+  name        String
+  content     String
+  folder      String?
+  createdById String   @map("created_by_id")
+  isShared    Boolean  @default(true) @map("is_shared")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @map("updated_at")
+
+  createdBy User @relation(fields: [createdById], references: [id], onDelete: Restrict)
+
+  @@index([folder])
+  @@index([createdById])
+  @@index([isShared])
+  @@map("canned_responses")
+}

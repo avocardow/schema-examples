@@ -1,0 +1,15 @@
+// business_schedule_entries: Daily time windows defining when business hours are active.
+// See README.md for full design rationale and field documentation.
+
+model BusinessScheduleEntry {
+  id         String @id @default(uuid())
+  scheduleId String @map("schedule_id")
+  dayOfWeek  Int    @map("day_of_week")
+  startTime  String @map("start_time")
+  endTime    String @map("end_time")
+
+  schedule BusinessSchedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+
+  @@index([scheduleId, dayOfWeek])
+  @@map("business_schedule_entries")
+}

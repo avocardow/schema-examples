@@ -1,0 +1,14 @@
+// business_schedule_holidays: Named dates excluded from business-hours SLA calculations.
+// See README.md for full design rationale and field documentation.
+
+model BusinessScheduleHoliday {
+  id         String   @id @default(uuid())
+  scheduleId String   @map("schedule_id")
+  name       String
+  date       String
+
+  schedule BusinessSchedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+
+  @@unique([scheduleId, date])
+  @@map("business_schedule_holidays")
+}

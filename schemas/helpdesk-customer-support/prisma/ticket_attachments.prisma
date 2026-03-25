@@ -1,0 +1,22 @@
+// ticket_attachments: Files attached to ticket messages with metadata.
+// See README.md for full design rationale and field documentation.
+
+model TicketAttachment {
+  id         String   @id @default(uuid())
+  ticketId   String   @map("ticket_id")
+  messageId  String?  @map("message_id")
+  fileName   String   @map("file_name")
+  fileUrl    String   @map("file_url")
+  fileSize   Int?     @map("file_size")
+  mimeType   String?  @map("mime_type")
+  uploadedBy String   @map("uploaded_by")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  ticket  Ticket         @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  message TicketMessage? @relation(fields: [messageId], references: [id], onDelete: SetNull)
+  uploader User          @relation("AttachmentUploader", fields: [uploadedBy], references: [id], onDelete: Restrict)
+
+  @@index([ticketId])
+  @@index([messageId])
+  @@map("ticket_attachments")
+}

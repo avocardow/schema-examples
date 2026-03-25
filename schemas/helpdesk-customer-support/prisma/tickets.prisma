@@ -1,0 +1,66 @@
+// tickets: Central support requests linking customers to agents with full lifecycle tracking.
+// See README.md for full design rationale and field documentation.
+
+enum TicketType {
+  question
+  incident
+  problem
+  feature_request
+}
+
+enum TicketSource {
+  email
+  web
+  phone
+  api
+  social
+}
+
+model Ticket {
+  id              String       @id @default(uuid())
+  subject         String
+  description     String?
+  statusId        String       @map("status_id")
+  priorityId      String       @map("priority_id")
+  type            TicketType   @default(question)
+  source          TicketSource @default(web)
+  categoryId      String?      @map("category_id")
+  requesterId     String       @map("requester_id")
+  assignedAgentId String?      @map("assigned_agent_id")
+  assignedTeamId  String?      @map("assigned_team_id")
+  slaPolicyId     String?      @map("sla_policy_id")
+  dueAt           DateTime?    @map("due_at")
+  firstResponseAt DateTime?    @map("first_response_at")
+  resolvedAt      DateTime?    @map("resolved_at")
+  closedAt        DateTime?    @map("closed_at")
+  createdBy       String       @map("created_by")
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @default(now()) @map("updated_at")
+
+  status        TicketStatus    @relation(fields: [statusId], references: [id], onDelete: Restrict)
+  priority      TicketPriority  @relation(fields: [priorityId], references: [id], onDelete: Restrict)
+  category      TicketCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  requester     User            @relation("TicketRequester", fields: [requesterId], references: [id], onDelete: Restrict)
+  assignedAgent User?           @relation("TicketAgent", fields: [assignedAgentId], references: [id], onDelete: SetNull)
+  slaPolicy     SlaPolicy?      @relation("TicketSlaPolicy", fields: [slaPolicyId], references: [id], onDelete: SetNull)
+  creator       User            @relation("TicketCreator", fields: [createdBy], references: [id], onDelete: Restrict)
+
+  ticketMessages  TicketMessage[]
+  ticketFollowers TicketFollower[]
+  ticketTags      TicketTag[]
+  feedback          TicketFeedback?
+  ticketAttachments TicketAttachment[]
+  ticketActivities  TicketActivity[]
+  customFieldValues CustomFieldValue[]
+
+  @@index([statusId])
+  @@index([priorityId])
+  @@index([requesterId])
+  @@index([assignedAgentId])
+  @@index([assignedTeamId])
+  @@index([categoryId])
+  @@index([slaPolicyId])
+  @@index([createdAt])
+  @@index([dueAt])
+  @@map("tickets")
+}

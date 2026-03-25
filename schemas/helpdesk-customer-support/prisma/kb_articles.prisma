@@ -1,0 +1,32 @@
+// kb_articles: Self-service help content with publishing workflow and helpfulness tracking.
+// See README.md for full design rationale and field documentation.
+
+enum KbArticleStatus {
+  draft
+  published
+  archived
+}
+
+model KbArticle {
+  id              String          @id @default(uuid())
+  categoryId      String?         @map("category_id")
+  title           String
+  slug            String          @unique
+  body            String
+  status          KbArticleStatus @default(draft)
+  authorId        String          @map("author_id")
+  viewCount       Int             @default(0) @map("view_count")
+  helpfulCount    Int             @default(0) @map("helpful_count")
+  notHelpfulCount Int             @default(0) @map("not_helpful_count")
+  publishedAt     DateTime?       @map("published_at")
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @default(now()) @map("updated_at")
+
+  category KbCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  author   User        @relation(fields: [authorId], references: [id], onDelete: Restrict)
+
+  @@index([categoryId])
+  @@index([status])
+  @@index([authorId])
+  @@map("kb_articles")
+}

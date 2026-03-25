@@ -1,0 +1,15 @@
+// custom_field_options: Selectable choices for dropdown custom fields.
+// See README.md for full design rationale and field documentation.
+
+model CustomFieldOption {
+  id            String @id @default(uuid())
+  customFieldId String @map("custom_field_id")
+  label         String
+  value         String
+  sortOrder     Int    @default(0) @map("sort_order")
+
+  customField CustomField @relation(fields: [customFieldId], references: [id], onDelete: Cascade)
+
+  @@index([customFieldId, sortOrder])
+  @@map("custom_field_options")
+}

@@ -1,0 +1,19 @@
+// ticket_priorities: Urgency levels that drive SLA targets and queue ordering.
+// See README.md for full design rationale and field documentation.
+
+model TicketPriority {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  sortOrder Int      @default(0) @map("sort_order")
+  color     String?
+  isDefault Boolean  @default(false) @map("is_default")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  tickets          Ticket[]
+  slaPolicyTargets SlaPolicyTarget[]
+
+  @@index([sortOrder])
+  @@map("ticket_priorities")
+}
