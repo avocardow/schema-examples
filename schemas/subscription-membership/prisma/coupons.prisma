@@ -1,0 +1,41 @@
+// coupons: Discount definitions with usage limits and validity windows.
+// See README.md for full design rationale.
+
+enum CouponDiscountType {
+  percentage
+  fixed_amount
+}
+
+enum CouponDuration {
+  once
+  repeating
+  forever
+}
+
+model Coupon {
+  id               String             @id @default(uuid())
+  code             String?            @unique
+  name             String
+  discountType     CouponDiscountType @map("discount_type")
+  discountValue    Int                @map("discount_value")
+  currency         String?
+  duration         CouponDuration     @default(once)
+  durationInMonths Int?               @map("duration_in_months")
+  maxRedemptions   Int?               @map("max_redemptions")
+  timesRedeemed    Int                @default(0) @map("times_redeemed")
+  isActive         Boolean            @default(true) @map("is_active")
+  validFrom        DateTime?          @map("valid_from")
+  validUntil       DateTime?          @map("valid_until")
+  metadata         Json?
+  providerType     String?            @map("provider_type")
+  providerId       String?            @map("provider_id")
+  createdAt        DateTime           @default(now()) @map("created_at")
+  updatedAt        DateTime           @default(now()) @map("updated_at")
+
+  couponRedemptions CouponRedemption[]
+  subscriptions     Subscription[]     @relation("SubscriptionCoupon")
+
+  @@index([isActive])
+  @@index([providerType, providerId])
+  @@map("coupons")
+}

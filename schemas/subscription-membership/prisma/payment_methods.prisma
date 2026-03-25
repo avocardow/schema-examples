@@ -1,0 +1,32 @@
+// payment_methods: Tokenized payment instruments attached to a customer.
+// See README.md for full design rationale.
+
+enum PaymentMethodType {
+  card
+  bank_account
+  paypal
+  sepa_debit
+  ideal
+  other
+}
+
+model PaymentMethod {
+  id           String            @id @default(uuid())
+  customerId   String            @map("customer_id")
+  type         PaymentMethodType
+  cardBrand    String?           @map("card_brand")
+  cardLast4    String?           @map("card_last4")
+  cardExpMonth Int?              @map("card_exp_month")
+  cardExpYear  Int?              @map("card_exp_year")
+  isDefault    Boolean           @default(false) @map("is_default")
+  providerType String?           @map("provider_type")
+  providerId   String?           @map("provider_id")
+  createdAt    DateTime          @default(now()) @map("created_at")
+  updatedAt    DateTime          @default(now()) @map("updated_at")
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([customerId])
+  @@index([providerType, providerId])
+  @@map("payment_methods")
+}

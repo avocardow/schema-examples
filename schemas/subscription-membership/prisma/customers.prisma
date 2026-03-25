@@ -1,0 +1,30 @@
+// customers: Billing customer entity linked to a user or organization.
+// See README.md for full design rationale.
+
+model Customer {
+  id             String   @id @default(uuid())
+  userId         String?  @map("user_id")
+  organizationId String?  @map("organization_id")
+  name           String
+  email          String
+  currency       String?
+  taxId          String?  @map("tax_id")
+  metadata       Json?
+  providerType   String?  @map("provider_type")
+  providerId     String?  @map("provider_id")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @default(now()) @map("updated_at")
+
+  user         User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+
+  paymentMethods   PaymentMethod[]
+  subscriptions    Subscription[]
+  invoices         Invoice[]
+  couponRedemptions CouponRedemption[]
+
+  @@index([userId])
+  @@index([organizationId])
+  @@index([providerType, providerId])
+  @@map("customers")
+}

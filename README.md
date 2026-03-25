@@ -1,6 +1,6 @@
 # Schema Examples
 
-A growing collection of production-ready database schema examples across multiple formats — with explanations and best practices. Fifteen domains complete (auth, notifications, file management, i18n, analytics, content moderation, e-commerce, CMS/blog, messaging/chat, social media, booking/scheduling, project management, CRM, helpdesk/customer support, SaaS/multi-tenant), with 42 more planned.
+A growing collection of production-ready database schema examples across multiple formats — with explanations and best practices. Sixteen domains complete (auth, notifications, file management, i18n, analytics, content moderation, e-commerce, CMS/blog, messaging/chat, social media, booking/scheduling, project management, CRM, helpdesk/customer support, SaaS/multi-tenant, subscription/membership), with 41 more planned.
 
 **Copy. Learn. Contribute. Ship.**
 
@@ -48,7 +48,7 @@ See each domain's **Dependencies** section for details.
 | [E-commerce](./schemas/e-commerce)                                   |     35 | ✅     |
 | [Marketplace (Multi-vendor)](./schemas/marketplace)                  |        | 🔲     |
 | [Auction](./schemas/auction)                                         |        | 🔲     |
-| [Subscription / Membership](./schemas/subscription-membership)       |        | 🔲     |
+| [Subscription / Membership](./schemas/subscription-membership)       |     11 | ✅     |
 | [Affiliate / Referral Program](./schemas/affiliate-referral-program) |        | 🔲     |
 | [Loyalty / Rewards Program](./schemas/loyalty-rewards-program)       |        | 🔲     |
 

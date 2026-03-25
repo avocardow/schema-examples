@@ -1,0 +1,43 @@
+// plan_prices: Price points for plans supporting recurring, one-time, and usage-based billing.
+// See README.md for full design rationale.
+
+enum PlanPriceType {
+  recurring
+  one_time
+  usage_based
+}
+
+enum PlanPriceInterval {
+  day
+  week
+  month
+  year
+}
+
+model PlanPrice {
+  id              String             @id @default(uuid())
+  planId          String             @map("plan_id")
+  nickname        String?
+  type            PlanPriceType      @default(recurring)
+  amount          Int
+  currency        String
+  interval        PlanPriceInterval?
+  intervalCount   Int                @default(1) @map("interval_count")
+  trialPeriodDays Int?               @map("trial_period_days")
+  isActive        Boolean            @default(true) @map("is_active")
+  metadata        Json?
+  providerType    String?            @map("provider_type")
+  providerId      String?            @map("provider_id")
+  createdAt       DateTime           @default(now()) @map("created_at")
+  updatedAt       DateTime           @default(now()) @map("updated_at")
+
+  plan Plan @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  subscriptionItems SubscriptionItem[]
+  invoiceItems      InvoiceItem[]
+
+  @@index([planId])
+  @@index([isActive])
+  @@index([providerType, providerId])
+  @@map("plan_prices")
+}

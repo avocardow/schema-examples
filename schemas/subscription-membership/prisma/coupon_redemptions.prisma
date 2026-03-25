@@ -1,0 +1,22 @@
+// coupon_redemptions: Records of coupons applied to customers and subscriptions.
+// See README.md for full design rationale.
+
+model CouponRedemption {
+  id             String   @id @default(uuid())
+  couponId       String   @map("coupon_id")
+  customerId     String   @map("customer_id")
+  subscriptionId String?  @map("subscription_id")
+  redeemedAt     DateTime @default(now()) @map("redeemed_at")
+  providerType   String?  @map("provider_type")
+  providerId     String?  @map("provider_id")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  coupon       Coupon        @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  customer     Customer      @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+
+  @@index([couponId])
+  @@index([customerId])
+  @@index([subscriptionId])
+  @@map("coupon_redemptions")
+}

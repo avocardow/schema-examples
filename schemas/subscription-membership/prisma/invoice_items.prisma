@@ -1,0 +1,25 @@
+// invoice_items: Line items on invoices with amount, quantity, and proration tracking.
+// See README.md for full design rationale.
+
+model InvoiceItem {
+  id           String    @id @default(uuid())
+  invoiceId    String    @map("invoice_id")
+  planPriceId  String?   @map("plan_price_id")
+  description  String
+  amount       Int
+  currency     String
+  quantity     Int       @default(1)
+  isProration  Boolean   @default(false) @map("is_proration")
+  periodStart  DateTime? @map("period_start")
+  periodEnd    DateTime? @map("period_end")
+  providerType String?   @map("provider_type")
+  providerId   String?   @map("provider_id")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  invoice   Invoice    @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  planPrice PlanPrice? @relation(fields: [planPriceId], references: [id], onDelete: SetNull)
+
+  @@index([invoiceId])
+  @@index([planPriceId])
+  @@map("invoice_items")
+}

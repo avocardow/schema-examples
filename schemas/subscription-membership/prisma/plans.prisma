@@ -1,0 +1,21 @@
+// plans: Subscription plan definitions describing available tiers.
+// See README.md for full design rationale.
+
+model Plan {
+  id           String   @id @default(uuid())
+  name         String
+  description  String?
+  isActive     Boolean  @default(true) @map("is_active")
+  sortOrder    Int      @default(0) @map("sort_order")
+  metadata     Json?
+  providerType String?  @map("provider_type")
+  providerId   String?  @map("provider_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @default(now()) @map("updated_at")
+
+  planPrices PlanPrice[]
+
+  @@index([isActive])
+  @@index([providerType, providerId])
+  @@map("plans")
+}

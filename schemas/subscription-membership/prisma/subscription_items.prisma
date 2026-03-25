@@ -1,0 +1,21 @@
+// subscription_items: Line items within a subscription linking to specific plan prices.
+// See README.md for full design rationale.
+
+model SubscriptionItem {
+  id             String   @id @default(uuid())
+  subscriptionId String   @map("subscription_id")
+  planPriceId    String   @map("plan_price_id")
+  quantity       Int      @default(1)
+  metadata       Json?
+  providerType   String?  @map("provider_type")
+  providerId     String?  @map("provider_id")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @default(now()) @map("updated_at")
+
+  subscription Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  planPrice    PlanPrice    @relation(fields: [planPriceId], references: [id], onDelete: Restrict)
+
+  @@unique([subscriptionId, planPriceId])
+  @@index([planPriceId])
+  @@map("subscription_items")
+}

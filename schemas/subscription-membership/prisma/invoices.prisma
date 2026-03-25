@@ -1,0 +1,45 @@
+// invoices: Local copies of billing invoices with totals and payment status.
+// See README.md for full design rationale.
+
+enum InvoiceStatus {
+  draft
+  open
+  paid
+  void
+  uncollectible
+}
+
+model Invoice {
+  id               String        @id @default(uuid())
+  customerId       String        @map("customer_id")
+  subscriptionId   String?       @map("subscription_id")
+  status           InvoiceStatus @default(draft)
+  currency         String
+  subtotal         Int           @default(0)
+  tax              Int           @default(0)
+  total            Int           @default(0)
+  amountPaid       Int           @default(0) @map("amount_paid")
+  amountDue        Int           @default(0) @map("amount_due")
+  periodStart      DateTime?     @map("period_start")
+  periodEnd        DateTime?     @map("period_end")
+  dueDate          DateTime?     @map("due_date")
+  paidAt           DateTime?     @map("paid_at")
+  hostedInvoiceUrl String?       @map("hosted_invoice_url")
+  invoicePdfUrl    String?       @map("invoice_pdf_url")
+  metadata         Json?
+  providerType     String?       @map("provider_type")
+  providerId       String?       @map("provider_id")
+  createdAt        DateTime      @default(now()) @map("created_at")
+  updatedAt        DateTime      @default(now()) @map("updated_at")
+
+  customer     Customer      @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+
+  invoiceItems InvoiceItem[]
+
+  @@index([customerId])
+  @@index([subscriptionId])
+  @@index([status])
+  @@index([providerType, providerId])
+  @@map("invoices")
+}

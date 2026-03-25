@@ -1,0 +1,18 @@
+// provider_webhook_events: Raw webhook event log from payment providers.
+// See README.md for full design rationale.
+
+model ProviderWebhookEvent {
+  id              String    @id @default(uuid())
+  providerType    String    @map("provider_type")
+  providerEventId String    @map("provider_event_id")
+  eventType       String    @map("event_type")
+  payload         Json
+  processedAt     DateTime? @map("processed_at")
+  processingError String?   @map("processing_error")
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  @@unique([providerType, providerEventId])
+  @@index([eventType])
+  @@index([processedAt])
+  @@map("provider_webhook_events")
+}
