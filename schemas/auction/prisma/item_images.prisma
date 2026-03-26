@@ -1,0 +1,16 @@
+// item_images: Images associated with auction items.
+// See README.md for full design rationale.
+
+model ItemImage {
+  id        String   @id @default(uuid())
+  itemId    String   @map("item_id")
+  url       String
+  altText   String?  @map("alt_text")
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  item Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@index([itemId])
+  @@map("item_images")
+}

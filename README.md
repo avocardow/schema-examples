@@ -1,6 +1,6 @@
 # Schema Examples
 
-A growing collection of production-ready database schema examples across multiple formats — with explanations and best practices. Twenty domains complete (auth, notifications, file management, i18n, analytics, content moderation, e-commerce, marketplace, CMS/blog, messaging/chat, social media, booking/scheduling, project management, CRM, helpdesk/customer support, SaaS/multi-tenant, subscription/membership, HR/payroll, compliance/GRC, event management/ticketing), with 37 more planned.
+A growing collection of production-ready database schema examples across multiple formats — with explanations and best practices. Twenty-one domains complete (auth, notifications, file management, i18n, analytics, content moderation, e-commerce, marketplace, auction, CMS/blog, messaging/chat, social media, booking/scheduling, project management, CRM, helpdesk/customer support, SaaS/multi-tenant, subscription/membership, HR/payroll, compliance/GRC, event management/ticketing), with 36 more planned.
 
 **Copy. Learn. Contribute. Ship.**
 
@@ -47,7 +47,7 @@ See each domain's **Dependencies** section for details.
 | -------------------------------------------------------------------- | -----: | ------ |
 | [E-commerce](./schemas/e-commerce)                                   |     35 | ✅     |
 | [Marketplace (Multi-vendor)](./schemas/marketplace)                  |     17 | ✅     |
-| [Auction](./schemas/auction)                                         |        | 🔲     |
+| [Auction](./schemas/auction)                                         |      9 | ✅     |
 | [Subscription / Membership](./schemas/subscription-membership)       |     11 | ✅     |
 | [Affiliate / Referral Program](./schemas/affiliate-referral-program) |        | 🔲     |
 | [Loyalty / Rewards Program](./schemas/loyalty-rewards-program)       |        | 🔲     |
@@ -172,7 +172,7 @@ See each domain's **Dependencies** section for details.
 | [Event Planning](./schemas/event-planning)                                 |        | 🔲     |
 | [Voting / Polling / Surveys](./schemas/voting-polling-surveys)             |        | 🔲     |
 
-**57 domains — 20 complete, 37 planned**
+**57 domains — 21 complete, 36 planned**
 
 ## How to Use
 

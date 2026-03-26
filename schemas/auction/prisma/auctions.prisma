@@ -1,0 +1,59 @@
+// auctions: Auction listings with bidding rules, timing, and lifecycle status tracking.
+// See README.md for full design rationale.
+
+enum AuctionType {
+  ENGLISH
+  DUTCH
+  SEALED_BID
+  BUY_NOW_ONLY
+}
+
+enum AuctionStatus {
+  DRAFT
+  SCHEDULED
+  ACTIVE
+  CLOSING
+  CLOSED
+  CANCELLED
+}
+
+model Auction {
+  id                     String         @id @default(uuid())
+  itemId                 String         @map("item_id")
+  sellerId               String         @map("seller_id")
+  auctionType            AuctionType    @default(ENGLISH) @map("auction_type")
+  status                 AuctionStatus  @default(DRAFT)
+  title                  String
+  description            String?
+  startingPrice          Decimal        @map("starting_price")
+  reservePrice           Decimal?       @map("reserve_price")
+  buyNowPrice            Decimal?       @map("buy_now_price")
+  currentPrice           Decimal        @default(0) @map("current_price")
+  bidCount               Int            @default(0) @map("bid_count")
+  highestBidderId        String?        @map("highest_bidder_id")
+  buyerPremiumPct        Decimal?       @map("buyer_premium_pct")
+  startTime              DateTime?      @map("start_time")
+  endTime                DateTime?      @map("end_time")
+  effectiveEndTime       DateTime?      @map("effective_end_time")
+  extensionSeconds       Int            @default(300) @map("extension_seconds")
+  extensionWindowSeconds Int            @default(300) @map("extension_window_seconds")
+  currency               String         @default("USD")
+  closedAt               DateTime?      @map("closed_at")
+  createdAt              DateTime       @default(now()) @map("created_at")
+  updatedAt              DateTime       @default(now()) @updatedAt @map("updated_at")
+
+  item              Item              @relation(fields: [itemId], references: [id], onDelete: Restrict)
+  seller            User              @relation("AuctionSeller", fields: [sellerId], references: [id], onDelete: Restrict)
+  highestBidder     User?             @relation("AuctionHighestBidder", fields: [highestBidderId], references: [id], onDelete: SetNull)
+  bids              Bid[]
+  watchlists        Watchlist[]
+  bidIncrementRules BidIncrementRule[]
+  winner            AuctionWinner?
+
+  @@index([itemId])
+  @@index([sellerId])
+  @@index([status])
+  @@index([auctionType])
+  @@index([effectiveEndTime])
+  @@map("auctions")
+}

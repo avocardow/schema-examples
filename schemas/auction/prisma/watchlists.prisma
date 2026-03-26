@@ -1,0 +1,18 @@
+// watchlists: User-saved auctions for tracking activity and receiving notifications.
+// See README.md for full design rationale.
+
+model Watchlist {
+  id            String   @id @default(uuid())
+  userId        String   @map("user_id")
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  auctionId     String   @map("auction_id")
+  notifyOutbid  Boolean  @default(true) @map("notify_outbid")
+  notifyEnding  Boolean  @default(true) @map("notify_ending")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  auction Auction @relation(fields: [auctionId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, auctionId])
+  @@index([auctionId])
+  @@map("watchlists")
+}

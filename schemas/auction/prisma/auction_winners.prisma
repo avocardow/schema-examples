@@ -1,0 +1,40 @@
+// auction_winners: Final sale records linking winning bids to buyers and sellers with settlement tracking.
+// See README.md for full design rationale.
+
+enum SettlementStatus {
+  PENDING
+  PAID
+  SHIPPED
+  COMPLETED
+  DISPUTED
+  REFUNDED
+}
+
+model AuctionWinner {
+  id               String           @id @default(uuid())
+  auctionId        String           @unique @map("auction_id")
+  winningBidId     String           @unique @map("winning_bid_id")
+  winnerId         String           @map("winner_id")
+  sellerId         String           @map("seller_id")
+  hammerPrice      Decimal          @map("hammer_price")
+  buyerPremium     Decimal          @default(0) @map("buyer_premium")
+  totalPrice       Decimal          @map("total_price")
+  settlementStatus SettlementStatus @default(PENDING) @map("settlement_status")
+  paidAt           DateTime?        @map("paid_at")
+  shippedAt        DateTime?        @map("shipped_at")
+  completedAt      DateTime?        @map("completed_at")
+  notes            String?
+  createdAt        DateTime         @default(now()) @map("created_at")
+  updatedAt        DateTime         @default(now()) @updatedAt @map("updated_at")
+
+  auction    Auction  @relation(fields: [auctionId], references: [id], onDelete: Restrict)
+  winningBid Bid      @relation(fields: [winningBidId], references: [id], onDelete: Restrict)
+  winner     User     @relation("AuctionWinnerBuyer", fields: [winnerId], references: [id], onDelete: Restrict)
+  seller     User     @relation("AuctionWinnerSeller", fields: [sellerId], references: [id], onDelete: Restrict)
+  feedback   Feedback[]
+
+  @@index([winnerId])
+  @@index([sellerId])
+  @@index([settlementStatus])
+  @@map("auction_winners")
+}

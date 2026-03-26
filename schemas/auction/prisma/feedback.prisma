@@ -1,0 +1,27 @@
+// feedback: Buyer and seller ratings exchanged after an auction completes.
+// See README.md for full design rationale.
+
+enum FeedbackDirection {
+  BUYER_TO_SELLER
+  SELLER_TO_BUYER
+}
+
+model Feedback {
+  id              String             @id @default(uuid())
+  auctionWinnerId String             @map("auction_winner_id")
+  authorId        String             @map("author_id")
+  recipientId     String             @map("recipient_id")
+  direction       FeedbackDirection
+  rating          Int
+  comment         String?
+  createdAt       DateTime           @default(now()) @map("created_at")
+
+  auctionWinner AuctionWinner @relation(fields: [auctionWinnerId], references: [id], onDelete: Cascade)
+  author        User          @relation("FeedbackAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  recipient     User          @relation("FeedbackRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+
+  @@unique([auctionWinnerId, direction])
+  @@index([recipientId])
+  @@index([authorId])
+  @@map("feedback")
+}

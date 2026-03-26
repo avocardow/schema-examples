@@ -1,0 +1,31 @@
+// bids: Individual bid entries linking bidders to auctions with proxy bidding support.
+// See README.md for full design rationale.
+
+enum BidStatus {
+  ACTIVE
+  OUTBID
+  WINNING
+  WON
+  CANCELLED
+}
+
+model Bid {
+  id             String         @id @default(uuid())
+  auctionId      String         @map("auction_id")
+  bidderId       String         @map("bidder_id")
+  amount         Decimal
+  maxAmount      Decimal?       @map("max_amount")
+  status         BidStatus      @default(ACTIVE)
+  isProxy        Boolean        @default(false) @map("is_proxy")
+  ipAddress      String?        @map("ip_address")
+  createdAt      DateTime       @default(now()) @map("created_at")
+
+  auction        Auction        @relation(fields: [auctionId], references: [id], onDelete: Restrict)
+  bidder         User           @relation(fields: [bidderId], references: [id], onDelete: Restrict)
+  auctionWinner  AuctionWinner?
+
+  @@unique([auctionId, amount])
+  @@index([bidderId])
+  @@index([status])
+  @@map("bids")
+}
