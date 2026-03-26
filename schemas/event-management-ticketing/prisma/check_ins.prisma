@@ -1,0 +1,25 @@
+// check_ins: Records of ticket holders entering an event or session.
+// See README.md for full design rationale.
+
+enum CheckInMethod {
+  qr_scan
+  manual
+  self_service
+  auto
+}
+
+model CheckIn {
+  id           String        @id @default(uuid())
+  ticketId     String        @map("ticket_id")
+  sessionId    String?       @map("session_id")
+  checkedInBy  String?       @map("checked_in_by")
+  method       CheckInMethod @default(qr_scan)
+  checkedInAt  DateTime      @default(now()) @map("checked_in_at")
+
+  ticket  Ticket        @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  session EventSession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+
+  @@index([ticketId])
+  @@index([sessionId, checkedInAt])
+  @@map("check_ins")
+}

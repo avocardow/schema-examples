@@ -1,0 +1,33 @@
+// promo_codes: Discount codes applicable to event orders.
+// See README.md for full design rationale.
+
+enum DiscountType {
+  percentage
+  fixed
+}
+
+model PromoCode {
+  id              String       @id @default(uuid())
+  eventId         String       @map("event_id")
+  code            String
+  discountType    DiscountType @map("discount_type")
+  discountValue   Int          @map("discount_value")
+  currency        String?
+  maxUses         Int?         @map("max_uses")
+  timesUsed       Int          @default(0) @map("times_used")
+  maxUsesPerOrder Int          @default(1) @map("max_uses_per_order")
+  validFrom       DateTime?    @map("valid_from")
+  validUntil      DateTime?    @map("valid_until")
+  isActive        Boolean      @default(true) @map("is_active")
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @default(now()) @map("updated_at")
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  promoCodeTicketTypes PromoCodeTicketType[]
+  orders               Order[]
+
+  @@unique([eventId, code])
+  @@index([isActive])
+  @@map("promo_codes")
+}

@@ -1,0 +1,24 @@
+// event_categories: Hierarchical classification of events.
+// See README.md for full design rationale.
+
+model EventCategory {
+  id          String  @id @default(uuid())
+  name        String
+  slug        String  @unique
+  description String?
+  parentId    String? @map("parent_id")
+  position    Int     @default(0)
+  color       String?
+  icon        String?
+  isActive    Boolean @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @map("updated_at")
+
+  parent   EventCategory?  @relation("CategoryParent", fields: [parentId], references: [id], onDelete: SetNull)
+  children EventCategory[] @relation("CategoryParent")
+  events   Event[]
+
+  @@index([parentId])
+  @@index([isActive, position])
+  @@map("event_categories")
+}

@@ -1,0 +1,50 @@
+// orders: Ticket purchase transactions for an event.
+// See README.md for full design rationale.
+
+enum OrderStatus {
+  pending
+  confirmed
+  cancelled
+  refunded
+}
+
+enum OrderPaymentStatus {
+  not_required
+  pending
+  paid
+  refunded
+  partially_refunded
+  failed
+}
+
+model Order {
+  id             String             @id @default(uuid())
+  eventId        String             @map("event_id")
+  userId         String             @map("user_id")
+  promoCodeId    String?            @map("promo_code_id")
+  subtotal       Int                @default(0)
+  discountAmount Int                @default(0) @map("discount_amount")
+  total          Int                @default(0)
+  currency       String             @default("USD")
+  status         OrderStatus        @default(pending)
+  paymentStatus  OrderPaymentStatus @default(pending) @map("payment_status")
+  paymentMethod  String?            @map("payment_method")
+  buyerName      String             @map("buyer_name")
+  buyerEmail     String             @map("buyer_email")
+  cancelledAt    DateTime?          @map("cancelled_at")
+  refundedAt     DateTime?          @map("refunded_at")
+  confirmedAt    DateTime?          @map("confirmed_at")
+  createdAt      DateTime           @default(now()) @map("created_at")
+  updatedAt      DateTime           @default(now()) @map("updated_at")
+
+  event     Event      @relation(fields: [eventId], references: [id], onDelete: Restrict)
+  promoCode PromoCode? @relation(fields: [promoCodeId], references: [id], onDelete: SetNull)
+
+  orderItems OrderItem[]
+
+  @@index([eventId, status])
+  @@index([userId])
+  @@index([status])
+  @@index([buyerEmail])
+  @@map("orders")
+}

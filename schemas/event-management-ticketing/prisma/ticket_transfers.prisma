@@ -1,0 +1,23 @@
+// ticket_transfers: Records of ticket ownership changes between users.
+// See README.md for full design rationale.
+
+model TicketTransfer {
+  id            String   @id @default(uuid())
+  ticketId      String   @map("ticket_id")
+  fromUserId    String?  @map("from_user_id")
+  fromName      String   @map("from_name")
+  fromEmail     String   @map("from_email")
+  toUserId      String?  @map("to_user_id")
+  toName        String   @map("to_name")
+  toEmail       String   @map("to_email")
+  transferredAt DateTime @default(now()) @map("transferred_at")
+  notes         String?
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId])
+  @@index([fromUserId])
+  @@index([toUserId])
+  @@map("ticket_transfers")
+}

@@ -1,0 +1,16 @@
+// promo_code_ticket_types: Maps which ticket types a promo code applies to.
+// See README.md for full design rationale.
+
+model PromoCodeTicketType {
+  id           String   @id @default(uuid())
+  promoCodeId  String   @map("promo_code_id")
+  ticketTypeId String   @map("ticket_type_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  promoCode  PromoCode  @relation(fields: [promoCodeId], references: [id], onDelete: Cascade)
+  ticketType TicketType @relation(fields: [ticketTypeId], references: [id], onDelete: Cascade)
+
+  @@unique([promoCodeId, ticketTypeId])
+  @@index([ticketTypeId])
+  @@map("promo_code_ticket_types")
+}

@@ -1,0 +1,18 @@
+// event_series: Groups of recurring or related events.
+// See README.md for full design rationale.
+
+model EventSeries {
+  id             String  @id @default(uuid())
+  name           String
+  slug           String  @unique
+  description    String?
+  recurrenceRule String? @map("recurrence_rule")
+  createdBy      String  @map("created_by")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @default(now()) @map("updated_at")
+
+  events Event[]
+
+  @@index([createdBy])
+  @@map("event_series")
+}

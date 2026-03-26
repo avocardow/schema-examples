@@ -1,0 +1,23 @@
+// event_organizers: Users assigned to manage or staff an event.
+// See README.md for full design rationale.
+
+enum OrganizerRole {
+  owner
+  admin
+  moderator
+  check_in_staff
+}
+
+model EventOrganizer {
+  id        String        @id @default(uuid())
+  eventId   String        @map("event_id")
+  userId    String        @map("user_id")
+  role      OrganizerRole @default(admin)
+  createdAt DateTime      @default(now()) @map("created_at")
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, userId])
+  @@index([userId])
+  @@map("event_organizers")
+}

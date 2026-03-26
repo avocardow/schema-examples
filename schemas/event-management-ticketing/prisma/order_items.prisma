@@ -1,0 +1,23 @@
+// order_items: Individual line items within an order.
+// See README.md for full design rationale.
+
+model OrderItem {
+  id             String   @id @default(uuid())
+  orderId        String   @map("order_id")
+  ticketTypeId   String?  @map("ticket_type_id")
+  ticketTypeName String   @map("ticket_type_name")
+  unitPrice      Int      @map("unit_price")
+  quantity       Int
+  subtotal       Int
+  currency       String
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  order      Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  ticketType TicketType? @relation(fields: [ticketTypeId], references: [id], onDelete: SetNull)
+
+  tickets Ticket[]
+
+  @@index([orderId])
+  @@index([ticketTypeId])
+  @@map("order_items")
+}

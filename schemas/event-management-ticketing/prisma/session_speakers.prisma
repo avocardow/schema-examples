@@ -1,0 +1,26 @@
+// session_speakers: Links speakers to the sessions they participate in.
+// See README.md for full design rationale.
+
+enum SpeakerRole {
+  speaker
+  moderator
+  panelist
+  host
+  keynote
+}
+
+model SessionSpeaker {
+  id        String      @id @default(uuid())
+  sessionId String      @map("session_id")
+  speakerId String      @map("speaker_id")
+  role      SpeakerRole @default(speaker)
+  position  Int         @default(0)
+  createdAt DateTime    @default(now()) @map("created_at")
+
+  session EventSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  speaker Speaker      @relation(fields: [speakerId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, speakerId])
+  @@index([speakerId])
+  @@map("session_speakers")
+}

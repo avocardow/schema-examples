@@ -1,6 +1,6 @@
 # Schema Examples
 
-A growing collection of production-ready database schema examples across multiple formats — with explanations and best practices. Eighteen domains complete (auth, notifications, file management, i18n, analytics, content moderation, e-commerce, CMS/blog, messaging/chat, social media, booking/scheduling, project management, CRM, helpdesk/customer support, SaaS/multi-tenant, subscription/membership, HR/payroll, compliance/GRC), with 39 more planned.
+A growing collection of production-ready database schema examples across multiple formats — with explanations and best practices. Nineteen domains complete (auth, notifications, file management, i18n, analytics, content moderation, e-commerce, CMS/blog, messaging/chat, social media, booking/scheduling, project management, CRM, helpdesk/customer support, SaaS/multi-tenant, subscription/membership, HR/payroll, compliance/GRC, event management/ticketing), with 38 more planned.
 
 **Copy. Learn. Contribute. Ship.**
 
@@ -87,7 +87,7 @@ See each domain's **Dependencies** section for details.
 | Domain                                                               | Tables | Status |
 | -------------------------------------------------------------------- | -----: | ------ |
 | [Booking / Scheduling](./schemas/booking-scheduling)                 |     17 | ✅     |
-| [Event Management / Ticketing](./schemas/event-management-ticketing) |        | 🔲     |
+| [Event Management / Ticketing](./schemas/event-management-ticketing) |     18 | ✅     |
 
 ### Healthcare & Wellness
 
@@ -172,7 +172,7 @@ See each domain's **Dependencies** section for details.
 | [Event Planning](./schemas/event-planning)                                 |        | 🔲     |
 | [Voting / Polling / Surveys](./schemas/voting-polling-surveys)             |        | 🔲     |
 
-**57 domains — 17 complete, 40 planned**
+**57 domains — 19 complete, 38 planned**
 
 ## How to Use
 

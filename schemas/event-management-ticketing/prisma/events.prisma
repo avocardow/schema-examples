@@ -1,0 +1,65 @@
+// events: Core event records with scheduling, visibility, and registration details.
+// See README.md for full design rationale.
+
+enum EventStatus {
+  draft
+  published
+  cancelled
+  postponed
+  completed
+}
+
+enum EventVisibility {
+  public
+  private
+  unlisted
+}
+
+model Event {
+  id                  String          @id @default(uuid())
+  seriesId            String?         @map("series_id")
+  categoryId          String?         @map("category_id")
+  venueId             String?         @map("venue_id")
+  title               String
+  slug                String          @unique
+  summary             String?
+  description         String?
+  coverImageUrl       String?         @map("cover_image_url")
+  startTime           DateTime        @map("start_time")
+  endTime             DateTime        @map("end_time")
+  timezone            String
+  isAllDay            Boolean         @default(false) @map("is_all_day")
+  maxAttendees        Int?            @map("max_attendees")
+  status              EventStatus     @default(draft)
+  visibility          EventVisibility @default(public)
+  registrationOpenAt  DateTime?       @map("registration_open_at")
+  registrationCloseAt DateTime?       @map("registration_close_at")
+  isFree              Boolean         @default(false) @map("is_free")
+  contactEmail        String?         @map("contact_email")
+  websiteUrl          String?         @map("website_url")
+  createdBy           String          @map("created_by")
+  createdAt           DateTime        @default(now()) @map("created_at")
+  updatedAt           DateTime        @default(now()) @map("updated_at")
+
+  series   EventSeries?   @relation(fields: [seriesId], references: [id], onDelete: SetNull)
+  category EventCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  venue    Venue?         @relation(fields: [venueId], references: [id], onDelete: SetNull)
+
+  organizers      EventOrganizer[]
+  sessions        EventSession[]
+  ticketTypes     TicketType[]
+  promoCodes      PromoCode[]
+  orders          Order[]
+  tickets         Ticket[]
+  waitlistEntries WaitlistEntry[]
+  updates         EventUpdate[]
+
+  @@index([seriesId])
+  @@index([categoryId])
+  @@index([venueId])
+  @@index([status, startTime])
+  @@index([visibility])
+  @@index([startTime, endTime])
+  @@index([createdBy])
+  @@map("events")
+}

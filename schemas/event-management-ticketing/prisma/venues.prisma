@@ -1,0 +1,44 @@
+// venues: Physical, virtual, or hybrid locations where events take place.
+// See README.md for full design rationale.
+
+enum VenueType {
+  physical
+  virtual
+  hybrid
+}
+
+model Venue {
+  id              String    @id @default(uuid())
+  name            String
+  slug            String    @unique
+  description     String?
+  type            VenueType @default(physical)
+  addressLine1    String?   @map("address_line1")
+  addressLine2    String?   @map("address_line2")
+  city            String?
+  state           String?
+  postalCode      String?   @map("postal_code")
+  country         String?
+  latitude        Decimal?
+  longitude       Decimal?
+  virtualUrl      String?   @map("virtual_url")
+  virtualPlatform String?   @map("virtual_platform")
+  capacity        Int?
+  timezone        String
+  phone           String?
+  email           String?
+  websiteUrl      String?   @map("website_url")
+  isActive        Boolean   @default(true) @map("is_active")
+  createdBy       String    @map("created_by")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @default(now()) @map("updated_at")
+
+  events        Event[]
+  eventSessions EventSession[]
+
+  @@index([type])
+  @@index([city, state])
+  @@index([isActive])
+  @@index([createdBy])
+  @@map("venues")
+}

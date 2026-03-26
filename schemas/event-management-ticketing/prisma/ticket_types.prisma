@@ -1,0 +1,33 @@
+// ticket_types: Purchasable ticket tiers for an event.
+// See README.md for full design rationale.
+
+model TicketType {
+  id           String   @id @default(uuid())
+  eventId      String   @map("event_id")
+  name         String
+  description  String?
+  price        Int      @default(0)
+  currency     String   @default("USD")
+  quantityTotal Int?    @map("quantity_total")
+  quantitySold Int      @default(0) @map("quantity_sold")
+  minPerOrder  Int      @default(1) @map("min_per_order")
+  maxPerOrder  Int      @default(10) @map("max_per_order")
+  saleStartAt  DateTime? @map("sale_start_at")
+  saleEndAt    DateTime? @map("sale_end_at")
+  isActive     Boolean  @default(true) @map("is_active")
+  isHidden     Boolean  @default(false) @map("is_hidden")
+  position     Int      @default(0)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @default(now()) @map("updated_at")
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  promoCodeTicketTypes PromoCodeTicketType[]
+  orderItems           OrderItem[]
+  tickets              Ticket[]
+  waitlistEntries      WaitlistEntry[]
+
+  @@index([eventId, position])
+  @@index([eventId, isActive])
+  @@map("ticket_types")
+}

@@ -1,0 +1,39 @@
+// tickets: Individual admission tickets issued to attendees.
+// See README.md for full design rationale.
+
+enum TicketStatus {
+  valid
+  used
+  cancelled
+  transferred
+  expired
+}
+
+model Ticket {
+  id           String       @id @default(uuid())
+  orderItemId  String       @map("order_item_id")
+  eventId      String       @map("event_id")
+  ticketTypeId String?      @map("ticket_type_id")
+  holderUserId String?      @map("holder_user_id")
+  holderName   String       @map("holder_name")
+  holderEmail  String       @map("holder_email")
+  ticketCode   String       @unique @map("ticket_code")
+  status       TicketStatus @default(valid)
+  checkedInAt  DateTime?    @map("checked_in_at")
+  cancelledAt  DateTime?    @map("cancelled_at")
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @default(now()) @map("updated_at")
+
+  orderItem  OrderItem   @relation(fields: [orderItemId], references: [id], onDelete: Restrict)
+  event      Event       @relation(fields: [eventId], references: [id], onDelete: Restrict)
+  ticketType TicketType? @relation(fields: [ticketTypeId], references: [id], onDelete: SetNull)
+
+  checkIns  CheckIn[]
+  transfers TicketTransfer[]
+
+  @@index([eventId, status])
+  @@index([holderUserId])
+  @@index([holderEmail])
+  @@index([orderItemId])
+  @@map("tickets")
+}
