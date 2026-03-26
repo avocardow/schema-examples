@@ -1,0 +1,65 @@
+// risks: Organizational risks identified and tracked through the GRC process.
+// See README.md for full design rationale.
+
+enum RiskCategory {
+  strategic
+  operational
+  financial
+  compliance
+  reputational
+  technical
+  third_party
+}
+
+enum RiskLevel {
+  critical
+  high
+  medium
+  low
+  very_low
+}
+
+enum RiskTreatment {
+  mitigate
+  accept
+  transfer
+  avoid
+}
+
+enum RiskStatus {
+  identified
+  assessing
+  treating
+  monitoring
+  closed
+}
+
+model Risk {
+  id             String        @id @default(uuid())
+  organizationId String?       @map("organization_id")
+  ownerId        String?       @map("owner_id")
+  identifier     String?       @unique
+  title          String
+  description    String?
+  category       RiskCategory
+  likelihood     Int           @default(3)
+  impact         Int           @default(3)
+  riskLevel      RiskLevel     @default(medium) @map("risk_level")
+  treatment      RiskTreatment @default(mitigate)
+  status         RiskStatus    @default(identified)
+  dueDate        String?       @map("due_date")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @default(now()) @map("updated_at")
+
+  organization  Organization?  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  owner         User?          @relation("RiskOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  riskControls  RiskControl[]
+  auditFindings AuditFinding[]
+
+  @@index([organizationId])
+  @@index([ownerId])
+  @@index([category])
+  @@index([riskLevel])
+  @@index([status])
+  @@map("risks")
+}

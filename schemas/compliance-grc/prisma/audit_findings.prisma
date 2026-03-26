@@ -1,0 +1,44 @@
+// audit_findings: Issues and observations discovered during audits.
+// See README.md for full design rationale.
+
+enum FindingSeverity {
+  critical
+  high
+  medium
+  low
+  informational
+}
+
+enum FindingStatus {
+  open
+  in_progress
+  remediated
+  accepted
+  closed
+}
+
+model AuditFinding {
+  id          String          @id @default(uuid())
+  auditId     String          @map("audit_id")
+  controlId   String?         @map("control_id")
+  riskId      String?         @map("risk_id")
+  title       String
+  description String?
+  severity    FindingSeverity
+  status      FindingStatus   @default(open)
+  dueDate     String?         @map("due_date")
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @default(now()) @map("updated_at")
+
+  audit                Audit                @relation(fields: [auditId], references: [id], onDelete: Cascade)
+  control              Control?             @relation(fields: [controlId], references: [id], onDelete: SetNull)
+  risk                 Risk?                @relation(fields: [riskId], references: [id], onDelete: SetNull)
+  findingRemediations  FindingRemediation[]
+
+  @@index([auditId])
+  @@index([controlId])
+  @@index([riskId])
+  @@index([severity])
+  @@index([status])
+  @@map("audit_findings")
+}

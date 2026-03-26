@@ -1,6 +1,6 @@
 # Schema Examples
 
-A growing collection of production-ready database schema examples across multiple formats — with explanations and best practices. Seventeen domains complete (auth, notifications, file management, i18n, analytics, content moderation, e-commerce, CMS/blog, messaging/chat, social media, booking/scheduling, project management, CRM, helpdesk/customer support, SaaS/multi-tenant, subscription/membership, HR/payroll), with 40 more planned.
+A growing collection of production-ready database schema examples across multiple formats — with explanations and best practices. Eighteen domains complete (auth, notifications, file management, i18n, analytics, content moderation, e-commerce, CMS/blog, messaging/chat, social media, booking/scheduling, project management, CRM, helpdesk/customer support, SaaS/multi-tenant, subscription/membership, HR/payroll, compliance/GRC), with 39 more planned.
 
 **Copy. Learn. Contribute. Ship.**
 
@@ -80,7 +80,7 @@ See each domain's **Dependencies** section for details.
 | [Project Management](./schemas/project-management)                 |     18 | ✅     |
 | [HR / Payroll](./schemas/hr-payroll)                               |     18 | ✅     |
 | [Helpdesk / Customer Support](./schemas/helpdesk-customer-support) |     22 | ✅     |
-| [Compliance / GRC](./schemas/compliance-grc)                       |        | 🔲     |
+| [Compliance / GRC](./schemas/compliance-grc)                       |     17 | ✅     |
 
 ### Booking & Scheduling
 

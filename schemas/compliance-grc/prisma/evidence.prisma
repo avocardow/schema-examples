@@ -1,0 +1,38 @@
+// evidence: Artifacts collected to demonstrate control effectiveness.
+// See README.md for full design rationale.
+
+enum EvidenceType {
+  document
+  screenshot
+  log_export
+  automated_test
+  manual_review
+  certification
+}
+
+model Evidence {
+  id           String       @id @default(uuid())
+  controlId    String       @map("control_id")
+  auditId      String?      @map("audit_id")
+  fileId       String?      @map("file_id")
+  collectedBy  String?      @map("collected_by")
+  title        String
+  evidenceType EvidenceType @map("evidence_type")
+  description  String?
+  collectedAt  DateTime     @map("collected_at")
+  validFrom    String?      @map("valid_from")
+  validUntil   String?      @map("valid_until")
+  createdAt    DateTime     @default(now()) @map("created_at")
+
+  control   Control @relation(fields: [controlId], references: [id], onDelete: Cascade)
+  audit     Audit?  @relation(fields: [auditId], references: [id], onDelete: SetNull)
+  file      File?   @relation(fields: [fileId], references: [id], onDelete: SetNull)
+  collector User?   @relation("EvidenceCollector", fields: [collectedBy], references: [id], onDelete: SetNull)
+
+  @@index([controlId])
+  @@index([auditId])
+  @@index([collectedBy])
+  @@index([evidenceType])
+  @@index([collectedAt])
+  @@map("evidence")
+}

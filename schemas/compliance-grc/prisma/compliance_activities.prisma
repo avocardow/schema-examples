@@ -1,0 +1,54 @@
+// compliance_activities: Audit trail of all compliance-related actions and events.
+// See README.md for full design rationale.
+
+enum ComplianceActivityType {
+  control_created
+  control_updated
+  control_tested
+  risk_created
+  risk_updated
+  risk_closed
+  policy_created
+  policy_approved
+  policy_acknowledged
+  audit_started
+  audit_completed
+  finding_created
+  finding_remediated
+  finding_closed
+  evidence_collected
+}
+
+enum ComplianceEntityType {
+  control
+  risk
+  policy
+  policy_version
+  audit
+  audit_finding
+  finding_remediation
+  evidence
+}
+
+model ComplianceActivity {
+  id             String                 @id @default(uuid())
+  organizationId String?                @map("organization_id")
+  actorId        String?                @map("actor_id")
+  activityType   ComplianceActivityType @map("activity_type")
+  entityType     ComplianceEntityType   @map("entity_type")
+  entityId       String                 @map("entity_id")
+  summary        String
+  details        Json?
+  createdAt      DateTime               @default(now()) @map("created_at")
+
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  actor        User?         @relation("ComplianceActivityActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId])
+  @@index([actorId])
+  @@index([activityType])
+  @@index([entityType])
+  @@index([entityId])
+  @@index([createdAt])
+  @@map("compliance_activities")
+}

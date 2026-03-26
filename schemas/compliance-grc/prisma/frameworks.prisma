@@ -1,0 +1,22 @@
+// frameworks: Compliance frameworks and standards tracked by the organization.
+// See README.md for full design rationale.
+
+model Framework {
+  id             String   @id @default(uuid())
+  organizationId String?  @map("organization_id")
+  name           String
+  version        String?
+  authority      String?
+  description    String?
+  websiteUrl     String?  @map("website_url")
+  isActive       Boolean  @default(true) @map("is_active")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @default(now()) @map("updated_at")
+
+  organization          Organization?          @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  frameworkRequirements FrameworkRequirement[]
+
+  @@index([organizationId])
+  @@index([isActive])
+  @@map("frameworks")
+}

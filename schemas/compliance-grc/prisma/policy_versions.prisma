@@ -1,0 +1,33 @@
+// policy_versions: Versioned content and approval history for policies.
+// See README.md for full design rationale.
+
+enum PolicyVersionStatus {
+  draft
+  in_review
+  approved
+  archived
+}
+
+model PolicyVersion {
+  id            String              @id @default(uuid())
+  policyId      String              @map("policy_id")
+  versionNumber String              @map("version_number")
+  content       String?
+  fileId        String?             @map("file_id")
+  status        PolicyVersionStatus @default(draft)
+  approvedBy    String?             @map("approved_by")
+  approvedAt    DateTime?           @map("approved_at")
+  effectiveDate String?             @map("effective_date")
+  createdAt     DateTime            @default(now()) @map("created_at")
+  updatedAt     DateTime            @default(now()) @map("updated_at")
+
+  policy                 Policy                  @relation(fields: [policyId], references: [id], onDelete: Cascade)
+  file                   File?                   @relation(fields: [fileId], references: [id], onDelete: SetNull)
+  approver               User?                   @relation("PolicyApprover", fields: [approvedBy], references: [id], onDelete: SetNull)
+  policyAcknowledgments  PolicyAcknowledgment[]
+
+  @@unique([policyId, versionNumber])
+  @@index([status])
+  @@index([approvedBy])
+  @@map("policy_versions")
+}

@@ -1,0 +1,40 @@
+// finding_remediations: Remediation plans and actions for audit findings.
+// See README.md for full design rationale.
+
+enum RemediationStatus {
+  pending
+  in_progress
+  completed
+  cancelled
+}
+
+enum RemediationPriority {
+  critical
+  high
+  medium
+  low
+}
+
+model FindingRemediation {
+  id          String              @id @default(uuid())
+  findingId   String              @map("finding_id")
+  assignedTo  String?             @map("assigned_to")
+  title       String
+  description String?
+  status      RemediationStatus   @default(pending)
+  priority    RemediationPriority @default(medium)
+  dueDate     String?             @map("due_date")
+  completedAt DateTime?           @map("completed_at")
+  createdAt   DateTime            @default(now()) @map("created_at")
+  updatedAt   DateTime            @default(now()) @map("updated_at")
+
+  finding  AuditFinding @relation(fields: [findingId], references: [id], onDelete: Cascade)
+  assignee User?        @relation("RemediationAssignee", fields: [assignedTo], references: [id], onDelete: SetNull)
+
+  @@index([findingId])
+  @@index([assignedTo])
+  @@index([status])
+  @@index([priority])
+  @@index([dueDate])
+  @@map("finding_remediations")
+}

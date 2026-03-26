@@ -1,0 +1,26 @@
+// compliance_taggables: Polymorphic join table linking tags to various compliance entities.
+// See README.md for full design rationale.
+
+enum TaggableType {
+  control
+  risk
+  policy
+  audit
+  finding
+  evidence
+}
+
+model ComplianceTaggable {
+  id           String       @id @default(uuid())
+  tagId        String       @map("tag_id")
+  taggableType TaggableType @map("taggable_type")
+  taggableId   String       @map("taggable_id")
+  createdAt    DateTime     @default(now()) @map("created_at")
+
+  tag ComplianceTag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([tagId, taggableType, taggableId])
+  @@index([taggableType])
+  @@index([taggableId])
+  @@map("compliance_taggables")
+}

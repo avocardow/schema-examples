@@ -1,0 +1,16 @@
+// compliance_tags: Tags for categorizing and organizing compliance entities.
+// See README.md for full design rationale.
+
+model ComplianceTag {
+  id             String   @id @default(uuid())
+  organizationId String?  @map("organization_id")
+  name           String
+  color          String?
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  organization        Organization?        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  complianceTaggables ComplianceTaggable[]
+
+  @@unique([organizationId, name])
+  @@map("compliance_tags")
+}

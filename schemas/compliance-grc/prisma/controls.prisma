@@ -1,0 +1,71 @@
+// controls: Security and compliance controls implemented by the organization.
+// See README.md for full design rationale.
+
+enum ControlType {
+  preventive
+  detective
+  corrective
+  directive
+}
+
+enum ControlCategory {
+  technical
+  administrative
+  physical
+}
+
+enum ControlFrequency {
+  continuous
+  daily
+  weekly
+  monthly
+  quarterly
+  annually
+  as_needed
+}
+
+enum ControlStatus {
+  draft
+  active
+  inactive
+  deprecated
+}
+
+enum ControlEffectiveness {
+  effective
+  partially_effective
+  ineffective
+  not_assessed
+}
+
+model Control {
+  id                  String               @id @default(uuid())
+  organizationId      String?              @map("organization_id")
+  ownerId             String?              @map("owner_id")
+  identifier          String?              @unique
+  title               String
+  description         String?
+  controlType         ControlType          @map("control_type")
+  category            ControlCategory
+  frequency           ControlFrequency     @default(continuous)
+  status              ControlStatus        @default(draft)
+  effectiveness       ControlEffectiveness @default(not_assessed)
+  implementationNotes String?              @map("implementation_notes")
+  createdAt           DateTime             @default(now()) @map("created_at")
+  updatedAt           DateTime             @default(now()) @map("updated_at")
+
+  organization        Organization?        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  owner               User?                @relation("ControlOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  controlRequirements ControlRequirement[]
+  controlTests        ControlTest[]
+  riskControls        RiskControl[]
+  auditFindings       AuditFinding[]
+  evidence            Evidence[]
+
+  @@index([organizationId])
+  @@index([ownerId])
+  @@index([status])
+  @@index([controlType])
+  @@index([category])
+  @@map("controls")
+}

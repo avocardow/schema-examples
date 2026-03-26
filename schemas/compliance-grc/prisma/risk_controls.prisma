@@ -1,0 +1,16 @@
+// risk_controls: Mapping between risks and the controls that mitigate them.
+// See README.md for full design rationale.
+
+model RiskControl {
+  id                 String   @id @default(uuid())
+  riskId             String   @map("risk_id")
+  controlId          String   @map("control_id")
+  effectivenessNotes String?  @map("effectiveness_notes")
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  risk    Risk    @relation(fields: [riskId], references: [id], onDelete: Cascade)
+  control Control @relation(fields: [controlId], references: [id], onDelete: Cascade)
+
+  @@unique([riskId, controlId])
+  @@map("risk_controls")
+}

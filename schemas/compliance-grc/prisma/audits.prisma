@@ -1,0 +1,43 @@
+// audits: Internal and external audit engagements.
+// See README.md for full design rationale.
+
+enum AuditType {
+  internal
+  external
+  self_assessment
+  certification
+}
+
+enum AuditStatus {
+  planned
+  in_progress
+  review
+  completed
+  cancelled
+}
+
+model Audit {
+  id             String      @id @default(uuid())
+  organizationId String?     @map("organization_id")
+  leadAuditorId  String?     @map("lead_auditor_id")
+  title          String
+  auditType      AuditType   @map("audit_type")
+  status         AuditStatus @default(planned)
+  scope          String?
+  startDate      String?     @map("start_date")
+  endDate        String?     @map("end_date")
+  conclusion     String?
+  createdAt      DateTime    @default(now()) @map("created_at")
+  updatedAt      DateTime    @default(now()) @map("updated_at")
+
+  organization  Organization?  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  leadAuditor   User?          @relation("AuditLeadAuditor", fields: [leadAuditorId], references: [id], onDelete: SetNull)
+  auditFindings AuditFinding[]
+  evidence      Evidence[]
+
+  @@index([organizationId])
+  @@index([leadAuditorId])
+  @@index([auditType])
+  @@index([status])
+  @@map("audits")
+}

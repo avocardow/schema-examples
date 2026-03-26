@@ -1,0 +1,27 @@
+// policy_acknowledgments: Records of users acknowledging policy versions.
+// See README.md for full design rationale.
+
+enum AcknowledgmentMethod {
+  click_through
+  electronic_signature
+  manual
+}
+
+model PolicyAcknowledgment {
+  id              String               @id @default(uuid())
+  policyVersionId String               @map("policy_version_id")
+  userId          String               @map("user_id")
+  acknowledgedAt  DateTime             @map("acknowledged_at")
+  method          AcknowledgmentMethod @default(click_through)
+  ipAddress       String?              @map("ip_address")
+  notes           String?
+  createdAt       DateTime             @default(now()) @map("created_at")
+
+  policyVersion PolicyVersion @relation(fields: [policyVersionId], references: [id], onDelete: Cascade)
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([policyVersionId, userId])
+  @@index([userId])
+  @@index([acknowledgedAt])
+  @@map("policy_acknowledgments")
+}
