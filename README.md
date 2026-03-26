@@ -172,7 +172,7 @@ See each domain's **Dependencies** section for details.
 | [Event Planning](./schemas/event-planning)                                 |        | 🔲     |
 | [Voting / Polling / Surveys](./schemas/voting-polling-surveys)             |        | 🔲     |
 
-**57 domains — 16 complete, 41 planned**
+**57 domains — 17 complete, 40 planned**
 
 ## How to Use
 
