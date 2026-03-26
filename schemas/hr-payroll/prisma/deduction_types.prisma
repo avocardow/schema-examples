@@ -1,0 +1,28 @@
+// deduction_types: Catalog of payroll deduction types (tax, retirement, insurance, etc.).
+// See README.md for full design rationale.
+
+enum DeductionCategory {
+  tax
+  retirement
+  insurance
+  garnishment
+  other
+}
+
+model DeductionType {
+  id           String             @id @default(uuid())
+  name         String
+  code         String             @unique
+  category     DeductionCategory  @map("category")
+  isPretax     Boolean            @default(false) @map("is_pretax")
+  isActive     Boolean            @default(true) @map("is_active")
+  description  String?
+  createdAt    DateTime           @default(now()) @map("created_at")
+  updatedAt    DateTime           @default(now()) @map("updated_at")
+
+  payStubDeductions  PayStubDeduction[]
+
+  @@index([category])
+  @@index([isActive])
+  @@map("deduction_types")
+}

@@ -1,0 +1,26 @@
+// pay_stubs: Per-employee payroll output with gross, deductions, and net pay.
+// See README.md for full design rationale.
+
+model PayStub {
+  id               String   @id @default(uuid())
+  payrollRunId     String   @map("payroll_run_id")
+  employeeId       String   @map("employee_id")
+  grossPay         Int      @default(0) @map("gross_pay")
+  totalDeductions  Int      @default(0) @map("total_deductions")
+  netPay           Int      @default(0) @map("net_pay")
+  currency         String   @default("USD")
+  payDate          String   @map("pay_date")
+  periodStart      String   @map("period_start")
+  periodEnd        String   @map("period_end")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  payrollRun       PayrollRun       @relation(fields: [payrollRunId], references: [id], onDelete: Cascade)
+  employee         Employee         @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  earnings         PayStubEarning[]
+  deductions       PayStubDeduction[]
+
+  @@unique([payrollRunId, employeeId])
+  @@index([employeeId])
+  @@index([payDate])
+  @@map("pay_stubs")
+}

@@ -1,0 +1,35 @@
+// leave_requests: Employee leave/time-off requests with approval workflow and policy tracking.
+// See README.md for full design rationale.
+
+enum LeaveRequestStatus {
+  pending
+  approved
+  rejected
+  cancelled
+}
+
+model LeaveRequest {
+  id             String             @id @default(uuid())
+  employeeId     String             @map("employee_id")
+  leavePolicyId  String             @map("leave_policy_id")
+  startDate      String             @map("start_date")
+  endDate        String             @map("end_date")
+  daysRequested  Decimal            @map("days_requested")
+  status         LeaveRequestStatus @default(pending)
+  reason         String?
+  reviewerId     String?            @map("reviewer_id")
+  reviewedAt     DateTime?          @map("reviewed_at")
+  reviewerNote   String?            @map("reviewer_note")
+  createdAt      DateTime           @default(now()) @map("created_at")
+  updatedAt      DateTime           @default(now()) @map("updated_at")
+
+  employee       Employee           @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  leavePolicy    LeavePolicy        @relation(fields: [leavePolicyId], references: [id], onDelete: Restrict)
+  reviewer       User?              @relation(fields: [reviewerId], references: [id], onDelete: SetNull)
+
+  @@index([employeeId])
+  @@index([leavePolicyId])
+  @@index([status])
+  @@index([startDate])
+  @@map("leave_requests")
+}

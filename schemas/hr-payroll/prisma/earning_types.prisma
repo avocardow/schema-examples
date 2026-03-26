@@ -1,0 +1,29 @@
+// earning_types: Categorized earning definitions (regular, overtime, bonus, etc.) with tax flags.
+// See README.md for full design rationale.
+
+enum EarningCategory {
+  regular
+  overtime
+  bonus
+  commission
+  reimbursement
+  other
+}
+
+model EarningType {
+  id          String          @id @default(uuid())
+  name        String
+  code        String          @unique
+  category    EarningCategory
+  isTaxable   Boolean         @default(true) @map("is_taxable")
+  isActive    Boolean         @default(true) @map("is_active")
+  description String?
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @default(now()) @map("updated_at")
+
+  payStubEarnings PayStubEarning[]
+
+  @@index([category])
+  @@index([isActive])
+  @@map("earning_types")
+}

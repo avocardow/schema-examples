@@ -1,0 +1,26 @@
+// pay_schedules: Recurring payroll schedule definitions with frequency and anchor date.
+// See README.md for full design rationale.
+
+enum PayScheduleFrequency {
+  weekly
+  biweekly
+  semimonthly
+  monthly
+}
+
+model PaySchedule {
+  id           String                @id @default(uuid())
+  name         String
+  frequency    PayScheduleFrequency
+  anchorDate   String                @map("anchor_date")
+  isActive     Boolean               @default(true) @map("is_active")
+  description  String?
+  createdAt    DateTime              @default(now()) @map("created_at")
+  updatedAt    DateTime              @default(now()) @map("updated_at")
+
+  payrollRuns  PayrollRun[]
+
+  @@index([frequency])
+  @@index([isActive])
+  @@map("pay_schedules")
+}

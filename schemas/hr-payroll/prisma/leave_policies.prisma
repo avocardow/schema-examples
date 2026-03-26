@@ -1,0 +1,44 @@
+// leave_policies: Defines leave/time-off policy rules including accrual, balance limits, and carryover.
+// See README.md for full design rationale.
+
+enum LeaveType {
+  vacation
+  sick
+  personal
+  parental
+  bereavement
+  jury_duty
+  unpaid
+  other
+}
+
+enum AccrualFrequency {
+  per_pay_period
+  monthly
+  quarterly
+  annually
+  none
+}
+
+model LeavePolicy {
+  id                String            @id @default(uuid())
+  name              String
+  type              LeaveType         @map("type")
+  accrualRate       Decimal?          @map("accrual_rate")
+  accrualFrequency  AccrualFrequency  @default(none) @map("accrual_frequency")
+  maxBalance        Decimal?          @map("max_balance")
+  maxCarryover      Decimal?          @map("max_carryover")
+  isPaid            Boolean           @default(true) @map("is_paid")
+  requiresApproval  Boolean           @default(true) @map("requires_approval")
+  isActive          Boolean           @default(true) @map("is_active")
+  description       String?
+  createdAt         DateTime          @default(now()) @map("created_at")
+  updatedAt         DateTime          @default(now()) @map("updated_at")
+
+  leaveBalances     LeaveBalance[]
+  leaveRequests     LeaveRequest[]
+
+  @@index([type])
+  @@index([isActive])
+  @@map("leave_policies")
+}

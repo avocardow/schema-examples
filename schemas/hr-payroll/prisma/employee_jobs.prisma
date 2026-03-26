@@ -1,0 +1,30 @@
+// employee_jobs: Job assignments linking employees to positions, departments, and managers.
+// See README.md for full design rationale.
+
+model EmployeeJob {
+  id              String          @id @default(uuid())
+  employeeId      String          @map("employee_id")
+  positionId      String?         @map("position_id")
+  departmentId    String          @map("department_id")
+  managerId       String?         @map("manager_id")
+  title           String
+  employmentType  EmploymentType  @map("employment_type")
+  effectiveDate   String          @map("effective_date")
+  endDate         String?         @map("end_date")
+  reason          String?
+  isPrimary       Boolean         @default(true) @map("is_primary")
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @default(now()) @map("updated_at")
+
+  employee        Employee        @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  position        Position?       @relation(fields: [positionId], references: [id], onDelete: SetNull)
+  department      Department      @relation(fields: [departmentId], references: [id], onDelete: Restrict)
+  manager         Employee?       @relation("Manager", fields: [managerId], references: [id], onDelete: SetNull)
+
+  @@index([employeeId])
+  @@index([positionId])
+  @@index([departmentId])
+  @@index([managerId])
+  @@index([effectiveDate])
+  @@map("employee_jobs")
+}

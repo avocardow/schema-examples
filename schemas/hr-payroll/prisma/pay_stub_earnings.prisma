@@ -1,0 +1,19 @@
+// pay_stub_earnings: Individual earning line items on a pay stub with hours, rate, and amount.
+// See README.md for full design rationale.
+
+model PayStubEarning {
+  id            String    @id @default(uuid())
+  payStubId     String    @map("pay_stub_id")
+  earningTypeId String    @map("earning_type_id")
+  hours         Decimal?
+  rate          Int?
+  amount        Int
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  payStub       PayStub     @relation(fields: [payStubId], references: [id], onDelete: Cascade)
+  earningType   EarningType @relation(fields: [earningTypeId], references: [id], onDelete: Restrict)
+
+  @@index([payStubId])
+  @@index([earningTypeId])
+  @@map("pay_stub_earnings")
+}

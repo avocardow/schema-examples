@@ -1,0 +1,36 @@
+// benefit_plans: Catalog of employer-offered benefit plans (health, dental, retirement, etc.).
+// See README.md for full design rationale.
+
+enum BenefitPlanType {
+  health
+  dental
+  vision
+  retirement_401k
+  life_insurance
+  disability
+  hsa
+  fsa
+  other
+}
+
+model BenefitPlan {
+  id                    String          @id @default(uuid())
+  name                  String
+  type                  BenefitPlanType @map("type")
+  description           String?
+  employerContribution  Int?            @map("employer_contribution")
+  employeeContribution  Int?            @map("employee_contribution")
+  currency              String          @default("USD")
+  isActive              Boolean         @default(true) @map("is_active")
+  planYearStart         String?         @map("plan_year_start")
+  planYearEnd           String?         @map("plan_year_end")
+  metadata              Json?
+  createdAt             DateTime        @default(now()) @map("created_at")
+  updatedAt             DateTime        @default(now()) @map("updated_at")
+
+  benefitEnrollments  BenefitEnrollment[]
+
+  @@index([type])
+  @@index([isActive])
+  @@map("benefit_plans")
+}

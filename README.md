@@ -1,6 +1,6 @@
 # Schema Examples
 
-A growing collection of production-ready database schema examples across multiple formats — with explanations and best practices. Sixteen domains complete (auth, notifications, file management, i18n, analytics, content moderation, e-commerce, CMS/blog, messaging/chat, social media, booking/scheduling, project management, CRM, helpdesk/customer support, SaaS/multi-tenant, subscription/membership), with 41 more planned.
+A growing collection of production-ready database schema examples across multiple formats — with explanations and best practices. Seventeen domains complete (auth, notifications, file management, i18n, analytics, content moderation, e-commerce, CMS/blog, messaging/chat, social media, booking/scheduling, project management, CRM, helpdesk/customer support, SaaS/multi-tenant, subscription/membership, HR/payroll), with 40 more planned.
 
 **Copy. Learn. Contribute. Ship.**
 
@@ -78,7 +78,7 @@ See each domain's **Dependencies** section for details.
 | [SaaS / Multi-tenant](./schemas/saas-multi-tenant)                 |     14 | ✅     |
 | [CRM](./schemas/crm)                                               |     19 | ✅     |
 | [Project Management](./schemas/project-management)                 |     18 | ✅     |
-| [HR / Payroll](./schemas/hr-payroll)                               |        | 🔲     |
+| [HR / Payroll](./schemas/hr-payroll)                               |     18 | ✅     |
 | [Helpdesk / Customer Support](./schemas/helpdesk-customer-support) |     22 | ✅     |
 | [Compliance / GRC](./schemas/compliance-grc)                       |        | 🔲     |
 
@@ -172,7 +172,7 @@ See each domain's **Dependencies** section for details.
 | [Event Planning](./schemas/event-planning)                                 |        | 🔲     |
 | [Voting / Polling / Surveys](./schemas/voting-polling-surveys)             |        | 🔲     |
 
-**57 domains — 15 complete, 42 planned**
+**57 domains — 16 complete, 41 planned**
 
 ## How to Use
 

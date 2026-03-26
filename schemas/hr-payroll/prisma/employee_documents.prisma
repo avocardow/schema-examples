@@ -1,0 +1,45 @@
+// employee_documents: Documents associated with employees such as contracts, tax forms, and certifications.
+// See README.md for full design rationale.
+
+enum DocumentType {
+  contract
+  tax_form
+  identification
+  certification
+  offer_letter
+  performance_review
+  other
+}
+
+enum DocumentStatus {
+  active
+  expired
+  superseded
+  archived
+}
+
+model EmployeeDocument {
+  id           String          @id @default(uuid())
+  employeeId   String          @map("employee_id")
+  fileId       String          @map("file_id")
+  type         DocumentType
+  name         String
+  description  String?
+  issuedDate   String?         @map("issued_date")
+  expiryDate   String?         @map("expiry_date")
+  status       DocumentStatus  @default(active)
+  uploadedBy   String?         @map("uploaded_by")
+  createdAt    DateTime        @default(now()) @map("created_at")
+  updatedAt    DateTime        @default(now()) @map("updated_at")
+
+  employee     Employee        @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  file         File            @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  uploader     User?           @relation(fields: [uploadedBy], references: [id], onDelete: SetNull)
+
+  @@index([employeeId])
+  @@index([fileId])
+  @@index([type])
+  @@index([expiryDate])
+  @@index([status])
+  @@map("employee_documents")
+}

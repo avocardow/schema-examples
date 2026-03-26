@@ -1,0 +1,51 @@
+// employees: Employee profile and employment details for HR and payroll.
+// See README.md for full design rationale.
+
+enum EmploymentType {
+  full_time
+  part_time
+  contractor
+  intern
+  temporary
+}
+
+enum EmployeeStatus {
+  active
+  on_leave
+  suspended
+  terminated
+}
+
+model Employee {
+  id               String           @id @default(uuid())
+  userId           String?          @map("user_id")
+  employeeNumber   String?          @unique @map("employee_number")
+  firstName        String           @map("first_name")
+  lastName         String           @map("last_name")
+  email            String
+  phone            String?
+  dateOfBirth      String?          @map("date_of_birth")
+  hireDate         String           @map("hire_date")
+  terminationDate  String?          @map("termination_date")
+  employmentType   EmploymentType   @map("employment_type")
+  status           EmployeeStatus   @default(active)
+  metadata         Json?
+  createdAt        DateTime         @default(now()) @map("created_at")
+  updatedAt        DateTime         @default(now()) @map("updated_at")
+
+  user             User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  employeeJobs       EmployeeJob[]
+  managedJobs        EmployeeJob[]        @relation("Manager")
+  compensation       Compensation[]
+  payStubs           PayStub[]
+  benefitEnrollments BenefitEnrollment[]
+  leaveBalances      LeaveBalance[]
+  leaveRequests      LeaveRequest[]
+  employeeDocuments  EmployeeDocument[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([employmentType])
+  @@map("employees")
+}

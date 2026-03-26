@@ -1,0 +1,35 @@
+// compensation: Employee pay rates, frequency, and compensation history.
+// See README.md for full design rationale.
+
+enum PayType {
+  salary
+  hourly
+}
+
+enum PayFrequency {
+  weekly
+  biweekly
+  semimonthly
+  monthly
+  annually
+}
+
+model Compensation {
+  id             String        @id @default(uuid())
+  employeeId     String        @map("employee_id")
+  payType        PayType       @map("pay_type")
+  amount         Int
+  currency       String        @default("USD")
+  payFrequency   PayFrequency  @map("pay_frequency")
+  effectiveDate  String        @map("effective_date")
+  endDate        String?       @map("end_date")
+  reason         String?
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @default(now()) @map("updated_at")
+
+  employee       Employee      @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@index([employeeId])
+  @@index([effectiveDate])
+  @@map("compensation")
+}

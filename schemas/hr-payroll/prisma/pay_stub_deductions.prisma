@@ -1,0 +1,18 @@
+// pay_stub_deductions: Line-item deductions on each pay stub (tax, insurance, retirement, etc.).
+// See README.md for full design rationale.
+
+model PayStubDeduction {
+  id               String   @id @default(uuid())
+  payStubId        String   @map("pay_stub_id")
+  deductionTypeId  String   @map("deduction_type_id")
+  employeeAmount   Int      @default(0) @map("employee_amount")
+  employerAmount   Int      @default(0) @map("employer_amount")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  payStub        PayStub       @relation(fields: [payStubId], references: [id], onDelete: Cascade)
+  deductionType  DeductionType @relation(fields: [deductionTypeId], references: [id], onDelete: Restrict)
+
+  @@index([payStubId])
+  @@index([deductionTypeId])
+  @@map("pay_stub_deductions")
+}

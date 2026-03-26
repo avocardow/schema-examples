@@ -1,0 +1,39 @@
+// payroll_runs: Payroll processing runs tracking gross, deductions, and net totals.
+// See README.md for full design rationale.
+
+enum PayrollRunStatus {
+  draft
+  processing
+  completed
+  failed
+  voided
+}
+
+model PayrollRun {
+  id              String           @id @default(uuid())
+  payScheduleId   String           @map("pay_schedule_id")
+  periodStart     String           @map("period_start")
+  periodEnd       String           @map("period_end")
+  payDate         String           @map("pay_date")
+  status          PayrollRunStatus @default(draft)
+  totalGross      Int              @default(0) @map("total_gross")
+  totalDeductions Int              @default(0) @map("total_deductions")
+  totalNet        Int              @default(0) @map("total_net")
+  employeeCount   Int              @default(0) @map("employee_count")
+  currency        String           @default("USD")
+  processedAt     DateTime?        @map("processed_at")
+  processedBy     String?          @map("processed_by")
+  notes           String?
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @default(now()) @map("updated_at")
+
+  paySchedule     PaySchedule      @relation(fields: [payScheduleId], references: [id], onDelete: Restrict)
+  processor       User?            @relation(fields: [processedBy], references: [id], onDelete: SetNull)
+
+  payStubs        PayStub[]
+
+  @@index([payScheduleId])
+  @@index([status])
+  @@index([payDate])
+  @@map("payroll_runs")
+}
