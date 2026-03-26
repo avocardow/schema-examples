@@ -1,0 +1,41 @@
+// commission_rules: Configurable commission rates by scope (global, vendor, or category).
+// See README.md for full design rationale.
+
+enum CommissionScope {
+  GLOBAL
+  VENDOR
+  CATEGORY
+}
+
+enum CommissionRateType {
+  PERCENTAGE
+  FLAT
+  HYBRID
+}
+
+model CommissionRule {
+  id             String             @id @default(uuid())
+  name           String
+  scope          CommissionScope
+  vendorId       String?            @map("vendor_id")
+  categoryId     String?            @map("category_id")
+  rateType       CommissionRateType @default(PERCENTAGE) @map("rate_type")
+  percentageRate Decimal?           @map("percentage_rate")
+  flatRate       Int?               @map("flat_rate")
+  currency       String?
+  minCommission  Int?               @map("min_commission")
+  maxCommission  Int?               @map("max_commission")
+  isActive       Boolean            @default(true) @map("is_active")
+  priority       Int                @default(0)
+  effectiveFrom  DateTime?          @map("effective_from")
+  effectiveTo    DateTime?          @map("effective_to")
+  createdAt      DateTime           @default(now()) @map("created_at")
+  updatedAt      DateTime           @default(now()) @updatedAt @map("updated_at")
+
+  vendor Vendor? @relation("VendorCommissionRules", fields: [vendorId], references: [id], onDelete: Cascade)
+
+  @@index([scope, isActive])
+  @@index([vendorId])
+  @@index([categoryId])
+  @@map("commission_rules")
+}

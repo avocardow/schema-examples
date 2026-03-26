@@ -1,0 +1,45 @@
+// vendor_orders: Per-vendor order splits with financial breakdown and fulfillment tracking.
+// See README.md for full design rationale.
+
+enum VendorOrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELED
+  REFUNDED
+}
+
+model VendorOrder {
+  id                String            @id @default(uuid())
+  orderId           String            @map("order_id")
+  vendorId          String            @map("vendor_id")
+  vendorOrderNumber String            @unique @map("vendor_order_number")
+  status            VendorOrderStatus @default(PENDING)
+  currency          String
+  subtotal          Int
+  shippingTotal     Int               @default(0) @map("shipping_total")
+  taxTotal          Int               @default(0) @map("tax_total")
+  discountTotal     Int               @default(0) @map("discount_total")
+  total             Int
+  commissionAmount  Int               @default(0) @map("commission_amount")
+  vendorEarning     Int               @default(0) @map("vendor_earning")
+  note              String?
+  shippedAt         DateTime?         @map("shipped_at")
+  deliveredAt       DateTime?         @map("delivered_at")
+  createdAt         DateTime          @default(now()) @map("created_at")
+  updatedAt         DateTime          @default(now()) @updatedAt @map("updated_at")
+
+  vendor   Vendor             @relation(fields: [vendorId], references: [id], onDelete: Restrict)
+  items    VendorOrderItem[]
+  payoutItems PayoutItem[]
+  disputes Dispute[]
+  reviews  VendorReview[]
+
+  @@index([orderId])
+  @@index([vendorId, status])
+  @@index([status])
+  @@index([createdAt])
+  @@map("vendor_orders")
+}

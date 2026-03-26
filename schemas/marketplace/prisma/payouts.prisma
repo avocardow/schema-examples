@@ -1,0 +1,37 @@
+// payouts: Scheduled vendor payment disbursements with provider tracking.
+// See README.md for full design rationale.
+
+enum PayoutStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELED
+}
+
+model Payout {
+  id           String       @id @default(uuid())
+  vendorId     String       @map("vendor_id")
+  payoutNumber String       @unique @map("payout_number")
+  status       PayoutStatus @default(PENDING)
+  currency     String
+  amount       Int
+  fee          Int          @default(0)
+  netAmount    Int          @map("net_amount")
+  provider     String?
+  providerId   String?      @map("provider_id")
+  periodStart  DateTime     @map("period_start")
+  periodEnd    DateTime     @map("period_end")
+  note         String?
+  completedAt  DateTime?    @map("completed_at")
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @default(now()) @updatedAt @map("updated_at")
+
+  vendor Vendor      @relation(fields: [vendorId], references: [id], onDelete: Restrict)
+  items  PayoutItem[]
+
+  @@index([vendorId, status])
+  @@index([status])
+  @@index([periodStart, periodEnd])
+  @@map("payouts")
+}

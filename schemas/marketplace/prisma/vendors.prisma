@@ -1,0 +1,51 @@
+// vendors: Multi-vendor marketplace sellers with verification and commission tracking.
+// See README.md for full design rationale.
+
+enum VendorStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  DEACTIVATED
+}
+
+enum VerificationStatus {
+  UNVERIFIED
+  PENDING_REVIEW
+  VERIFIED
+  REJECTED
+}
+
+model Vendor {
+  id                 String             @id @default(uuid())
+  ownerId            String             @map("owner_id")
+  name               String
+  slug               String             @unique
+  email              String
+  phone              String?
+  status             VendorStatus       @default(PENDING)
+  verificationStatus VerificationStatus @default(UNVERIFIED) @map("verification_status")
+  commissionRate     Decimal?           @map("commission_rate")
+  metadata           Json?              @default("{}")
+  approvedAt         DateTime?          @map("approved_at")
+  suspendedAt        DateTime?          @map("suspended_at")
+  createdAt          DateTime           @default(now()) @map("created_at")
+  updatedAt          DateTime           @default(now()) @updatedAt @map("updated_at")
+
+  profile              VendorProfile?
+  members              VendorMember[]
+  addresses            VendorAddress[]
+  documents            VendorDocument[]
+  commissionRules      CommissionRule[]      @relation("VendorCommissionRules")
+  listings             Listing[]
+  vendorOrders         VendorOrder[]
+  payouts              Payout[]
+  balance              VendorBalance?
+  balanceTransactions  BalanceTransaction[]
+  disputes             Dispute[]
+  reviews              VendorReview[]
+
+  @@index([ownerId])
+  @@index([status])
+  @@index([verificationStatus])
+  @@map("vendors")
+}

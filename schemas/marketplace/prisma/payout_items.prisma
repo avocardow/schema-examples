@@ -1,0 +1,17 @@
+// payout_items: Individual vendor order amounts included in a payout batch.
+// See README.md for full design rationale.
+
+model PayoutItem {
+  id            String   @id @default(uuid())
+  payoutId      String   @map("payout_id")
+  vendorOrderId String   @map("vendor_order_id")
+  amount        Int
+  commission    Int      @default(0)
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  payout      Payout      @relation(fields: [payoutId], references: [id], onDelete: Cascade)
+  vendorOrder VendorOrder @relation(fields: [vendorOrderId], references: [id], onDelete: Restrict)
+
+  @@unique([payoutId, vendorOrderId])
+  @@map("payout_items")
+}

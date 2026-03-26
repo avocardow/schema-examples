@@ -1,0 +1,26 @@
+// vendor_members: Team membership and roles for vendor organizations.
+// See README.md for full design rationale.
+
+enum VendorMemberRole {
+  OWNER
+  ADMIN
+  EDITOR
+  VIEWER
+}
+
+model VendorMember {
+  id        String           @id @default(uuid())
+  vendorId  String           @map("vendor_id")
+  userId    String           @map("user_id")
+  role      VendorMemberRole @default(VIEWER)
+  invitedBy String?          @map("invited_by")
+  joinedAt  DateTime?        @map("joined_at")
+  createdAt DateTime         @default(now()) @map("created_at")
+  updatedAt DateTime         @default(now()) @updatedAt @map("updated_at")
+
+  vendor  Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  @@unique([vendorId, userId])
+  @@index([userId])
+  @@map("vendor_members")
+}

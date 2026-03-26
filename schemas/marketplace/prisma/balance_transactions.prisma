@@ -1,0 +1,32 @@
+// balance_transactions: Immutable ledger of all vendor balance changes.
+// See README.md for full design rationale.
+
+enum BalanceTransactionType {
+  EARNING
+  COMMISSION
+  PAYOUT
+  REFUND
+  ADJUSTMENT
+  HOLD
+  RELEASE
+}
+
+model BalanceTransaction {
+  id             String                 @id @default(uuid())
+  vendorId       String                 @map("vendor_id")
+  type           BalanceTransactionType
+  amount         Int
+  currency       String
+  runningBalance Int                    @map("running_balance")
+  referenceType  String?                @map("reference_type")
+  referenceId    String?                @map("reference_id")
+  description    String?
+  createdAt      DateTime               @default(now()) @map("created_at")
+
+  vendor Vendor @relation(fields: [vendorId], references: [id], onDelete: Restrict)
+
+  @@index([vendorId, createdAt])
+  @@index([type])
+  @@index([referenceType, referenceId])
+  @@map("balance_transactions")
+}

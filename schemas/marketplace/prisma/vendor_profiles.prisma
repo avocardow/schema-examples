@@ -1,0 +1,22 @@
+// vendor_profiles: Extended vendor display information and policies.
+// See README.md for full design rationale.
+
+model VendorProfile {
+  id             String   @id @default(uuid())
+  vendorId       String   @unique @map("vendor_id")
+  displayName    String   @map("display_name")
+  tagline        String?
+  description    String?
+  logoUrl        String?  @map("logo_url")
+  bannerUrl      String?  @map("banner_url")
+  websiteUrl     String?  @map("website_url")
+  socialLinks    Json?    @map("social_links")
+  returnPolicy   String?  @map("return_policy")
+  shippingPolicy String?  @map("shipping_policy")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @default(now()) @updatedAt @map("updated_at")
+
+  vendor Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  @@map("vendor_profiles")
+}

@@ -1,0 +1,40 @@
+// listings: Vendor-specific product listings with approval workflow and condition tracking.
+// See README.md for full design rationale.
+
+enum ListingStatus {
+  DRAFT
+  PENDING_APPROVAL
+  ACTIVE
+  PAUSED
+  REJECTED
+  ARCHIVED
+}
+
+enum ListingCondition {
+  NEW
+  REFURBISHED
+  USED_LIKE_NEW
+  USED_GOOD
+  USED_FAIR
+}
+
+model Listing {
+  id              String           @id @default(uuid())
+  vendorId        String           @map("vendor_id")
+  productId       String           @map("product_id")
+  status          ListingStatus    @default(DRAFT)
+  condition       ListingCondition @default(NEW)
+  handlingDays    Int              @default(1) @map("handling_days")
+  rejectionReason String?          @map("rejection_reason")
+  approvedAt      DateTime?        @map("approved_at")
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @default(now()) @updatedAt @map("updated_at")
+
+  vendor   Vendor           @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  variants ListingVariant[]
+
+  @@unique([vendorId, productId])
+  @@index([productId, status])
+  @@index([status])
+  @@map("listings")
+}

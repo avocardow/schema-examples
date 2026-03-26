@@ -1,0 +1,29 @@
+// vendor_reviews: Customer ratings and reviews for vendor service quality.
+// See README.md for full design rationale.
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model VendorReview {
+  id            String       @id @default(uuid())
+  vendorId      String       @map("vendor_id")
+  customerId    String       @map("customer_id")
+  vendorOrderId String?      @map("vendor_order_id")
+  rating        Int
+  title         String?
+  body          String?
+  status        ReviewStatus @default(PENDING)
+  createdAt     DateTime     @default(now()) @map("created_at")
+  updatedAt     DateTime     @default(now()) @updatedAt @map("updated_at")
+
+  vendor      Vendor       @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  vendorOrder VendorOrder? @relation(fields: [vendorOrderId], references: [id], onDelete: SetNull)
+
+  @@unique([vendorId, customerId, vendorOrderId])
+  @@index([vendorId, status])
+  @@index([status])
+  @@map("vendor_reviews")
+}

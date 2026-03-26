@@ -1,0 +1,25 @@
+// vendor_order_items: Line items within a vendor order with commission calculations.
+// See README.md for full design rationale.
+
+model VendorOrderItem {
+  id               String   @id @default(uuid())
+  vendorOrderId    String   @map("vendor_order_id")
+  orderItemId      String   @map("order_item_id")
+  listingVariantId String?  @map("listing_variant_id")
+  productName      String   @map("product_name")
+  variantTitle     String   @map("variant_title")
+  sku              String?
+  unitPrice        Int      @map("unit_price")
+  quantity         Int
+  subtotal         Int
+  commissionAmount Int      @default(0) @map("commission_amount")
+  vendorEarning    Int      @default(0) @map("vendor_earning")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  vendorOrder    VendorOrder     @relation(fields: [vendorOrderId], references: [id], onDelete: Cascade)
+  listingVariant ListingVariant? @relation(fields: [listingVariantId], references: [id], onDelete: SetNull)
+
+  @@index([vendorOrderId])
+  @@index([orderItemId])
+  @@map("vendor_order_items")
+}

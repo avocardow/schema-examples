@@ -1,0 +1,47 @@
+// disputes: Customer-vendor dispute cases with resolution workflow.
+// See README.md for full design rationale.
+
+enum DisputeReason {
+  NOT_RECEIVED
+  NOT_AS_DESCRIBED
+  DEFECTIVE
+  WRONG_ITEM
+  UNAUTHORIZED
+  OTHER
+}
+
+enum DisputeStatus {
+  OPEN
+  UNDER_REVIEW
+  ESCALATED
+  RESOLVED_CUSTOMER
+  RESOLVED_VENDOR
+  CLOSED
+}
+
+model Dispute {
+  id             String        @id @default(uuid())
+  vendorOrderId  String        @map("vendor_order_id")
+  customerId     String        @map("customer_id")
+  vendorId       String        @map("vendor_id")
+  reason         DisputeReason
+  status         DisputeStatus @default(OPEN)
+  description    String
+  resolutionNote String?       @map("resolution_note")
+  refundAmount   Int?          @map("refund_amount")
+  currency       String
+  resolvedBy     String?       @map("resolved_by")
+  resolvedAt     DateTime?     @map("resolved_at")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @default(now()) @updatedAt @map("updated_at")
+
+  vendorOrder VendorOrder      @relation(fields: [vendorOrderId], references: [id], onDelete: Restrict)
+  vendor      Vendor           @relation(fields: [vendorId], references: [id], onDelete: Restrict)
+  messages    DisputeMessage[]
+
+  @@index([vendorOrderId])
+  @@index([customerId])
+  @@index([vendorId, status])
+  @@index([status])
+  @@map("disputes")
+}

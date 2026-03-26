@@ -1,0 +1,17 @@
+// vendor_balances: Real-time financial balance summary per vendor.
+// See README.md for full design rationale.
+
+model VendorBalance {
+  id           String   @id @default(uuid())
+  vendorId     String   @unique @map("vendor_id")
+  currency     String
+  available    Int      @default(0)
+  pending      Int      @default(0)
+  totalEarned  Int      @default(0) @map("total_earned")
+  totalPaidOut Int      @default(0) @map("total_paid_out")
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
+
+  vendor Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  @@map("vendor_balances")
+}

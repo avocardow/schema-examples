@@ -1,0 +1,23 @@
+// dispute_messages: Threaded messages within a dispute case.
+// See README.md for full design rationale.
+
+enum DisputeSenderRole {
+  CUSTOMER
+  VENDOR
+  ADMIN
+}
+
+model DisputeMessage {
+  id          String            @id @default(uuid())
+  disputeId   String            @map("dispute_id")
+  senderId    String            @map("sender_id")
+  senderRole  DisputeSenderRole @map("sender_role")
+  body        String
+  attachments Json?
+  createdAt   DateTime          @default(now()) @map("created_at")
+
+  dispute Dispute @relation(fields: [disputeId], references: [id], onDelete: Cascade)
+
+  @@index([disputeId, createdAt])
+  @@map("dispute_messages")
+}

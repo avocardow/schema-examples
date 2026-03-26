@@ -1,0 +1,36 @@
+// vendor_documents: Uploaded verification documents for vendor onboarding and compliance.
+// See README.md for full design rationale.
+
+enum VendorDocumentType {
+  BUSINESS_LICENSE
+  TAX_CERTIFICATE
+  IDENTITY_PROOF
+  BANK_STATEMENT
+  OTHER
+}
+
+enum DocumentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model VendorDocument {
+  id              String             @id @default(uuid())
+  vendorId        String             @map("vendor_id")
+  type            VendorDocumentType
+  fileUrl         String             @map("file_url")
+  fileName        String             @map("file_name")
+  status          DocumentStatus     @default(PENDING)
+  rejectionReason String?            @map("rejection_reason")
+  reviewedBy      String?            @map("reviewed_by")
+  reviewedAt      DateTime?          @map("reviewed_at")
+  expiresAt       DateTime?          @map("expires_at")
+  createdAt       DateTime           @default(now()) @map("created_at")
+
+  vendor Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  @@index([vendorId, type])
+  @@index([status])
+  @@map("vendor_documents")
+}
