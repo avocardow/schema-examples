@@ -4,9 +4,9 @@
 CREATE TABLE bid_increment_rules (
     id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     auction_id  UUID REFERENCES auctions(id) ON DELETE CASCADE,
-    min_price   NUMERIC NOT NULL,
-    max_price   NUMERIC,
-    increment   NUMERIC NOT NULL,
+    min_price   INTEGER NOT NULL,
+    max_price   INTEGER,
+    increment   INTEGER NOT NULL,
     created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 

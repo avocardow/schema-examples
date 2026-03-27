@@ -12,11 +12,11 @@ pub struct BidIncrementRule {
     pub auction_id: Option<String>, // UUID. FK → auctions.id (cascade delete). Null = global default rule.
 
     #[index(btree)]
-    pub min_price: f64, // Lower bound of the price range (inclusive).
+    pub min_price: i64, // Lower bound of the price range (inclusive).
 
-    pub max_price: Option<f64>, // Upper bound of the price range. Null = no upper limit.
+    pub max_price: Option<i64>, // Upper bound of the price range. Null = no upper limit.
 
-    pub increment: f64, // Minimum bid increment required within this price range.
+    pub increment: i64, // Minimum bid increment required within this price range.
 
     pub created_at: Timestamp,
 }

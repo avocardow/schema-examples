@@ -25,9 +25,9 @@ pub struct AuctionWinner {
     pub winner_id: String, // UUID, FK -> users.id (restrict delete)
     #[index(btree)]
     pub seller_id: String, // UUID, FK -> users.id (restrict delete)
-    pub hammer_price: f64,
-    pub buyer_premium: f64,
-    pub total_price: f64,
+    pub hammer_price: i64,
+    pub buyer_premium: i64,
+    pub total_price: i64,
     #[index(btree)]
     pub settlement_status: SettlementStatus,
     pub paid_at: Option<Timestamp>,

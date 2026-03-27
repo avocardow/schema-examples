@@ -118,9 +118,9 @@ table bid_increment_rules {
   id              uuid primary_key default auto_generate
   auction_id      uuid nullable references auctions(id) on_delete cascade
                                                -- Null = global default rule. Non-null = auction-specific override.
-  min_price       decimal not_null             -- Lower bound of price range (inclusive).
-  max_price       decimal nullable             -- Upper bound of price range (exclusive). Null = no upper limit (final tier).
-  increment       decimal not_null             -- Minimum bid increment for this price range.
+  min_price       integer not_null             -- Lower bound of price range (inclusive). In smallest currency unit.
+  max_price       integer nullable             -- Upper bound of price range (exclusive). Null = no upper limit (final tier). In smallest currency unit.
+  increment       integer not_null             -- Minimum bid increment for this price range. In smallest currency unit.
   created_at      timestamp default now
 }
 
@@ -231,10 +231,10 @@ table auctions {
                                                -- cancelled: cancelled by seller or admin.
   title               string not_null          -- Auction title (may differ from item title for marketing).
   description         string nullable          -- Auction-specific description or terms.
-  starting_price      decimal not_null         -- Opening/starting bid price.
-  reserve_price       decimal nullable         -- Minimum price for sale. Null = no reserve (absolute auction).
-  buy_now_price       decimal nullable         -- Fixed price to purchase immediately. Null = no buy-now option.
-  current_price       decimal not_null default 0 -- Denormalized current highest bid (or starting price if no bids).
+  starting_price      integer not_null         -- Opening/starting bid price. In smallest currency unit.
+  reserve_price       integer nullable         -- Minimum price for sale. Null = no reserve (absolute auction). In smallest currency unit.
+  buy_now_price       integer nullable         -- Fixed price to purchase immediately. Null = no buy-now option. In smallest currency unit.
+  current_price       integer not_null default 0 -- Denormalized current highest bid (or starting price if no bids). In smallest currency unit.
   bid_count           integer not_null default 0 -- Denormalized total number of bids placed.
   highest_bidder_id   uuid nullable references users(id) on_delete set_null
                                                -- Current highest bidder. Null = no bids yet.
@@ -285,8 +285,8 @@ table bids {
   bidder_id       uuid not_null references users(id) on_delete restrict
                                                -- Who placed this bid.
                                                -- Restrict: cannot delete a user with bid history.
-  amount          decimal not_null             -- The visible bid amount placed.
-  max_amount      decimal nullable             -- Maximum proxy bid amount. Null = exact bid (no proxy).
+  amount          integer not_null             -- The visible bid amount placed. In smallest currency unit.
+  max_amount      integer nullable             -- Maximum proxy bid amount. Null = exact bid (no proxy). In smallest currency unit.
                                                -- System auto-bids up to this amount in increments.
   status          enum(active, outbid, winning, won, cancelled) not_null default active
                                                -- active: currently the highest bid.
@@ -363,9 +363,9 @@ table auction_winners {
   seller_id       uuid not_null references users(id) on_delete restrict
                                                -- The seller (denormalized from auction/item).
                                                -- Restrict: cannot delete a selling user.
-  hammer_price    decimal not_null             -- Final auction price (the winning bid amount).
-  buyer_premium   decimal not_null default 0   -- Buyer's premium amount (hammer_price * buyer_premium_pct).
-  total_price     decimal not_null             -- Total due from buyer (hammer_price + buyer_premium).
+  hammer_price    integer not_null             -- Final auction price (the winning bid amount). In smallest currency unit.
+  buyer_premium   integer not_null default 0   -- Buyer's premium amount (hammer_price * buyer_premium_pct). In smallest currency unit.
+  total_price     integer not_null             -- Total due from buyer (hammer_price + buyer_premium). In smallest currency unit.
   settlement_status enum(pending, paid, shipped, completed, disputed, refunded) not_null default pending
                                                -- pending: awaiting payment.
                                                -- paid: buyer has paid.

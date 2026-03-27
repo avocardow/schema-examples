@@ -25,8 +25,8 @@ pub struct Bid {
     #[index(btree)]
     pub bidder_id: String, // UUID, FK -> users.id (restrict delete)
 
-    pub amount: f64,
-    pub max_amount: Option<f64>,
+    pub amount: i64,
+    pub max_amount: Option<i64>,
 
     #[index(btree)]
     pub status: BidStatus, // default: Active

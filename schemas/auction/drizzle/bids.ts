@@ -1,7 +1,7 @@
 // bids: Records placed on auctions, supporting proxy bidding and status tracking.
 // See README.md for full design rationale.
 
-import { pgTable, pgEnum, uuid, numeric, boolean, varchar, timestamp, index, unique } from "drizzle-orm/pg-core";
+import { pgTable, pgEnum, uuid, integer, boolean, varchar, timestamp, index, unique } from "drizzle-orm/pg-core";
 import { auctions } from "./auctions";
 import { users } from "../../auth-rbac/drizzle/users";
 
@@ -13,8 +13,8 @@ export const bids = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     auctionId: uuid("auction_id").notNull().references(() => auctions.id, { onDelete: "restrict" }),
     bidderId: uuid("bidder_id").notNull().references(() => users.id, { onDelete: "restrict" }),
-    amount: numeric("amount").notNull(),
-    maxAmount: numeric("max_amount"),
+    amount: integer("amount").notNull(),
+    maxAmount: integer("max_amount"),
     status: bidStatus("status").notNull().default("active"),
     isProxy: boolean("is_proxy").notNull().default(false),
     ipAddress: varchar("ip_address"),

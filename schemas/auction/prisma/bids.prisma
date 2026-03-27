@@ -13,8 +13,8 @@ model Bid {
   id             String         @id @default(uuid())
   auctionId      String         @map("auction_id")
   bidderId       String         @map("bidder_id")
-  amount         Decimal
-  maxAmount      Decimal?       @map("max_amount")
+  amount         Int
+  maxAmount      Int?           @map("max_amount")
   status         BidStatus      @default(ACTIVE)
   isProxy        Boolean        @default(false) @map("is_proxy")
   ipAddress      String?        @map("ip_address")

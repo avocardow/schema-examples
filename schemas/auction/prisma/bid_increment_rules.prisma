@@ -4,9 +4,9 @@
 model BidIncrementRule {
   id         String   @id @default(uuid())
   auctionId  String?  @map("auction_id")
-  minPrice   Decimal  @map("min_price")
-  maxPrice   Decimal? @map("max_price")
-  increment  Decimal
+  minPrice   Int      @map("min_price")
+  maxPrice   Int?     @map("max_price")
+  increment  Int
   createdAt  DateTime @default(now()) @map("created_at")
 
   auction Auction? @relation(fields: [auctionId], references: [id], onDelete: Cascade)

@@ -1,7 +1,7 @@
 // bid_increment_rules: Defines price-range-based bid increment tiers for auctions.
 // See README.md for full design rationale.
 
-import { pgTable, uuid, numeric, timestamp, index } from "drizzle-orm/pg-core";
+import { pgTable, uuid, integer, timestamp, index } from "drizzle-orm/pg-core";
 import { auctions } from "./auctions";
 
 export const bidIncrementRules = pgTable(
@@ -9,9 +9,9 @@ export const bidIncrementRules = pgTable(
   {
     id: uuid("id").primaryKey().defaultRandom(),
     auctionId: uuid("auction_id").references(() => auctions.id, { onDelete: "cascade" }),
-    minPrice: numeric("min_price").notNull(),
-    maxPrice: numeric("max_price"),
-    increment: numeric("increment").notNull(),
+    minPrice: integer("min_price").notNull(),
+    maxPrice: integer("max_price"),
+    increment: integer("increment").notNull(),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [

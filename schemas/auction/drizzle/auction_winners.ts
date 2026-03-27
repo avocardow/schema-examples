@@ -1,7 +1,7 @@
 // auction_winners: Records the winning outcome of each auction including settlement tracking.
 // See README.md for full design rationale.
 
-import { pgTable, pgEnum, uuid, numeric, timestamp, text, index } from "drizzle-orm/pg-core";
+import { pgTable, pgEnum, uuid, integer, timestamp, text, index } from "drizzle-orm/pg-core";
 import { auctions } from "./auctions";
 import { bids } from "./bids";
 import { users } from "../../auth-rbac/drizzle/users";
@@ -16,9 +16,9 @@ export const auctionWinners = pgTable(
     winningBidId: uuid("winning_bid_id").unique().notNull().references(() => bids.id, { onDelete: "restrict" }),
     winnerId: uuid("winner_id").notNull().references(() => users.id, { onDelete: "restrict" }),
     sellerId: uuid("seller_id").notNull().references(() => users.id, { onDelete: "restrict" }),
-    hammerPrice: numeric("hammer_price").notNull(),
-    buyerPremium: numeric("buyer_premium").notNull().default("0"),
-    totalPrice: numeric("total_price").notNull(),
+    hammerPrice: integer("hammer_price").notNull(),
+    buyerPremium: integer("buyer_premium").notNull().default(0),
+    totalPrice: integer("total_price").notNull(),
     settlementStatus: settlementStatus("settlement_status").notNull().default("pending"),
     paidAt: timestamp("paid_at", { withTimezone: true }),
     shippedAt: timestamp("shipped_at", { withTimezone: true }),

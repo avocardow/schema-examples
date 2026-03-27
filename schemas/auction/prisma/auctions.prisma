@@ -25,10 +25,10 @@ model Auction {
   status                 AuctionStatus  @default(DRAFT)
   title                  String
   description            String?
-  startingPrice          Decimal        @map("starting_price")
-  reservePrice           Decimal?       @map("reserve_price")
-  buyNowPrice            Decimal?       @map("buy_now_price")
-  currentPrice           Decimal        @default(0) @map("current_price")
+  startingPrice          Int            @map("starting_price")
+  reservePrice           Int?           @map("reserve_price")
+  buyNowPrice            Int?           @map("buy_now_price")
+  currentPrice           Int            @default(0) @map("current_price")
   bidCount               Int            @default(0) @map("bid_count")
   highestBidderId        String?        @map("highest_bidder_id")
   buyerPremiumPct        Decimal?       @map("buyer_premium_pct")
