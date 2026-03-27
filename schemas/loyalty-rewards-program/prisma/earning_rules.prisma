@@ -1,0 +1,33 @@
+// earning_rules: Rules defining how members earn points (event type, amount, conditions).
+// See README.md for full design rationale.
+
+enum EarningType {
+  fixed
+  per_currency
+  multiplier
+}
+
+model EarningRule {
+  id               String      @id @default(uuid())
+  programId        String      @map("program_id")
+  name             String
+  description      String?
+  eventType        String      @map("event_type")
+  earningType      EarningType @default(fixed) @map("earning_type")
+  pointsAmount     Int?        @map("points_amount")
+  multiplier       Decimal?
+  minPurchaseAmount Int?       @map("min_purchase_amount")
+  maxPointsPerEvent Int?       @map("max_points_per_event")
+  conditions       Json?
+  isActive         Boolean     @default(true) @map("is_active")
+  sortOrder        Int         @default(0) @map("sort_order")
+  createdAt        DateTime    @default(now()) @map("created_at")
+  updatedAt        DateTime    @default(now()) @map("updated_at")
+
+  program            LoyaltyProgram      @relation(fields: [programId], references: [id], onDelete: Cascade)
+  pointsTransactions PointsTransaction[]
+
+  @@index([programId, isActive])
+  @@index([eventType])
+  @@map("earning_rules")
+}

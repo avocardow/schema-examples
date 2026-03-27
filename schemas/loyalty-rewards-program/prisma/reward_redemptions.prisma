@@ -1,0 +1,33 @@
+// reward_redemptions: Records of members redeeming points for rewards with fulfillment lifecycle.
+// See README.md for full design rationale.
+
+enum RedemptionStatus {
+  pending
+  fulfilled
+  canceled
+  expired
+}
+
+model RewardRedemption {
+  id           String           @id @default(uuid())
+  memberId     String           @map("member_id")
+  rewardId     String           @map("reward_id")
+  pointsSpent  Int              @map("points_spent")
+  status       RedemptionStatus @default(pending)
+  couponCode   String?          @map("coupon_code")
+  fulfilledAt  DateTime?        @map("fulfilled_at")
+  canceledAt   DateTime?        @map("canceled_at")
+  expiresAt    DateTime?        @map("expires_at")
+  metadata     Json?
+  createdAt    DateTime         @default(now()) @map("created_at")
+  updatedAt    DateTime         @default(now()) @map("updated_at")
+
+  member             LoyaltyMember       @relation(fields: [memberId], references: [id], onDelete: Restrict)
+  reward             Reward              @relation(fields: [rewardId], references: [id], onDelete: Restrict)
+  pointsTransactions PointsTransaction[]
+
+  @@index([memberId, createdAt])
+  @@index([rewardId])
+  @@index([status])
+  @@map("reward_redemptions")
+}

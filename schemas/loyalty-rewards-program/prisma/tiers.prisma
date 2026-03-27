@@ -1,0 +1,37 @@
+// tiers: Tier/VIP level definitions with qualification thresholds and ordering.
+// See README.md for full design rationale.
+
+enum TierQualificationType {
+  points_earned
+  amount_spent
+  transaction_count
+}
+
+model Tier {
+  id                      String                 @id @default(uuid())
+  programId               String                 @map("program_id")
+  name                    String
+  slug                    String
+  description             String?
+  position                Int
+  qualificationType       TierQualificationType  @default(points_earned) @map("qualification_type")
+  qualificationValue      Int                    @map("qualification_value")
+  qualificationPeriodDays Int?                   @map("qualification_period_days")
+  retainDays              Int?                   @map("retain_days")
+  iconUrl                 String?                @map("icon_url")
+  color                   String?
+  isDefault               Boolean                @default(false) @map("is_default")
+  metadata                Json?
+  createdAt               DateTime               @default(now()) @map("created_at")
+  updatedAt               DateTime               @default(now()) @map("updated_at")
+
+  program     LoyaltyProgram @relation(fields: [programId], references: [id], onDelete: Cascade)
+  benefits    TierBenefit[]
+  memberTiers MemberTier[]
+  rewards     Reward[]
+
+  @@unique([programId, slug])
+  @@unique([programId, position])
+  @@index([isDefault])
+  @@map("tiers")
+}

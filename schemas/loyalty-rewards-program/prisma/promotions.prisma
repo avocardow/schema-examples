@@ -1,0 +1,40 @@
+// promotions: Time-limited bonus earning campaigns (multipliers, fixed bonuses).
+// See README.md for full design rationale.
+
+enum PromotionType {
+  multiplier
+  fixed_bonus
+}
+
+enum PromotionStatus {
+  scheduled
+  active
+  ended
+  canceled
+}
+
+model Promotion {
+  id                 String          @id @default(uuid())
+  programId          String          @map("program_id")
+  name               String
+  description        String?
+  promotionType      PromotionType   @default(multiplier) @map("promotion_type")
+  multiplier         Decimal?
+  bonusPoints        Int?            @map("bonus_points")
+  eventType          String?         @map("event_type")
+  conditions         Json?
+  status             PromotionStatus @default(scheduled)
+  startsAt           DateTime        @map("starts_at")
+  endsAt             DateTime        @map("ends_at")
+  maxPointsPerMember Int?            @map("max_points_per_member")
+  createdAt          DateTime        @default(now()) @map("created_at")
+  updatedAt          DateTime        @default(now()) @map("updated_at")
+
+  program            LoyaltyProgram      @relation(fields: [programId], references: [id], onDelete: Cascade)
+  pointsTransactions PointsTransaction[]
+
+  @@index([programId, status])
+  @@index([status])
+  @@index([startsAt, endsAt])
+  @@map("promotions")
+}

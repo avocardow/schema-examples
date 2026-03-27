@@ -1,0 +1,41 @@
+// points_transactions: Immutable ledger of every point movement (earn, redeem, expire, adjust).
+// See README.md for full design rationale.
+
+enum PointsTransactionType {
+  earn
+  redeem
+  expire
+  adjust
+  bonus
+}
+
+model PointsTransaction {
+  id                  String                @id @default(uuid())
+  memberId            String                @map("member_id")
+  type                PointsTransactionType
+  points              Int
+  balanceAfter        Int                   @map("balance_after")
+  description         String?
+  sourceReferenceType String?               @map("source_reference_type")
+  sourceReferenceId   String?               @map("source_reference_id")
+  earningRuleId       String?               @map("earning_rule_id")
+  promotionId         String?               @map("promotion_id")
+  redemptionId        String?               @map("redemption_id")
+  expiresAt           DateTime?             @map("expires_at")
+  isPending           Boolean               @default(false) @map("is_pending")
+  confirmedAt         DateTime?             @map("confirmed_at")
+  createdAt           DateTime              @default(now()) @map("created_at")
+
+  member           LoyaltyMember     @relation(fields: [memberId], references: [id], onDelete: Restrict)
+  earningRule      EarningRule?       @relation(fields: [earningRuleId], references: [id], onDelete: SetNull)
+  promotion        Promotion?         @relation(fields: [promotionId], references: [id], onDelete: SetNull)
+  redemption       RewardRedemption?  @relation(fields: [redemptionId], references: [id], onDelete: SetNull)
+  memberActivities MemberActivity[]
+
+  @@index([memberId, createdAt])
+  @@index([type])
+  @@index([expiresAt])
+  @@index([isPending])
+  @@index([sourceReferenceType, sourceReferenceId])
+  @@map("points_transactions")
+}

@@ -1,0 +1,39 @@
+// loyalty_members: Enrollment of a user in a loyalty program with cached point balances.
+// See README.md for full design rationale.
+
+enum LoyaltyMemberStatus {
+  active
+  suspended
+  banned
+}
+
+model LoyaltyMember {
+  id             String              @id @default(uuid())
+  programId      String              @map("program_id")
+  userId         String              @map("user_id")
+  memberNumber   String              @unique @map("member_number")
+  status         LoyaltyMemberStatus @default(active)
+  pointsBalance  Int                 @default(0) @map("points_balance")
+  pointsPending  Int                 @default(0) @map("points_pending")
+  lifetimePoints Int                 @default(0) @map("lifetime_points")
+  pointsRedeemed Int                 @default(0) @map("points_redeemed")
+  pointsExpired  Int                 @default(0) @map("points_expired")
+  enrolledAt     DateTime            @default(now()) @map("enrolled_at")
+  suspendedAt    DateTime?           @map("suspended_at")
+  metadata       Json?               @default("{}")
+  createdAt      DateTime            @default(now()) @map("created_at")
+  updatedAt      DateTime            @default(now()) @map("updated_at")
+
+  program            LoyaltyProgram      @relation(fields: [programId], references: [id], onDelete: Cascade)
+  user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pointsTransactions PointsTransaction[]
+  rewardRedemptions  RewardRedemption[]
+  memberTiers        MemberTier[]
+  memberActivities   MemberActivity[]
+
+  @@unique([programId, userId])
+  @@index([userId])
+  @@index([status])
+  @@index([pointsBalance])
+  @@map("loyalty_members")
+}

@@ -1,0 +1,27 @@
+// member_activities: Log of member actions that may trigger earning rules.
+// See README.md for full design rationale.
+
+model MemberActivity {
+  id            String    @id @default(uuid())
+  memberId      String    @map("member_id")
+  activityType  String    @map("activity_type")
+  description   String?
+  source        String?
+  referenceType String?   @map("reference_type")
+  referenceId   String?   @map("reference_id")
+  monetaryValue Int?      @map("monetary_value")
+  currency      String?
+  pointsAwarded Int?      @map("points_awarded")
+  transactionId String?   @map("transaction_id")
+  metadata      Json?
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  member      LoyaltyMember      @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  transaction PointsTransaction? @relation(fields: [transactionId], references: [id], onDelete: SetNull)
+
+  @@index([memberId, createdAt])
+  @@index([activityType])
+  @@index([referenceType, referenceId])
+  @@index([transactionId])
+  @@map("member_activities")
+}

@@ -1,0 +1,24 @@
+// member_tiers: Assignment of members to tiers with temporal tracking and history.
+// See README.md for full design rationale.
+
+model MemberTier {
+  id                    String    @id @default(uuid())
+  memberId              String    @map("member_id")
+  tierId                String    @map("tier_id")
+  isCurrent             Boolean   @default(true) @map("is_current")
+  startedAt             DateTime  @default(now()) @map("started_at")
+  endsAt                DateTime? @map("ends_at")
+  endedAt               DateTime? @map("ended_at")
+  qualificationSnapshot Json?     @map("qualification_snapshot")
+  isManual              Boolean   @default(false) @map("is_manual")
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @default(now()) @map("updated_at")
+
+  member LoyaltyMember @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  tier   Tier          @relation(fields: [tierId], references: [id], onDelete: Cascade)
+
+  @@index([memberId, isCurrent])
+  @@index([tierId])
+  @@index([endsAt])
+  @@map("member_tiers")
+}

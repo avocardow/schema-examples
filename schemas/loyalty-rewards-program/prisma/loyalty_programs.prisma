@@ -1,0 +1,39 @@
+// loyalty_programs: Top-level loyalty program configuration with currency, earning, and expiration settings.
+// See README.md for full design rationale.
+
+enum LoyaltyProgramStatus {
+  draft
+  active
+  paused
+  archived
+}
+
+model LoyaltyProgram {
+  id               String               @id @default(uuid())
+  name             String
+  slug             String               @unique
+  description      String?
+  status           LoyaltyProgramStatus @default(draft)
+  currencyName     String               @default("points") @map("currency_name")
+  pointsPerCurrency Decimal             @default(1) @map("points_per_currency")
+  currency         String?
+  pointsExpiryDays Int?                 @map("points_expiry_days")
+  allowNegative    Boolean              @default(false) @map("allow_negative")
+  isPublic         Boolean              @default(true) @map("is_public")
+  termsUrl         String?              @map("terms_url")
+  metadata         Json?                @default("{}")
+  createdBy        String               @map("created_by")
+  createdAt        DateTime             @default(now()) @map("created_at")
+  updatedAt        DateTime             @default(now()) @map("updated_at")
+
+  creator      User              @relation("LoyaltyProgramCreator", fields: [createdBy], references: [id], onDelete: Restrict)
+  members      LoyaltyMember[]
+  earningRules EarningRule[]
+  promotions   Promotion[]
+  rewards      Reward[]
+  tiers        Tier[]
+
+  @@index([status])
+  @@index([createdBy])
+  @@map("loyalty_programs")
+}

@@ -1,0 +1,43 @@
+// rewards: Catalog of available rewards with points cost and inventory tracking.
+// See README.md for full design rationale.
+
+enum RewardType {
+  discount_percentage
+  discount_fixed
+  free_product
+  free_shipping
+  gift_card
+  experience
+  custom
+}
+
+model Reward {
+  id                      String     @id @default(uuid())
+  programId               String     @map("program_id")
+  name                    String
+  description             String?
+  rewardType              RewardType @map("reward_type")
+  pointsCost              Int        @map("points_cost")
+  rewardValue             Int?       @map("reward_value")
+  currency                String?
+  imageUrl                String?    @map("image_url")
+  inventory               Int?
+  maxRedemptionsPerMember Int?       @map("max_redemptions_per_member")
+  isActive                Boolean    @default(true) @map("is_active")
+  minTierId               String?    @map("min_tier_id")
+  metadata                Json?
+  sortOrder               Int        @default(0) @map("sort_order")
+  validFrom               DateTime?  @map("valid_from")
+  validUntil              DateTime?  @map("valid_until")
+  createdAt               DateTime   @default(now()) @map("created_at")
+  updatedAt               DateTime   @default(now()) @map("updated_at")
+
+  program    LoyaltyProgram     @relation(fields: [programId], references: [id], onDelete: Cascade)
+  minTier    Tier?              @relation(fields: [minTierId], references: [id], onDelete: SetNull)
+  redemptions RewardRedemption[]
+
+  @@index([programId, isActive])
+  @@index([rewardType])
+  @@index([minTierId])
+  @@map("rewards")
+}
