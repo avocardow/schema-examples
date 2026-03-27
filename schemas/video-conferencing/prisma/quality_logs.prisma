@@ -1,0 +1,25 @@
+// quality_logs: Network and media quality metrics sampled during meetings.
+// See README.md for full design rationale.
+
+model QualityLog {
+  id            String   @id @default(uuid())
+  meetingId     String   @map("meeting_id")
+  participantId String   @map("participant_id")
+  bitrateKbps   Int?     @map("bitrate_kbps")
+  packetLossPct Decimal? @map("packet_loss_pct")
+  jitterMs      Int?     @map("jitter_ms")
+  roundTripMs   Int?     @map("round_trip_ms")
+  videoWidth    Int?     @map("video_width")
+  videoHeight   Int?     @map("video_height")
+  framerate     Int?     @map("framerate")
+  qualityScore  Decimal? @map("quality_score")
+  loggedAt      DateTime @default(now()) @map("logged_at")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  meeting     Meeting            @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  participant MeetingParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+
+  @@index([meetingId, loggedAt])
+  @@index([participantId, loggedAt])
+  @@map("quality_logs")
+}

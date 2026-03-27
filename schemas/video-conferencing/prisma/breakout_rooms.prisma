@@ -1,0 +1,26 @@
+// breakout_rooms: Smaller sub-rooms within a meeting for group activities.
+// See README.md for full design rationale.
+
+enum BreakoutRoomStatus {
+  pending
+  open
+  closed
+}
+
+model BreakoutRoom {
+  id        String             @id @default(uuid())
+  meetingId String             @map("meeting_id")
+  name      String             @map("name")
+  position  Int                @default(0) @map("position")
+  status    BreakoutRoomStatus @default(pending) @map("status")
+  openedAt  DateTime?          @map("opened_at")
+  closedAt  DateTime?          @map("closed_at")
+  createdAt DateTime           @default(now()) @map("created_at")
+  updatedAt DateTime           @default(now()) @map("updated_at")
+
+  meeting Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+
+  @@index([meetingId, position])
+  @@index([meetingId, status])
+  @@map("breakout_rooms")
+}

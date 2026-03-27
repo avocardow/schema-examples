@@ -1,0 +1,29 @@
+// transcripts: Meeting transcription jobs with status tracking.
+// See README.md for full design rationale.
+
+enum TranscriptStatus {
+  processing
+  ready
+  failed
+}
+
+model Transcript {
+  id           String           @id @default(uuid())
+  meetingId    String           @map("meeting_id")
+  language     String           @default("en") @map("language")
+  status       TranscriptStatus @default(processing) @map("status")
+  startedBy    String?          @map("started_by")
+  segmentCount Int              @default(0) @map("segment_count")
+  startedAt    DateTime         @default(now()) @map("started_at")
+  completedAt  DateTime?        @map("completed_at")
+  createdAt    DateTime         @default(now()) @map("created_at")
+  updatedAt    DateTime         @default(now()) @map("updated_at")
+
+  meeting  Meeting             @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  starter  User?               @relation("TranscriptStarter", fields: [startedBy], references: [id], onDelete: SetNull)
+  segments TranscriptSegment[]
+
+  @@index([meetingId])
+  @@index([status])
+  @@map("transcripts")
+}

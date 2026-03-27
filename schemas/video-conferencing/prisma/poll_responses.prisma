@@ -1,0 +1,18 @@
+// poll_responses: Individual user responses to meeting polls.
+// See README.md for full design rationale.
+
+model PollResponse {
+  id              String   @id @default(uuid())
+  pollId          String   @map("poll_id")
+  userId          String   @map("user_id")
+  selectedOptions Json     @map("selected_options")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @default(now()) @map("updated_at")
+
+  poll MeetingPoll @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  user User        @relation("PollResponseUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([pollId, userId])
+  @@index([userId])
+  @@map("poll_responses")
+}

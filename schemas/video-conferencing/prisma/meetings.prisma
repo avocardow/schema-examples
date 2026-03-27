@@ -1,0 +1,46 @@
+// meetings: Scheduled or live video conference sessions within rooms.
+// See README.md for full design rationale.
+
+enum MeetingStatus {
+  scheduled
+  live
+  ended
+  cancelled
+}
+
+model Meeting {
+  id                String        @id @default(uuid())
+  roomId            String        @map("room_id")
+  title             String?       @map("title")
+  status            MeetingStatus @default(scheduled) @map("status")
+  scheduledStart    DateTime?     @map("scheduled_start")
+  scheduledEnd      DateTime?     @map("scheduled_end")
+  actualStart       DateTime?     @map("actual_start")
+  actualEnd         DateTime?     @map("actual_end")
+  maxParticipants   Int?          @map("max_participants")
+  enableWaitingRoom Boolean?      @map("enable_waiting_room")
+  hostId            String        @map("host_id")
+  participantCount  Int           @default(0) @map("participant_count")
+  createdAt         DateTime      @default(now()) @map("created_at")
+  updatedAt         DateTime      @default(now()) @map("updated_at")
+
+  room               Room                 @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  host               User                 @relation("MeetingHost", fields: [hostId], references: [id], onDelete: Restrict)
+  participants       MeetingParticipant[]
+  invitations        MeetingInvitation[]
+  recordings         Recording[]
+  chatMessages       MeetingChatMessage[]
+  breakoutRooms      BreakoutRoom[]
+  waitingRoomEntries WaitingRoomEntry[]
+  polls              MeetingPoll[]
+  reactions          MeetingReaction[]
+  transcripts        Transcript[]
+  qualityLogs        QualityLog[]
+
+  @@index([roomId, scheduledStart])
+  @@index([hostId])
+  @@index([status])
+  @@index([scheduledStart])
+  @@index([actualStart])
+  @@map("meetings")
+}

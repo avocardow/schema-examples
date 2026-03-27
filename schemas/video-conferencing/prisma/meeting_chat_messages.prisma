@@ -1,0 +1,19 @@
+// meeting_chat_messages: In-meeting chat messages between participants.
+// See README.md for full design rationale.
+
+model MeetingChatMessage {
+  id          String   @id @default(uuid())
+  meetingId   String   @map("meeting_id")
+  senderId    String?  @map("sender_id")
+  recipientId String?  @map("recipient_id")
+  content     String   @map("content")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  meeting   Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  sender    User?   @relation("ChatMessageSender", fields: [senderId], references: [id], onDelete: SetNull)
+  recipient User?   @relation("ChatMessageRecipient", fields: [recipientId], references: [id], onDelete: SetNull)
+
+  @@index([meetingId, createdAt])
+  @@index([senderId])
+  @@map("meeting_chat_messages")
+}

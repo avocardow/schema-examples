@@ -1,0 +1,42 @@
+// recordings: Video and audio recordings captured during meetings.
+// See README.md for full design rationale.
+
+enum RecordingType {
+  composite
+  audio_only
+  video_only
+  screen_share
+}
+
+enum RecordingStatus {
+  recording
+  processing
+  ready
+  failed
+  deleted
+}
+
+model Recording {
+  id              String          @id @default(uuid())
+  meetingId       String          @map("meeting_id")
+  fileId          String?         @map("file_id")
+  type            RecordingType   @default(composite) @map("type")
+  status          RecordingStatus @default(recording) @map("status")
+  durationSeconds Int?            @map("duration_seconds")
+  fileSize        BigInt?         @map("file_size")
+  startedAt       DateTime        @default(now()) @map("started_at")
+  endedAt         DateTime?       @map("ended_at")
+  startedBy       String?         @map("started_by")
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @default(now()) @map("updated_at")
+
+  meeting      Meeting                @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  file         File?                  @relation(fields: [fileId], references: [id], onDelete: SetNull)
+  starter      User?                  @relation("RecordingStarter", fields: [startedBy], references: [id], onDelete: SetNull)
+  accessGrants RecordingAccessGrant[]
+
+  @@index([meetingId])
+  @@index([status])
+  @@index([startedBy])
+  @@map("recordings")
+}

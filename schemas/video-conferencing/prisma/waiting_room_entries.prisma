@@ -1,0 +1,28 @@
+// waiting_room_entries: Users waiting to be admitted into a meeting.
+// See README.md for full design rationale.
+
+enum WaitingRoomStatus {
+  waiting
+  admitted
+  rejected
+}
+
+model WaitingRoomEntry {
+  id          String            @id @default(uuid())
+  meetingId   String            @map("meeting_id")
+  userId      String?           @map("user_id")
+  displayName String            @map("display_name")
+  status      WaitingRoomStatus @default(waiting) @map("status")
+  admittedBy  String?           @map("admitted_by")
+  respondedAt DateTime?         @map("responded_at")
+  createdAt   DateTime          @default(now()) @map("created_at")
+  updatedAt   DateTime          @default(now()) @map("updated_at")
+
+  meeting  Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  user     User?   @relation("WaitingRoomUser", fields: [userId], references: [id], onDelete: Cascade)
+  admitter User?   @relation("WaitingRoomAdmitter", fields: [admittedBy], references: [id], onDelete: SetNull)
+
+  @@index([meetingId, status])
+  @@index([meetingId, createdAt])
+  @@map("waiting_room_entries")
+}

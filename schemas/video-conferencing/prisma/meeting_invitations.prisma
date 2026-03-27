@@ -1,0 +1,30 @@
+// meeting_invitations: Invitations sent to users for upcoming meetings.
+// See README.md for full design rationale.
+
+enum InvitationStatus {
+  pending
+  accepted
+  declined
+  tentative
+}
+
+model MeetingInvitation {
+  id          String           @id @default(uuid())
+  meetingId   String           @map("meeting_id")
+  inviterId   String           @map("inviter_id")
+  inviteeId   String           @map("invitee_id")
+  status      InvitationStatus @default(pending) @map("status")
+  respondedAt DateTime?        @map("responded_at")
+  message     String?          @map("message")
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @default(now()) @map("updated_at")
+
+  meeting Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  inviter User    @relation("MeetingInvitationInviter", fields: [inviterId], references: [id], onDelete: Cascade)
+  invitee User    @relation("MeetingInvitationInvitee", fields: [inviteeId], references: [id], onDelete: Cascade)
+
+  @@unique([meetingId, inviteeId])
+  @@index([inviteeId, status])
+  @@index([meetingId, status])
+  @@map("meeting_invitations")
+}

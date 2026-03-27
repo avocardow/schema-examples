@@ -1,0 +1,34 @@
+// rooms: Virtual meeting rooms with configurable settings.
+// See README.md for full design rationale.
+
+enum RoomType {
+  permanent
+  temporary
+}
+
+model Room {
+  id                   String   @id @default(uuid())
+  name                 String   @map("name")
+  slug                 String   @unique @map("slug")
+  description          String?  @map("description")
+  type                 RoomType @default(permanent) @map("type")
+  maxParticipants      Int?     @map("max_participants")
+  enableWaitingRoom    Boolean  @default(false) @map("enable_waiting_room")
+  enableRecording      Boolean  @default(false) @map("enable_recording")
+  enableChat           Boolean  @default(true) @map("enable_chat")
+  enableTranscription  Boolean  @default(false) @map("enable_transcription")
+  enableBreakoutRooms  Boolean  @default(false) @map("enable_breakout_rooms")
+  isPrivate            Boolean  @default(false) @map("is_private")
+  passwordHash         String?  @map("password_hash")
+  createdBy            String   @map("created_by")
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @default(now()) @map("updated_at")
+
+  creator  User      @relation("RoomCreator", fields: [createdBy], references: [id], onDelete: Restrict)
+  meetings Meeting[]
+
+  @@index([createdBy])
+  @@index([type])
+  @@index([isPrivate])
+  @@map("rooms")
+}

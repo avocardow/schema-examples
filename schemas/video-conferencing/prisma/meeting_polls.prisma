@@ -1,0 +1,35 @@
+// meeting_polls: Polls created during meetings for audience engagement.
+// See README.md for full design rationale.
+
+enum PollType {
+  single_choice
+  multiple_choice
+}
+
+enum PollStatus {
+  draft
+  active
+  closed
+}
+
+model MeetingPoll {
+  id         String     @id @default(uuid())
+  meetingId  String     @map("meeting_id")
+  createdBy  String     @map("created_by")
+  question   String     @map("question")
+  options    Json       @map("options")
+  pollType   PollType   @default(single_choice) @map("poll_type")
+  status     PollStatus @default(draft) @map("status")
+  launchedAt DateTime?  @map("launched_at")
+  closedAt   DateTime?  @map("closed_at")
+  createdAt  DateTime   @default(now()) @map("created_at")
+  updatedAt  DateTime   @default(now()) @map("updated_at")
+
+  meeting   Meeting        @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  creator   User           @relation("MeetingPollCreator", fields: [createdBy], references: [id], onDelete: Cascade)
+  responses PollResponse[]
+
+  @@index([meetingId, status])
+  @@index([meetingId, createdAt])
+  @@map("meeting_polls")
+}

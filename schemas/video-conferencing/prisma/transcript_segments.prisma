@@ -1,0 +1,23 @@
+// transcript_segments: Individual spoken segments within a transcript.
+// See README.md for full design rationale.
+
+model TranscriptSegment {
+  id           String   @id @default(uuid())
+  transcriptId String   @map("transcript_id")
+  speakerId    String?  @map("speaker_id")
+  content      String   @map("content")
+  speakerName  String?  @map("speaker_name")
+  startMs      Int      @map("start_ms")
+  endMs        Int      @map("end_ms")
+  position     Int      @map("position")
+  confidence   Decimal? @map("confidence")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  transcript Transcript @relation(fields: [transcriptId], references: [id], onDelete: Cascade)
+  speaker    User?      @relation("TranscriptSegmentSpeaker", fields: [speakerId], references: [id], onDelete: SetNull)
+
+  @@index([transcriptId, position])
+  @@index([transcriptId, startMs])
+  @@index([speakerId])
+  @@map("transcript_segments")
+}

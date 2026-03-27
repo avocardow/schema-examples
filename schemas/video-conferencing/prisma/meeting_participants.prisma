@@ -1,0 +1,35 @@
+// meeting_participants: Tracks users who join meetings with their roles and media state.
+// See README.md for full design rationale.
+
+enum ParticipantRole {
+  host
+  co_host
+  moderator
+  attendee
+  viewer
+}
+
+model MeetingParticipant {
+  id              String          @id @default(uuid())
+  meetingId       String          @map("meeting_id")
+  userId          String?         @map("user_id")
+  displayName     String          @map("display_name")
+  role            ParticipantRole @default(attendee) @map("role")
+  joinedAt        DateTime        @default(now()) @map("joined_at")
+  leftAt          DateTime?       @map("left_at")
+  durationSeconds Int?            @map("duration_seconds")
+  isCameraOn      Boolean         @default(false) @map("is_camera_on")
+  isMicOn         Boolean         @default(false) @map("is_mic_on")
+  isScreenSharing Boolean         @default(false) @map("is_screen_sharing")
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @default(now()) @map("updated_at")
+
+  meeting     Meeting      @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  user        User?        @relation("MeetingParticipantUser", fields: [userId], references: [id], onDelete: SetNull)
+  qualityLogs QualityLog[]
+
+  @@unique([meetingId, userId])
+  @@index([userId])
+  @@index([meetingId, joinedAt])
+  @@map("meeting_participants")
+}

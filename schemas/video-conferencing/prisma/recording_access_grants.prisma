@@ -1,0 +1,25 @@
+// recording_access_grants: Grants specific users permission to view or download recordings.
+// See README.md for full design rationale.
+
+enum RecordingPermission {
+  view
+  download
+}
+
+model RecordingAccessGrant {
+  id          String              @id @default(uuid())
+  recordingId String              @map("recording_id")
+  grantedTo   String              @map("granted_to")
+  grantedBy   String              @map("granted_by")
+  permission  RecordingPermission @default(view) @map("permission")
+  expiresAt   DateTime?           @map("expires_at")
+  createdAt   DateTime            @default(now()) @map("created_at")
+
+  recording Recording @relation(fields: [recordingId], references: [id], onDelete: Cascade)
+  grantee   User      @relation("RecordingAccessGrantee", fields: [grantedTo], references: [id], onDelete: Cascade)
+  granter   User      @relation("RecordingAccessGranter", fields: [grantedBy], references: [id], onDelete: Cascade)
+
+  @@unique([recordingId, grantedTo])
+  @@index([grantedTo])
+  @@map("recording_access_grants")
+}

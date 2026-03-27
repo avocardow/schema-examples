@@ -1,0 +1,17 @@
+// meeting_reactions: Real-time emoji reactions during meetings.
+// See README.md for full design rationale.
+
+model MeetingReaction {
+  id        String   @id @default(uuid())
+  meetingId String   @map("meeting_id")
+  userId    String   @map("user_id")
+  emoji     String   @map("emoji")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  meeting Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  user    User    @relation("MeetingReactionUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([meetingId, createdAt])
+  @@index([meetingId, emoji])
+  @@map("meeting_reactions")
+}
