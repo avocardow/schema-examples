@@ -1,0 +1,57 @@
+// campaigns: Email campaigns with scheduling, A/B testing, and delivery tracking.
+// See README.md for full design rationale.
+
+enum CampaignStatus {
+  draft
+  scheduled
+  sending
+  paused
+  cancelled
+  sent
+}
+
+enum CampaignType {
+  regular
+  ab_test
+}
+
+enum AbTestMetric {
+  open_rate
+  click_rate
+}
+
+model Campaign {
+  id               String         @id @default(uuid())
+  name             String         @map("name")
+  subject          String?        @map("subject")
+  fromName         String?        @map("from_name")
+  fromEmail        String?        @map("from_email")
+  replyTo          String?        @map("reply_to")
+  templateId       String?        @map("template_id")
+  htmlBody         String?        @map("html_body")
+  textBody         String?        @map("text_body")
+  status           CampaignStatus @default(draft) @map("status")
+  campaignType     CampaignType   @default(regular) @map("campaign_type")
+  scheduledAt      DateTime?      @map("scheduled_at")
+  sentAt           DateTime?      @map("sent_at")
+  abTestWinnerId   String?        @map("ab_test_winner_id")
+  abTestSamplePct  Int?           @map("ab_test_sample_pct")
+  abTestMetric     AbTestMetric?  @map("ab_test_metric")
+  createdBy        String?        @map("created_by")
+  createdAt        DateTime       @default(now()) @map("created_at")
+  updatedAt        DateTime       @default(now()) @map("updated_at")
+
+  template          Template?          @relation(fields: [templateId], references: [id], onDelete: SetNull)
+  creator           User?              @relation("CampaignCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+  recipients        CampaignRecipient[]
+  sends             CampaignSend[]
+  links             CampaignLink[]
+  suppressionEntries SuppressionEntry[]
+
+  @@index([status])
+  @@index([campaignType])
+  @@index([templateId])
+  @@index([scheduledAt])
+  @@index([createdAt])
+  @@map("campaigns")
+}

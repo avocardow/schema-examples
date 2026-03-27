@@ -1,0 +1,18 @@
+// segments: Dynamic contact groups defined by filter criteria.
+// See README.md for full design rationale.
+
+model Segment {
+  id             String   @id @default(uuid())
+  name           String   @map("name")
+  description    String?  @map("description")
+  filterCriteria Json     @map("filter_criteria")
+  createdBy      String?  @map("created_by")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @default(now()) @map("updated_at")
+
+  creator           User?              @relation("SegmentCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+  campaignRecipients CampaignRecipient[]
+
+  @@index([createdBy])
+  @@map("segments")
+}

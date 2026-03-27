@@ -1,0 +1,27 @@
+// campaign_events: Records engagement events (opens, clicks, bounces) per send.
+// See README.md for full design rationale.
+
+enum CampaignEventType {
+  open
+  click
+  bounce
+  complaint
+  unsubscribe
+}
+
+model CampaignEvent {
+  id         String            @id @default(uuid())
+  sendId     String            @map("send_id")
+  eventType  CampaignEventType @map("event_type")
+  linkId     String?           @map("link_id")
+  metadata   Json?             @map("metadata")
+  occurredAt DateTime          @default(now()) @map("occurred_at")
+
+  send CampaignSend @relation(fields: [sendId], references: [id], onDelete: Cascade)
+  link CampaignLink? @relation(fields: [linkId], references: [id], onDelete: SetNull)
+
+  @@index([sendId])
+  @@index([eventType])
+  @@index([occurredAt])
+  @@map("campaign_events")
+}

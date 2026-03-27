@@ -1,0 +1,30 @@
+// automation_enrollments: Tracks contact progress through automation workflows.
+// See README.md for full design rationale.
+
+enum AutomationEnrollmentStatus {
+  active
+  completed
+  paused
+  exited
+}
+
+model AutomationEnrollment {
+  id            String                     @id @default(uuid())
+  workflowId    String                     @map("workflow_id")
+  contactId     String                     @map("contact_id")
+  currentStepId String?                    @map("current_step_id")
+  status        AutomationEnrollmentStatus @default(active) @map("status")
+  enrolledAt    DateTime                   @default(now()) @map("enrolled_at")
+  completedAt   DateTime?                  @map("completed_at")
+  createdAt     DateTime                   @default(now()) @map("created_at")
+  updatedAt     DateTime                   @default(now()) @map("updated_at")
+
+  workflow    AutomationWorkflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  contact     Contact            @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  currentStep AutomationStep?    @relation(fields: [currentStepId], references: [id], onDelete: SetNull)
+
+  @@unique([workflowId, contactId])
+  @@index([contactId])
+  @@index([status])
+  @@map("automation_enrollments")
+}

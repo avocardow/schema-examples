@@ -1,0 +1,18 @@
+// contact_lists: Named lists for organizing and grouping contacts.
+// See README.md for full design rationale.
+
+model ContactList {
+  id          String   @id @default(uuid())
+  name        String   @map("name")
+  description String?  @map("description")
+  createdBy   String?  @map("created_by")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @map("updated_at")
+
+  creator           User?              @relation("ListCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+  members           ContactListMember[]
+  campaignRecipients CampaignRecipient[]
+
+  @@index([createdBy])
+  @@map("contact_lists")
+}

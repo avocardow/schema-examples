@@ -1,0 +1,31 @@
+// contacts: Stores email contacts with subscription status and metadata.
+// See README.md for full design rationale.
+
+enum ContactStatus {
+  active
+  unsubscribed
+  bounced
+  complained
+}
+
+model Contact {
+  id        String   @id @default(uuid())
+  email     String   @unique @map("email")
+  firstName String?  @map("first_name")
+  lastName  String?  @map("last_name")
+  status    ContactStatus @default(active) @map("status")
+  metadata  Json?    @default("{}") @map("metadata")
+  createdBy String?  @map("created_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  creator              User?                  @relation("ContactCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+  listMembers          ContactListMember[]
+  tagAssignments       ContactTagAssignment[]
+  campaignSends        CampaignSend[]
+  automationEnrollments AutomationEnrollment[]
+
+  @@index([status])
+  @@index([createdAt])
+  @@map("contacts")
+}

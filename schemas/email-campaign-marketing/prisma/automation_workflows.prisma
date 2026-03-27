@@ -1,0 +1,29 @@
+// automation_workflows: Defines triggered email automation sequences.
+// See README.md for full design rationale.
+
+enum AutomationTriggerType {
+  list_join
+  tag_added
+  manual
+  event
+}
+
+model AutomationWorkflow {
+  id            String               @id @default(uuid())
+  name          String               @map("name")
+  description   String?              @map("description")
+  triggerType   AutomationTriggerType @map("trigger_type")
+  triggerConfig Json?                @default("{}") @map("trigger_config")
+  isActive      Boolean              @default(true) @map("is_active")
+  createdBy     String?              @map("created_by")
+  createdAt     DateTime             @default(now()) @map("created_at")
+  updatedAt     DateTime             @default(now()) @map("updated_at")
+
+  creator     User?                  @relation("WorkflowCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+  steps       AutomationStep[]
+  enrollments AutomationEnrollment[]
+
+  @@index([isActive])
+  @@index([triggerType])
+  @@map("automation_workflows")
+}

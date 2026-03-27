@@ -1,0 +1,16 @@
+// campaign_links: Tracked URLs embedded in campaign emails for click analytics.
+// See README.md for full design rationale.
+
+model CampaignLink {
+  id          String   @id @default(uuid())
+  campaignId  String   @map("campaign_id")
+  originalUrl String   @map("original_url")
+  position    Int?     @map("position")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  campaign Campaign       @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  events   CampaignEvent[]
+
+  @@unique([campaignId, originalUrl])
+  @@map("campaign_links")
+}

@@ -1,0 +1,22 @@
+// templates: Reusable email templates with HTML/text bodies and sender defaults.
+// See README.md for full design rationale.
+
+model Template {
+  id        String   @id @default(uuid())
+  name      String   @map("name")
+  subject   String?  @map("subject")
+  htmlBody  String?  @map("html_body")
+  textBody  String?  @map("text_body")
+  fromName  String?  @map("from_name")
+  fromEmail String?  @map("from_email")
+  createdBy String?  @map("created_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  creator         User?            @relation("TemplateCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+  campaigns       Campaign[]
+  automationSteps AutomationStep[]
+
+  @@index([createdBy])
+  @@map("templates")
+}

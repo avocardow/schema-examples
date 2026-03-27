@@ -1,0 +1,19 @@
+// campaign_recipients: Links campaigns to target lists and segments.
+// See README.md for full design rationale.
+
+model CampaignRecipient {
+  id         String   @id @default(uuid())
+  campaignId String   @map("campaign_id")
+  listId     String?  @map("list_id")
+  segmentId  String?  @map("segment_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  campaign Campaign     @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  list     ContactList? @relation(fields: [listId], references: [id], onDelete: Cascade)
+  segment  Segment?     @relation(fields: [segmentId], references: [id], onDelete: Cascade)
+
+  @@index([campaignId])
+  @@index([listId])
+  @@index([segmentId])
+  @@map("campaign_recipients")
+}

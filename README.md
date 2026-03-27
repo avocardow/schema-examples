@@ -1,6 +1,6 @@
 # Schema Examples
 
-A growing collection of production-ready database schema examples across multiple formats — with explanations and best practices. Twenty-four domains complete (auth, notifications, file management, i18n, analytics, content moderation, e-commerce, marketplace, auction, CMS/blog, messaging/chat, social media, video conferencing, booking/scheduling, project management, CRM, helpdesk/customer support, SaaS/multi-tenant, subscription/membership, HR/payroll, compliance/GRC, event management/ticketing, affiliate/referral program, loyalty/rewards program), with 33 more planned.
+A growing collection of production-ready database schema examples across multiple formats — with explanations and best practices. Twenty-five domains complete (auth, notifications, file management, i18n, analytics, content moderation, e-commerce, marketplace, auction, CMS/blog, messaging/chat, social media, video conferencing, booking/scheduling, project management, CRM, helpdesk/customer support, SaaS/multi-tenant, subscription/membership, HR/payroll, compliance/GRC, event management/ticketing, affiliate/referral program, loyalty/rewards program, email/campaign marketing), with 32 more planned.
 
 **Copy. Learn. Contribute. Ship.**
 
@@ -59,7 +59,7 @@ See each domain's **Dependencies** section for details.
 | [Social Media](./schemas/social-media)                           |     18 | ✅     |
 | [Messaging / Chat](./schemas/messaging-chat)                     |     12 | ✅     |
 | [Video Conferencing](./schemas/video-conferencing)               |     15 | ✅     |
-| [Email / Campaign Marketing](./schemas/email-campaign-marketing) |        | 🔲     |
+| [Email / Campaign Marketing](./schemas/email-campaign-marketing) |     16 | ✅     |
 
 ### Content & Media
 

@@ -1,0 +1,16 @@
+// tags: Labels for categorizing and filtering contacts.
+// See README.md for full design rationale.
+
+model Tag {
+  id          String   @id @default(uuid())
+  name        String   @unique @map("name")
+  description String?  @map("description")
+  createdBy   String?  @map("created_by")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @map("updated_at")
+
+  creator            User?                  @relation("TagCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+  contactAssignments ContactTagAssignment[]
+
+  @@map("tags")
+}

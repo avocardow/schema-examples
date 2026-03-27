@@ -1,0 +1,24 @@
+// suppression_entries: Global suppression list preventing emails to problematic addresses.
+// See README.md for full design rationale.
+
+enum SuppressionReason {
+  hard_bounce
+  complaint
+  manual
+  list_unsubscribe
+}
+
+model SuppressionEntry {
+  id               String           @id @default(uuid())
+  email            String           @unique @map("email")
+  reason           SuppressionReason @map("reason")
+  sourceCampaignId String?          @map("source_campaign_id")
+  createdBy        String?          @map("created_by")
+  createdAt        DateTime         @default(now()) @map("created_at")
+
+  sourceCampaign Campaign? @relation(fields: [sourceCampaignId], references: [id], onDelete: SetNull)
+  creator        User?     @relation("SuppressionCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+
+  @@index([reason])
+  @@map("suppression_entries")
+}

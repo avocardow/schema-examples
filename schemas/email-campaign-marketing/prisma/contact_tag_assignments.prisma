@@ -1,0 +1,16 @@
+// contact_tag_assignments: Junction table linking contacts to tags.
+// See README.md for full design rationale.
+
+model ContactTagAssignment {
+  id        String   @id @default(uuid())
+  contactId String   @map("contact_id")
+  tagId     String   @map("tag_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  contact Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  tag     Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([contactId, tagId])
+  @@index([tagId])
+  @@map("contact_tag_assignments")
+}
