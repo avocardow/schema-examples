@@ -1,0 +1,47 @@
+// commissions: Calculated commission records linked to conversions with approval and payout tracking.
+// See README.md for full design rationale.
+
+enum CommissionStatus {
+  PENDING
+  APPROVED
+  PAID
+  VOIDED
+}
+
+enum CommissionType {
+  PERCENTAGE
+  FLAT
+  HYBRID
+}
+
+model Commission {
+  id             String           @id @default(uuid())
+  conversionId   String           @map("conversion_id")
+  affiliateId    String           @map("affiliate_id")
+  programId      String           @map("program_id")
+  amount         Int
+  currency       String
+  status         CommissionStatus @default(PENDING)
+  commissionType CommissionType   @map("commission_type")
+  commissionRate Decimal?         @map("commission_rate")
+  commissionFlat Int?             @map("commission_flat")
+  tierLevel      Int              @default(1) @map("tier_level")
+  approvedAt     DateTime?        @map("approved_at")
+  paidAt         DateTime?        @map("paid_at")
+  voidedAt       DateTime?        @map("voided_at")
+  voidedReason   String?          @map("voided_reason")
+  createdAt      DateTime         @default(now()) @map("created_at")
+  updatedAt      DateTime         @default(now()) @map("updated_at")
+
+  conversion  Conversion  @relation(fields: [conversionId], references: [id], onDelete: Restrict)
+  affiliate   Affiliate   @relation(fields: [affiliateId], references: [id], onDelete: Restrict)
+  program     Program     @relation(fields: [programId], references: [id], onDelete: Restrict)
+  payoutItems PayoutItem[]
+
+  @@index([conversionId])
+  @@index([affiliateId, status])
+  @@index([programId, status])
+  @@index([status])
+  @@index([createdAt])
+  @@map("commissions")
+}

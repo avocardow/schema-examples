@@ -1,0 +1,49 @@
+// programs: Affiliate program definitions with commission rules and attribution settings.
+// See README.md for full design rationale.
+
+enum ProgramStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  ARCHIVED
+}
+
+enum CommissionType {
+  PERCENTAGE
+  FLAT
+  HYBRID
+}
+
+enum AttributionModel {
+  FIRST_TOUCH
+  LAST_TOUCH
+}
+
+model Program {
+  id                   String           @id @default(uuid())
+  name                 String
+  slug                 String           @unique
+  description          String?
+  status               ProgramStatus    @default(DRAFT)
+  commissionType       CommissionType   @default(PERCENTAGE) @map("commission_type")
+  commissionPercentage Decimal?         @map("commission_percentage")
+  commissionFlat       Int?             @map("commission_flat")
+  currency             String
+  cookieDuration       Int              @default(30) @map("cookie_duration")
+  attributionModel     AttributionModel @default(LAST_TOUCH) @map("attribution_model")
+  minPayout            Int              @default(0) @map("min_payout")
+  autoApprove          Boolean          @default(false) @map("auto_approve")
+  isPublic             Boolean          @default(true) @map("is_public")
+  termsUrl             String?          @map("terms_url")
+  createdBy            String           @map("created_by")
+  createdAt            DateTime         @default(now()) @map("created_at")
+  updatedAt            DateTime         @default(now()) @map("updated_at")
+
+  creator     User         @relation("ProgramCreator", fields: [createdBy], references: [id], onDelete: Restrict)
+  affiliates  Affiliate[]
+  commissions Commission[]
+
+  @@index([status])
+  @@index([createdBy])
+  @@map("programs")
+}

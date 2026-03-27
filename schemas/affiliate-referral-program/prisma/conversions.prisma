@@ -1,0 +1,35 @@
+// conversions: Tracked conversion events tied to referrals with amount and approval status.
+// See README.md for full design rationale.
+
+enum ConversionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  REVERSED
+}
+
+model Conversion {
+  id            String           @id @default(uuid())
+  referralId    String           @map("referral_id")
+  affiliateId   String           @map("affiliate_id")
+  externalId    String?          @map("external_id")
+  referenceType String?          @map("reference_type")
+  amount        Int              @default(0)
+  currency      String
+  status        ConversionStatus @default(PENDING)
+  metadata      Json?
+  approvedAt    DateTime?        @map("approved_at")
+  createdAt     DateTime         @default(now()) @map("created_at")
+  updatedAt     DateTime         @default(now()) @map("updated_at")
+
+  referral    Referral     @relation(fields: [referralId], references: [id], onDelete: Restrict)
+  affiliate   Affiliate    @relation(fields: [affiliateId], references: [id], onDelete: Restrict)
+  commissions Commission[]
+
+  @@index([referralId])
+  @@index([affiliateId, status])
+  @@index([externalId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("conversions")
+}

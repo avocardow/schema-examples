@@ -1,0 +1,23 @@
+// clicks: Tracks individual clicks on affiliate links with device and geo metadata.
+// See README.md for full design rationale.
+
+model Click {
+  id              String   @id @default(uuid())
+  affiliateLinkId String   @map("affiliate_link_id")
+  clickId         String   @unique @map("click_id")
+  ipAddress       String?  @map("ip_address")
+  userAgent       String?  @map("user_agent")
+  refererUrl      String?  @map("referer_url")
+  landingUrl      String?  @map("landing_url")
+  country         String?
+  deviceType      String?  @map("device_type")
+  isUnique        Boolean  @default(true) @map("is_unique")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  affiliateLink AffiliateLink @relation(fields: [affiliateLinkId], references: [id], onDelete: Cascade)
+  referrals     Referral[]
+
+  @@index([affiliateLinkId, createdAt])
+  @@index([createdAt])
+  @@map("clicks")
+}

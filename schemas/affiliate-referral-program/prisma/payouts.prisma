@@ -1,0 +1,35 @@
+// payouts: Tracks affiliate payout disbursements with status, amount, and provider details.
+// See README.md for full design rationale.
+
+enum PayoutStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELED
+}
+
+model Payout {
+  id           String       @id @default(uuid())
+  affiliateId  String       @map("affiliate_id")
+  payoutNumber String       @unique @map("payout_number")
+  status       PayoutStatus @default(PENDING)
+  currency     String
+  amount       Int
+  fee          Int          @default(0)
+  netAmount    Int          @map("net_amount")
+  payoutMethod String?      @map("payout_method")
+  providerId   String?      @map("provider_id")
+  note         String?
+  completedAt  DateTime?    @map("completed_at")
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @default(now()) @map("updated_at")
+
+  affiliate Affiliate    @relation(fields: [affiliateId], references: [id], onDelete: Restrict)
+  items     PayoutItem[]
+
+  @@index([affiliateId, status])
+  @@index([status])
+  @@index([createdAt])
+  @@map("payouts")
+}

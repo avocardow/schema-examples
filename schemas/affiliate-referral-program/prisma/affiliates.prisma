@@ -1,0 +1,45 @@
+// affiliates: Links users to affiliate programs with unique referral codes and commission settings.
+// See README.md for full design rationale.
+
+enum AffiliateStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  REJECTED
+}
+
+model Affiliate {
+  id                   String           @id @default(uuid())
+  programId            String           @map("program_id")
+  userId               String           @map("user_id")
+  referralCode         String           @unique @map("referral_code")
+  couponCode           String?          @map("coupon_code")
+  status               AffiliateStatus  @default(PENDING)
+  customCommissionRate Decimal?         @map("custom_commission_rate")
+  payoutMethod         String?          @map("payout_method")
+  payoutEmail          String?          @map("payout_email")
+  metadata             Json?            @default("{}") @map("metadata")
+  referredBy           String?          @map("referred_by")
+  approvedAt           DateTime?        @map("approved_at")
+  suspendedAt          DateTime?        @map("suspended_at")
+  createdAt            DateTime         @default(now()) @map("created_at")
+  updatedAt            DateTime         @default(now()) @map("updated_at")
+
+  program              Program          @relation(fields: [programId], references: [id], onDelete: Cascade)
+  user                 User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  referrer             Affiliate?       @relation("AffiliateReferral", fields: [referredBy], references: [id], onDelete: SetNull)
+  recruitedAffiliates  Affiliate[]      @relation("AffiliateReferral")
+  links                AffiliateLink[]
+  referrals            Referral[]
+  conversions          Conversion[]
+  commissions          Commission[]
+  payouts              Payout[]
+  balance              AffiliateBalance?
+  balanceTransactions  BalanceTransaction[]
+
+  @@unique([programId, userId])
+  @@index([userId])
+  @@index([status])
+  @@index([referredBy])
+  @@map("affiliates")
+}

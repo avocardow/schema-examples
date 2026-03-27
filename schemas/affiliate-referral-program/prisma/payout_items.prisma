@@ -1,0 +1,16 @@
+// payout_items: Line items linking individual commissions to a payout with their amounts.
+// See README.md for full design rationale.
+
+model PayoutItem {
+  id           String   @id @default(uuid())
+  payoutId     String   @map("payout_id")
+  commissionId String   @map("commission_id")
+  amount       Int
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  payout     Payout     @relation(fields: [payoutId], references: [id], onDelete: Cascade)
+  commission Commission @relation(fields: [commissionId], references: [id], onDelete: Restrict)
+
+  @@unique([payoutId, commissionId])
+  @@map("payout_items")
+}

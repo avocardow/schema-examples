@@ -1,0 +1,17 @@
+// affiliate_balances: Running balance ledger per affiliate tracking available, pending, and paid-out funds.
+// See README.md for full design rationale.
+
+model AffiliateBalance {
+  id           String   @id @default(uuid())
+  affiliateId  String   @unique @map("affiliate_id")
+  currency     String
+  available    Int      @default(0)
+  pending      Int      @default(0)
+  totalEarned  Int      @default(0) @map("total_earned")
+  totalPaidOut Int      @default(0) @map("total_paid_out")
+  updatedAt    DateTime @default(now()) @map("updated_at")
+
+  affiliate Affiliate @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+
+  @@map("affiliate_balances")
+}

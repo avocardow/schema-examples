@@ -1,0 +1,29 @@
+// balance_transactions: Ledger entries tracking affiliate balance changes from commissions, payouts, reversals, and adjustments.
+// See README.md for full design rationale.
+
+enum BalanceTransactionType {
+  COMMISSION
+  PAYOUT
+  REVERSAL
+  ADJUSTMENT
+}
+
+model BalanceTransaction {
+  id              String                 @id @default(uuid())
+  affiliateId     String                 @map("affiliate_id")
+  type            BalanceTransactionType
+  amount          Int
+  currency        String
+  runningBalance  Int                    @map("running_balance")
+  referenceType   String?                @map("reference_type")
+  referenceId     String?                @map("reference_id")
+  description     String?
+  createdAt       DateTime               @default(now()) @map("created_at")
+
+  affiliate Affiliate @relation(fields: [affiliateId], references: [id], onDelete: Restrict)
+
+  @@index([affiliateId, createdAt])
+  @@index([type])
+  @@index([referenceType, referenceId])
+  @@map("balance_transactions")
+}
