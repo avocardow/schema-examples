@@ -1,0 +1,14 @@
+model Season {
+  id            String  @id @default(uuid()) @map("id")
+  showId        String  @map("show_id")
+  seasonNumber  Int     @map("season_number")
+  name          String? @map("name")
+  description   String? @map("description")
+  artworkFileId String? @map("artwork_file_id")
+
+  show        Show  @relation(fields: [showId], references: [id], onDelete: Cascade)
+  artworkFile File? @relation("SeasonArtwork", fields: [artworkFileId], references: [id], onDelete: SetNull)
+
+  @@unique([showId, seasonNumber])
+  @@map("seasons")
+}

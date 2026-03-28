@@ -1,0 +1,14 @@
+model PlaylistEpisode {
+  id         String   @id @default(uuid())
+  playlistId String   @map("playlist_id")
+  episodeId  String   @map("episode_id")
+  position   Int      @map("position")
+  addedAt    DateTime @default(now()) @map("added_at")
+
+  playlist Playlist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+  episode  Episode  @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+
+  @@index([playlistId, position])
+  @@index([episodeId])
+  @@map("playlist_episodes")
+}

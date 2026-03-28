@@ -1,6 +1,6 @@
 # Schema Examples
 
-A growing collection of production-ready database schema examples across multiple formats — with explanations and best practices. Twenty-six domains complete (auth, notifications, file management, i18n, analytics, content moderation, e-commerce, marketplace, auction, CMS/blog, messaging/chat, social media, video conferencing, booking/scheduling, project management, CRM, helpdesk/customer support, SaaS/multi-tenant, subscription/membership, HR/payroll, compliance/GRC, event management/ticketing, affiliate/referral program, loyalty/rewards program, email/campaign marketing, media streaming), with 31 more planned.
+A growing collection of production-ready database schema examples across multiple formats — with explanations and best practices. Twenty-seven domains complete (auth, notifications, file management, i18n, analytics, content moderation, e-commerce, marketplace, auction, CMS/blog, messaging/chat, social media, video conferencing, booking/scheduling, project management, CRM, helpdesk/customer support, SaaS/multi-tenant, subscription/membership, HR/payroll, compliance/GRC, event management/ticketing, affiliate/referral program, loyalty/rewards program, email/campaign marketing, media streaming, podcast platform), with 30 more planned.
 
 **Copy. Learn. Contribute. Ship.**
 
@@ -67,7 +67,7 @@ See each domain's **Dependencies** section for details.
 | -------------------------------------------------------------------- | -----: | ------ |
 | [CMS / Blog](./schemas/cms-blog)                                     |     18 | ✅     |
 | [Media Streaming](./schemas/media-streaming)                         |     20 | ✅     |
-| [Podcast Platform](./schemas/podcast-platform)                       |        | 🔲     |
+| [Podcast Platform](./schemas/podcast-platform)                       |     25 | ✅     |
 | [Digital Asset Management (DAM)](./schemas/digital-asset-management) |        | 🔲     |
 | [Recipe / Cooking](./schemas/recipe-cooking)                         |        | 🔲     |
 
@@ -172,7 +172,7 @@ See each domain's **Dependencies** section for details.
 | [Event Planning](./schemas/event-planning)                                 |        | 🔲     |
 | [Voting / Polling / Surveys](./schemas/voting-polling-surveys)             |        | 🔲     |
 
-**57 domains — 26 complete, 31 planned**
+**57 domains — 27 complete, 30 planned**
 
 ## How to Use
 

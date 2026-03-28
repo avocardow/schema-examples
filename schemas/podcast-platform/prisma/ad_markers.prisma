@@ -1,0 +1,19 @@
+enum AdMarkerType {
+  preroll
+  midroll
+  postroll
+}
+
+model AdMarker {
+  id          String        @id @default(uuid()) @map("id")
+  episodeId   String        @map("episode_id")
+  markerType  AdMarkerType  @map("marker_type")
+  positionMs  Int?          @map("position_ms")
+  durationMs  Int?          @map("duration_ms")
+  createdAt   DateTime      @default(now()) @map("created_at")
+
+  episode Episode @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+
+  @@index([episodeId, markerType])
+  @@map("ad_markers")
+}

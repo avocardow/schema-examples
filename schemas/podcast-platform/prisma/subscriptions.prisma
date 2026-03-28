@@ -1,0 +1,24 @@
+enum NewEpisodeSort {
+  newest_first
+  oldest_first
+}
+
+model Subscription {
+  id                     String          @id @default(uuid())
+  userId                 String          @map("user_id")
+  showId                 String          @map("show_id")
+  autoDownload           Boolean         @default(false) @map("auto_download")
+  downloadWifiOnly       Boolean         @default(true) @map("download_wifi_only")
+  notificationsEnabled   Boolean         @default(true) @map("notifications_enabled")
+  customPlaybackSpeed    Decimal?        @map("custom_playback_speed")
+  newEpisodeSort         NewEpisodeSort  @default(newest_first) @map("new_episode_sort")
+  createdAt              DateTime        @default(now()) @map("created_at")
+  updatedAt              DateTime        @default(now()) @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  show Show @relation(fields: [showId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, showId])
+  @@index([showId])
+  @@map("subscriptions")
+}

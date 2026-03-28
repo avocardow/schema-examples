@@ -1,0 +1,19 @@
+model Person {
+  id               String   @id @default(uuid()) @map("id")
+  name             String   @map("name")
+  slug             String   @unique @map("slug")
+  bio              String?  @map("bio")
+  url              String?  @map("url")
+  imageFileId      String?  @map("image_file_id")
+  podcastIndexId   String?  @map("podcast_index_id")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @default(now()) @map("updated_at")
+
+  imageFile      File?           @relation("PersonImage", fields: [imageFileId], references: [id], onDelete: SetNull)
+
+  showCredits    ShowCredit[]
+  episodeCredits EpisodeCredit[]
+
+  @@index([name])
+  @@map("people")
+}

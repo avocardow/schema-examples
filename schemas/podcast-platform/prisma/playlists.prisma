@@ -1,0 +1,23 @@
+enum PlaylistType {
+  manual
+  smart
+}
+
+model Playlist {
+  id             String         @id @default(uuid())
+  userId         String         @map("user_id")
+  name           String
+  description    String?
+  playlistType   PlaylistType   @default(manual) @map("playlist_type")
+  smartFilters   Json?          @map("smart_filters")
+  isPublic       Boolean        @default(false) @map("is_public")
+  episodeCount   Int            @default(0) @map("episode_count")
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @default(now()) @map("updated_at")
+
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  playlistEpisodes PlaylistEpisode[]
+
+  @@index([userId, createdAt])
+  @@map("playlists")
+}

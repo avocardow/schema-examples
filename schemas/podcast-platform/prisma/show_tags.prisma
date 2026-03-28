@@ -1,0 +1,11 @@
+model ShowTag {
+  id     String @id @default(uuid()) @map("id")
+  showId String @map("show_id")
+  tag    String @map("tag")
+
+  show Show @relation(fields: [showId], references: [id], onDelete: Cascade)
+
+  @@unique([showId, tag])
+  @@index([tag])
+  @@map("show_tags")
+}

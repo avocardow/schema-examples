@@ -1,0 +1,13 @@
+model FundingLink {
+  id        String   @id @default(uuid()) @map("id")
+  showId    String   @map("show_id")
+  url       String   @map("url")
+  title     String   @map("title")
+  position  Int      @default(0) @map("position")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  show Show @relation(fields: [showId], references: [id], onDelete: Cascade)
+
+  @@index([showId, position])
+  @@map("funding_links")
+}

@@ -1,0 +1,21 @@
+// networks: Podcast network grouping one or more shows under a shared brand.
+// See README.md for full design rationale.
+
+model Network {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  description String?
+  website     String?
+  logoFileId  String?  @map("logo_file_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @map("updated_at")
+
+  logoFile File? @relation("NetworkLogo", fields: [logoFileId], references: [id], onDelete: SetNull)
+
+  // Reverse relations
+  shows Show[]
+
+  @@index([name])
+  @@map("networks")
+}

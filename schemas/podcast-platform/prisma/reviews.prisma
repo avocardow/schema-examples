@@ -1,0 +1,18 @@
+model Review {
+  id        String   @id @default(uuid()) @map("id")
+  userId    String   @map("user_id")
+  showId    String   @map("show_id")
+  rating    Int      @map("rating")
+  title     String?  @map("title")
+  body      String?  @map("body")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  show Show @relation(fields: [showId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, showId])
+  @@index([showId, createdAt])
+  @@index([showId, rating])
+  @@map("reviews")
+}

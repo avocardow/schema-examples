@@ -1,0 +1,14 @@
+model EpisodeQueue {
+  id        String   @id @default(uuid()) @map("id")
+  userId    String   @map("user_id")
+  episodeId String   @map("episode_id")
+  position  Int      @map("position")
+  addedAt   DateTime @default(now()) @map("added_at")
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  episode Episode @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, episodeId])
+  @@index([userId, position])
+  @@map("episode_queue")
+}

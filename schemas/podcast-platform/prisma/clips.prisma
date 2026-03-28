@@ -1,0 +1,16 @@
+model Clip {
+  id          String   @id @default(uuid()) @map("id")
+  episodeId   String   @map("episode_id")
+  createdBy   String   @map("created_by")
+  title       String   @map("title")
+  startTimeMs Int      @map("start_time_ms")
+  durationMs  Int      @map("duration_ms")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  episode Episode @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+  creator User    @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+
+  @@index([episodeId])
+  @@index([createdBy])
+  @@map("clips")
+}

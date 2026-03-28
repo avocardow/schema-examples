@@ -1,0 +1,15 @@
+model EpisodeCredit {
+  id        String      @id @default(uuid()) @map("id")
+  episodeId String      @map("episode_id")
+  personId  String      @map("person_id")
+  role      CreditRole  @map("role")
+  group     CreditGroup @default(cast) @map("group")
+  position  Int         @default(0) @map("position")
+
+  episode Episode @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+  person  Person  @relation(fields: [personId], references: [id], onDelete: Cascade)
+
+  @@unique([episodeId, personId, role])
+  @@index([personId])
+  @@map("episode_credits")
+}

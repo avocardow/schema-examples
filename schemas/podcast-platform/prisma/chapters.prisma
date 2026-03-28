@@ -1,0 +1,17 @@
+model Chapter {
+  id           String   @id @default(uuid()) @map("id")
+  episodeId    String   @map("episode_id")
+  startTimeMs  Int      @map("start_time_ms")
+  endTimeMs    Int?     @map("end_time_ms")
+  title        String   @map("title")
+  url          String?  @map("url")
+  imageUrl     String?  @map("image_url")
+  isHidden     Boolean  @default(false) @map("is_hidden")
+  position     Int      @map("position")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  episode Episode @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+
+  @@index([episodeId, startTimeMs])
+  @@map("chapters")
+}

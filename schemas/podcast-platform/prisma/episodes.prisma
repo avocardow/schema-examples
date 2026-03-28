@@ -1,0 +1,53 @@
+enum EpisodeType {
+  full
+  trailer
+  bonus
+}
+
+model Episode {
+  id                String      @id @default(uuid()) @map("id")
+  showId            String      @map("show_id")
+  title             String      @map("title")
+  slug              String      @map("slug")
+  description       String?     @map("description")
+  htmlDescription   String?     @map("html_description")
+  episodeType       EpisodeType @default(full) @map("episode_type")
+  seasonNumber      Int?        @map("season_number")
+  episodeNumber     Int?        @map("episode_number")
+  durationMs        Int         @default(0) @map("duration_ms")
+  explicit          Boolean     @default(false) @map("explicit")
+  audioFileId       String?     @map("audio_file_id")
+  artworkFileId     String?     @map("artwork_file_id")
+  enclosureUrl      String?     @map("enclosure_url")
+  enclosureLength   Int?        @map("enclosure_length")
+  enclosureType     String?     @map("enclosure_type")
+  guid              String?     @map("guid")
+  publishedAt       DateTime?   @map("published_at")
+  isBlocked         Boolean     @default(false) @map("is_blocked")
+  playCount         Int         @default(0) @map("play_count")
+  createdAt         DateTime    @default(now()) @map("created_at")
+  updatedAt         DateTime    @default(now()) @map("updated_at")
+
+  show            Show            @relation(fields: [showId], references: [id], onDelete: Cascade)
+  audioFile       File?           @relation("EpisodeAudio", fields: [audioFileId], references: [id], onDelete: SetNull)
+  artworkFile     File?           @relation("EpisodeArtwork", fields: [artworkFileId], references: [id], onDelete: SetNull)
+
+  chapters         Chapter[]
+  transcripts      Transcript[]
+  clips            Clip[]
+  episodeCredits   EpisodeCredit[]
+  listenProgress   ListenProgress[]
+  listenHistory    ListenHistory[]
+  episodeQueue     EpisodeQueue[]
+  savedEpisodes    SavedEpisode[]
+  playlistEpisodes PlaylistEpisode[]
+  adMarkers        AdMarker[]
+  episodeDownloads EpisodeDownload[]
+
+  @@unique([showId, slug])
+  @@index([showId, publishedAt])
+  @@index([showId, seasonNumber, episodeNumber])
+  @@index([publishedAt])
+  @@index([guid])
+  @@map("episodes")
+}

@@ -1,0 +1,28 @@
+// distribution_targets: Tracks syndication of a show to external podcast platforms.
+// See README.md for full design rationale.
+
+enum DistributionStatus {
+  pending
+  active
+  rejected
+  suspended
+}
+
+model DistributionTarget {
+  id              String             @id @default(uuid())
+  showId          String             @map("show_id")
+  platform        String
+  externalId      String?            @map("external_id")
+  status          DistributionStatus @default(pending)
+  feedUrlOverride String?            @map("feed_url_override")
+  submittedAt     DateTime?          @map("submitted_at")
+  approvedAt      DateTime?          @map("approved_at")
+  createdAt       DateTime           @default(now()) @map("created_at")
+  updatedAt       DateTime           @default(now()) @map("updated_at")
+
+  show Show @relation(fields: [showId], references: [id], onDelete: Cascade)
+
+  @@index([showId, platform])
+  @@index([status])
+  @@map("distribution_targets")
+}

@@ -1,0 +1,36 @@
+enum CreditRole {
+  host
+  co_host
+  guest
+  producer
+  editor
+  sound_designer
+  composer
+  narrator
+  researcher
+  writer
+}
+
+enum CreditGroup {
+  cast
+  crew
+  writing
+  audio_post_production
+  video_post_production
+}
+
+model ShowCredit {
+  id       String      @id @default(uuid())
+  showId   String      @map("show_id")
+  personId String      @map("person_id")
+  role     CreditRole  @map("role")
+  group    CreditGroup @default(cast) @map("group")
+  position Int         @default(0) @map("position")
+
+  show   Show   @relation(fields: [showId], references: [id], onDelete: Cascade)
+  person Person @relation(fields: [personId], references: [id], onDelete: Cascade)
+
+  @@unique([showId, personId, role])
+  @@index([personId])
+  @@map("show_credits")
+}

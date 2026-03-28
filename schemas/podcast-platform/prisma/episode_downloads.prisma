@@ -1,0 +1,27 @@
+enum EpisodeDownloadStatus {
+  queued
+  downloading
+  completed
+  failed
+  expired
+}
+
+model EpisodeDownload {
+  id            String                @id @default(uuid()) @map("id")
+  userId        String                @map("user_id")
+  episodeId     String                @map("episode_id")
+  status        EpisodeDownloadStatus @default(queued) @map("status")
+  deviceId      String?               @map("device_id")
+  fileSizeBytes Int?                  @map("file_size_bytes")
+  downloadedAt  DateTime?             @map("downloaded_at")
+  expiresAt     DateTime?             @map("expires_at")
+  createdAt     DateTime              @default(now()) @map("created_at")
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  episode Episode @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, episodeId, deviceId])
+  @@index([userId, status])
+  @@index([expiresAt])
+  @@map("episode_downloads")
+}

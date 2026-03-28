@@ -1,0 +1,13 @@
+model ShowCategory {
+  id         String   @id @default(uuid()) @map("id")
+  showId     String   @map("show_id")
+  categoryId String   @map("category_id")
+  isPrimary  Boolean  @default(false) @map("is_primary")
+
+  show     Show     @relation(fields: [showId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([showId, categoryId])
+  @@index([categoryId])
+  @@map("show_categories")
+}

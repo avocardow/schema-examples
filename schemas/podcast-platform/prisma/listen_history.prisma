@@ -1,0 +1,28 @@
+enum ListenSource {
+  app
+  web
+  car
+  smart_speaker
+  watch
+  unknown
+}
+
+model ListenHistory {
+  id                  String       @id @default(uuid()) @map("id")
+  userId              String       @map("user_id")
+  episodeId           String       @map("episode_id")
+  startedAt           DateTime     @map("started_at")
+  endedAt             DateTime?    @map("ended_at")
+  positionStartMs     Int          @map("position_start_ms")
+  positionEndMs       Int?         @map("position_end_ms")
+  durationListenedMs  Int          @default(0) @map("duration_listened_ms")
+  source              ListenSource @default(unknown) @map("source")
+  createdAt           DateTime     @default(now()) @map("created_at")
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  episode Episode @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+
+  @@index([userId, startedAt])
+  @@index([episodeId, startedAt])
+  @@map("listen_history")
+}

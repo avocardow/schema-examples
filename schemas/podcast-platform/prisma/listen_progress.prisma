@@ -1,0 +1,16 @@
+model ListenProgress {
+  id         String   @id @default(uuid()) @map("id")
+  userId     String   @map("user_id")
+  episodeId  String   @map("episode_id")
+  positionMs Int      @default(0) @map("position_ms")
+  durationMs Int      @default(0) @map("duration_ms")
+  completed  Boolean  @default(false) @map("completed")
+  updatedAt  DateTime @default(now()) @map("updated_at")
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  episode Episode @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, episodeId])
+  @@index([userId, completed, updatedAt])
+  @@map("listen_progress")
+}

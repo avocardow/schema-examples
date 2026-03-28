@@ -1,0 +1,65 @@
+// shows: Core podcast show record, owned by a user and optionally grouped under a network.
+// See README.md for full design rationale.
+
+enum ShowType {
+  episodic
+  serial
+}
+
+enum ShowMedium {
+  podcast
+  music
+  video
+  audiobook
+  newsletter
+}
+
+model Show {
+  id              String     @id @default(uuid())
+  ownerId         String     @map("owner_id")
+  networkId       String?    @map("network_id")
+  title           String
+  slug            String     @unique
+  description     String
+  htmlDescription String?    @map("html_description")
+  author          String
+  language        String     @default("en")
+  showType        ShowType   @default(episodic) @map("show_type")
+  explicit        Boolean    @default(false)
+  artworkFileId   String?    @map("artwork_file_id")
+  bannerFileId    String?    @map("banner_file_id")
+  feedUrl         String?    @map("feed_url")
+  website         String?
+  copyright       String?
+  ownerName       String?    @map("owner_name")
+  ownerEmail      String?    @map("owner_email")
+  podcastGuid     String?    @map("podcast_guid")
+  medium          ShowMedium @default(podcast)
+  isComplete      Boolean    @default(false) @map("is_complete")
+  episodeCount    Int        @default(0) @map("episode_count")
+  subscriberCount Int        @default(0) @map("subscriber_count")
+  createdAt       DateTime   @default(now()) @map("created_at")
+  updatedAt       DateTime   @default(now()) @map("updated_at")
+
+  owner       User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  network     Network? @relation(fields: [networkId], references: [id], onDelete: SetNull)
+  artworkFile File?    @relation("ShowArtwork", fields: [artworkFileId], references: [id], onDelete: SetNull)
+  bannerFile  File?    @relation("ShowBanner", fields: [bannerFileId], references: [id], onDelete: SetNull)
+
+  // Reverse relations
+  seasons             Season[]
+  episodes            Episode[]
+  showCredits         ShowCredit[]
+  showCategories      ShowCategory[]
+  showTags            ShowTag[]
+  distributionTargets DistributionTarget[]
+  subscriptions       Subscription[]
+  reviews             Review[]
+  fundingLinks        FundingLink[]
+
+  @@index([ownerId])
+  @@index([networkId])
+  @@index([language, showType])
+  @@index([subscriberCount])
+  @@map("shows")
+}
