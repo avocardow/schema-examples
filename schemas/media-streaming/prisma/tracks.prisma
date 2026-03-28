@@ -1,0 +1,31 @@
+// tracks: Individual music tracks with duration, popularity metrics, and play counts.
+// See README.md for full design rationale.
+
+model Track {
+  id          String   @id @default(uuid())
+  title       String   @map("title")
+  durationMs  Int      @map("duration_ms")
+  explicit    Boolean  @default(false) @map("explicit")
+  isrc        String?  @map("isrc")
+  popularity  Int      @default(0) @map("popularity")
+  previewUrl  String?  @map("preview_url")
+  playCount   Int      @default(0) @map("play_count")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @map("updated_at")
+
+  trackFiles    TrackFile[]
+  albumTracks   AlbumTrack[]
+  trackCredits  TrackCredit[]
+  lyrics        Lyric?
+  playlistTracks PlaylistTrack[]
+  savedTracks   SavedTrack[]
+  playHistory   PlayHistory[]
+  downloads     Download[]
+  chartEntries  ChartEntry[]
+
+  @@index([popularity])
+  @@index([playCount])
+  @@index([isrc])
+  @@index([title])
+  @@map("tracks")
+}

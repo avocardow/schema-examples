@@ -1,0 +1,26 @@
+// track_credits: Credits linking artists to tracks with specific roles such as writer or producer.
+// See README.md for full design rationale.
+
+enum CreditRole {
+  primary_artist
+  featured_artist
+  writer
+  producer
+  composer
+  mixer
+  engineer
+}
+
+model TrackCredit {
+  id       String     @id @default(uuid())
+  trackId  String     @map("track_id")
+  artistId String     @map("artist_id")
+  role     CreditRole @map("role")
+
+  track  Track  @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  artist Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+
+  @@unique([trackId, artistId, role])
+  @@index([artistId, role])
+  @@map("track_credits")
+}

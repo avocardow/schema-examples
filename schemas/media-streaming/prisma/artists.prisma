@@ -1,0 +1,30 @@
+// artists: Musical artists with profile information, verification status, and popularity metrics.
+// See README.md for full design rationale.
+
+model Artist {
+  id              String   @id @default(uuid())
+  name            String   @map("name")
+  slug            String   @unique @map("slug")
+  bio             String?  @map("bio")
+  imageFileId     String?  @map("image_file_id")
+  bannerFileId    String?  @map("banner_file_id")
+  isVerified      Boolean  @default(false) @map("is_verified")
+  followerCount   Int      @default(0) @map("follower_count")
+  monthlyListeners Int     @default(0) @map("monthly_listeners")
+  popularity      Int      @default(0) @map("popularity")
+  externalUrl     String?  @map("external_url")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @default(now()) @map("updated_at")
+
+  imageFile  File? @relation("ArtistImage", fields: [imageFileId], references: [id], onDelete: SetNull)
+  bannerFile File? @relation("ArtistBanner", fields: [bannerFileId], references: [id], onDelete: SetNull)
+
+  albums          Album[]
+  artistGenres    ArtistGenre[]
+  trackCredits    TrackCredit[]
+  followedArtists FollowedArtist[]
+
+  @@index([popularity])
+  @@index([name])
+  @@map("artists")
+}

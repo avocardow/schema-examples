@@ -1,0 +1,16 @@
+// followed_artists: Artists followed by users.
+// See README.md for full design rationale.
+
+model FollowedArtist {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  artistId  String   @map("artist_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  artist Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, artistId])
+  @@index([artistId])
+  @@map("followed_artists")
+}

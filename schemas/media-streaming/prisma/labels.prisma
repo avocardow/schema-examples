@@ -1,0 +1,16 @@
+// labels: Record labels that publish and distribute albums.
+// See README.md for full design rationale.
+
+model Label {
+  id        String   @id @default(uuid())
+  name      String   @map("name")
+  slug      String   @unique @map("slug")
+  website   String?  @map("website")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  albums Album[]
+
+  @@index([name])
+  @@map("labels")
+}

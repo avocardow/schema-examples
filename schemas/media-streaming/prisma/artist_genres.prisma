@@ -1,0 +1,15 @@
+// artist_genres: Many-to-many association between artists and genres.
+// See README.md for full design rationale.
+
+model ArtistGenre {
+  id       String @id @default(uuid())
+  artistId String @map("artist_id")
+  genreId  String @map("genre_id")
+
+  artist Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  genre  Genre  @relation(fields: [genreId], references: [id], onDelete: Cascade)
+
+  @@unique([artistId, genreId])
+  @@index([genreId])
+  @@map("artist_genres")
+}

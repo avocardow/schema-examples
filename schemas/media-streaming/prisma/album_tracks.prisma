@@ -1,0 +1,17 @@
+// album_tracks: Ordered association of tracks within albums, supporting multi-disc releases.
+// See README.md for full design rationale.
+
+model AlbumTrack {
+  id         String @id @default(uuid())
+  albumId    String @map("album_id")
+  trackId    String @map("track_id")
+  discNumber Int    @default(1) @map("disc_number")
+  position   Int    @map("position")
+
+  album Album @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  track Track @relation(fields: [trackId], references: [id], onDelete: Cascade)
+
+  @@unique([albumId, discNumber, position])
+  @@index([trackId])
+  @@map("album_tracks")
+}

@@ -1,0 +1,30 @@
+// track_files: Audio file variants for tracks across different quality levels and codecs.
+// See README.md for full design rationale.
+
+enum TrackQuality {
+  low
+  normal
+  high
+  lossless
+}
+
+model TrackFile {
+  id            String       @id @default(uuid())
+  trackId       String       @map("track_id")
+  fileId        String       @map("file_id")
+  quality       TrackQuality @map("quality")
+  codec         String       @map("codec")
+  bitrateKbps   Int?         @map("bitrate_kbps")
+  sampleRateHz  Int?         @map("sample_rate_hz")
+  fileSizeBytes Int          @map("file_size_bytes")
+  createdAt     DateTime     @default(now()) @map("created_at")
+
+  track Track @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  file  File  @relation("TrackFileFile", fields: [fileId], references: [id], onDelete: Restrict)
+
+  downloads Download[]
+
+  @@index([trackId, quality])
+  @@index([fileId])
+  @@map("track_files")
+}

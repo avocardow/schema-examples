@@ -1,0 +1,41 @@
+// albums: Music albums, singles, EPs, and compilations with metadata and release information.
+// See README.md for full design rationale.
+
+enum AlbumType {
+  album
+  single
+  ep
+  compilation
+}
+
+model Album {
+  id              String    @id @default(uuid())
+  title           String    @map("title")
+  slug            String    @unique @map("slug")
+  artistId        String    @map("artist_id")
+  labelId         String?   @map("label_id")
+  albumType       AlbumType @default(album) @map("album_type")
+  coverFileId     String?   @map("cover_file_id")
+  releaseDate     String?   @map("release_date")
+  totalTracks     Int       @default(0) @map("total_tracks")
+  totalDurationMs Int       @default(0) @map("total_duration_ms")
+  upc             String?   @map("upc")
+  copyright       String?   @map("copyright")
+  popularity      Int       @default(0) @map("popularity")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @default(now()) @map("updated_at")
+
+  artist    Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  label     Label? @relation(fields: [labelId], references: [id], onDelete: SetNull)
+  coverFile File?  @relation("AlbumCover", fields: [coverFileId], references: [id], onDelete: SetNull)
+
+  albumTracks AlbumTrack[]
+  savedAlbums SavedAlbum[]
+
+  @@index([artistId, releaseDate])
+  @@index([labelId])
+  @@index([albumType, releaseDate])
+  @@index([popularity])
+  @@index([releaseDate])
+  @@map("albums")
+}

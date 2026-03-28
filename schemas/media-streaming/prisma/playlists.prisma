@@ -1,0 +1,27 @@
+// playlists: User-created or curated playlists with track collections and follower counts.
+// See README.md for full design rationale.
+
+model Playlist {
+  id              String   @id @default(uuid())
+  ownerId         String   @map("owner_id")
+  name            String   @map("name")
+  description     String?  @map("description")
+  coverFileId     String?  @map("cover_file_id")
+  isPublic        Boolean  @default(true) @map("is_public")
+  isCollaborative Boolean  @default(false) @map("is_collaborative")
+  trackCount      Int      @default(0) @map("track_count")
+  followerCount   Int      @default(0) @map("follower_count")
+  totalDurationMs Int      @default(0) @map("total_duration_ms")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @default(now()) @map("updated_at")
+
+  owner     User  @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  coverFile File? @relation("PlaylistCover", fields: [coverFileId], references: [id], onDelete: SetNull)
+
+  playlistTracks    PlaylistTrack[]
+  playlistFollowers PlaylistFollower[]
+
+  @@index([ownerId, createdAt])
+  @@index([isPublic, followerCount])
+  @@map("playlists")
+}

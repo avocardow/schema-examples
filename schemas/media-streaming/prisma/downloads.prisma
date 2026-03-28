@@ -1,0 +1,30 @@
+// downloads: Offline download records for tracks with status tracking and expiration.
+// See README.md for full design rationale.
+
+enum DownloadStatus {
+  pending
+  downloading
+  completed
+  expired
+  failed
+}
+
+model Download {
+  id           String         @id @default(uuid())
+  userId       String         @map("user_id")
+  trackId      String         @map("track_id")
+  trackFileId  String         @map("track_file_id")
+  status       DownloadStatus @default(pending) @map("status")
+  expiresAt    DateTime?      @map("expires_at")
+  downloadedAt DateTime?      @map("downloaded_at")
+  createdAt    DateTime       @default(now()) @map("created_at")
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  track     Track     @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  trackFile TrackFile @relation(fields: [trackFileId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, trackFileId])
+  @@index([userId, status])
+  @@index([expiresAt])
+  @@map("downloads")
+}

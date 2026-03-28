@@ -1,0 +1,16 @@
+// saved_tracks: Tracks saved to a user's personal library.
+// See README.md for full design rationale.
+
+model SavedTrack {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  trackId   String   @map("track_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  track Track @relation(fields: [trackId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, trackId])
+  @@index([userId, createdAt])
+  @@map("saved_tracks")
+}

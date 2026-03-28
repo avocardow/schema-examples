@@ -1,0 +1,18 @@
+// lyrics: Song lyrics with optional time-synced data and language metadata.
+// See README.md for full design rationale.
+
+model Lyric {
+  id         String   @id @default(uuid())
+  trackId    String   @unique @map("track_id")
+  plainText  String?  @map("plain_text")
+  syncedText Json?    @map("synced_text")
+  language   String?  @map("language")
+  source     String?  @map("source")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @default(now()) @map("updated_at")
+
+  track Track @relation(fields: [trackId], references: [id], onDelete: Cascade)
+
+  @@index([language])
+  @@map("lyrics")
+}

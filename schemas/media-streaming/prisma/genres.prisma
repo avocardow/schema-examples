@@ -1,0 +1,13 @@
+// genres: Music genre categories for classifying artists.
+// See README.md for full design rationale.
+
+model Genre {
+  id        String   @id @default(uuid())
+  name      String   @unique @map("name")
+  slug      String   @unique @map("slug")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  artistGenres ArtistGenre[]
+
+  @@map("genres")
+}

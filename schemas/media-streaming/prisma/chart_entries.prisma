@@ -1,0 +1,21 @@
+// chart_entries: Individual track positions within charts, tracking movement and longevity.
+// See README.md for full design rationale.
+
+model ChartEntry {
+  id               String   @id @default(uuid())
+  chartId          String   @map("chart_id")
+  trackId          String   @map("track_id")
+  position         Int      @map("position")
+  previousPosition Int?     @map("previous_position")
+  peakPosition     Int      @map("peak_position")
+  weeksOnChart     Int      @default(1) @map("weeks_on_chart")
+  chartDate        String   @map("chart_date")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  chart Chart @relation(fields: [chartId], references: [id], onDelete: Cascade)
+  track Track @relation(fields: [trackId], references: [id], onDelete: Cascade)
+
+  @@index([chartId, chartDate, position])
+  @@index([trackId, chartDate])
+  @@map("chart_entries")
+}

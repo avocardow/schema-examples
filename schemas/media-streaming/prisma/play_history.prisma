@@ -1,0 +1,30 @@
+// play_history: Track playback history with duration and context information.
+// See README.md for full design rationale.
+
+enum PlayContextType {
+  album
+  playlist
+  artist
+  chart
+  search
+  queue
+  unknown
+}
+
+model PlayHistory {
+  id          String          @id @default(uuid())
+  userId      String          @map("user_id")
+  trackId     String          @map("track_id")
+  durationMs  Int             @map("duration_ms")
+  completed   Boolean         @default(false) @map("completed")
+  contextType PlayContextType @default(unknown) @map("context_type")
+  contextId   String?         @map("context_id")
+  playedAt    DateTime        @default(now()) @map("played_at")
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  track Track @relation(fields: [trackId], references: [id], onDelete: Cascade)
+
+  @@index([userId, playedAt])
+  @@index([trackId, playedAt])
+  @@map("play_history")
+}
