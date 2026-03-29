@@ -1,0 +1,17 @@
+// asset_tags: Junction table associating tags with assets.
+// See README.md for full design rationale.
+
+model AssetTag {
+  id         String   @id @default(uuid())
+  assetId    String   @map("asset_id")
+  tagId      String   @map("tag_id")
+  assignedBy String   @map("assigned_by")
+  assignedAt DateTime @default(now()) @map("assigned_at")
+
+  asset      Asset    @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  tag        Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([assetId, tagId])
+  @@index([tagId])
+  @@map("asset_tags")
+}

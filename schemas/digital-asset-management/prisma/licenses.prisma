@@ -1,0 +1,32 @@
+// licenses: Defines reusable license templates with usage rights and restrictions.
+// See README.md for full design rationale.
+
+enum LicenseType {
+  royalty_free
+  rights_managed
+  editorial
+  creative_commons
+  internal
+  custom
+}
+
+model License {
+  id            String      @id @default(uuid())
+  workspaceId   String      @map("workspace_id")
+  name          String
+  description   String?
+  licenseType   LicenseType @map("license_type")
+  territories   Json?
+  channels      Json?
+  maxUses       Int?        @map("max_uses")
+  createdBy     String      @map("created_by")
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @default(now()) @map("updated_at")
+
+  workspace     Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  assetLicenses AssetLicense[]
+
+  @@index([workspaceId])
+  @@index([licenseType])
+  @@map("licenses")
+}

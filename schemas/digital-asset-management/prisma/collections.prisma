@@ -1,0 +1,24 @@
+// collections: Curated groupings of assets for sharing, presentation, or organizational purposes.
+// See README.md for full design rationale.
+
+model Collection {
+  id           String   @id @default(uuid())
+  workspaceId  String   @map("workspace_id")
+  name         String
+  description  String?
+  coverAssetId String?  @map("cover_asset_id")
+  isPublic     Boolean  @default(false) @map("is_public")
+  assetCount   Int      @default(0) @map("asset_count")
+  createdBy    String   @map("created_by")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @default(now()) @map("updated_at")
+
+  workspace        Workspace         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  coverAsset       Asset?            @relation("CollectionCover", fields: [coverAssetId], references: [id], onDelete: SetNull)
+  collectionAssets CollectionAsset[]
+  shareLinks       ShareLink[]       @relation("ShareLinkCollection")
+
+  @@index([workspaceId])
+  @@index([createdBy])
+  @@map("collections")
+}

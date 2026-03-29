@@ -1,0 +1,15 @@
+// tags: Workspace-scoped labels for categorizing and searching assets.
+// See README.md for full design rationale.
+
+model Tag {
+  id          String   @id @default(uuid())
+  workspaceId String   @map("workspace_id")
+  name        String
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  workspace   Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  assetTags   AssetTag[]
+
+  @@unique([workspaceId, name])
+  @@map("tags")
+}

@@ -1,0 +1,29 @@
+// share_links: Tokenized URLs for sharing assets or collections with optional access controls.
+// See README.md for full design rationale.
+
+model ShareLink {
+  id            String    @id @default(uuid())
+  workspaceId   String    @map("workspace_id")
+  assetId       String?   @map("asset_id")
+  collectionId  String?   @map("collection_id")
+  token         String    @unique
+  passwordHash  String?   @map("password_hash")
+  allowDownload Boolean   @default(true) @map("allow_download")
+  expiresAt     DateTime? @map("expires_at")
+  viewCount     Int       @default(0) @map("view_count")
+  maxViews      Int?      @map("max_views")
+  createdBy     String    @map("created_by")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @default(now()) @map("updated_at")
+
+  workspace      Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  asset          Asset?          @relation("ShareLinkAsset", fields: [assetId], references: [id], onDelete: Cascade)
+  collection     Collection?     @relation("ShareLinkCollection", fields: [collectionId], references: [id], onDelete: Cascade)
+  assetDownloads AssetDownload[]
+
+  @@index([workspaceId])
+  @@index([assetId])
+  @@index([collectionId])
+  @@index([expiresAt])
+  @@map("share_links")
+}

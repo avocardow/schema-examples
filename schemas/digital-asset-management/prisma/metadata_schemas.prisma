@@ -1,0 +1,30 @@
+// metadata_schemas: Defines custom metadata fields per workspace for flexible asset annotation.
+// See README.md for full design rationale.
+
+enum MetadataFieldType {
+  text
+  number
+  date
+  boolean
+  single_select
+  multi_select
+}
+
+model MetadataSchema {
+  id            String            @id @default(uuid())
+  workspaceId   String            @map("workspace_id")
+  fieldName     String            @map("field_name")
+  fieldLabel    String            @map("field_label")
+  fieldType     MetadataFieldType @map("field_type")
+  options       Json?
+  isRequired    Boolean           @default(false) @map("is_required")
+  displayOrder  Int               @default(0) @map("display_order")
+  createdAt     DateTime          @default(now()) @map("created_at")
+  updatedAt     DateTime          @default(now()) @map("updated_at")
+
+  workspace      Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  metadataValues MetadataValue[]
+
+  @@unique([workspaceId, fieldName])
+  @@map("metadata_schemas")
+}

@@ -1,0 +1,22 @@
+// asset_versions: Tracks individual file revisions for an asset, enabling version history.
+// See README.md for full design rationale.
+
+model AssetVersion {
+  id              String   @id @default(uuid())
+  assetId         String   @map("asset_id")
+  versionNumber   Int      @map("version_number")
+  storageKey      String   @map("storage_key")
+  mimeType        String   @map("mime_type")
+  fileSize        BigInt   @map("file_size")
+  fileExtension   String   @map("file_extension")
+  checksumSha256  String?  @map("checksum_sha256")
+  changeSummary   String?  @map("change_summary")
+  createdBy       String   @map("created_by")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  asset                  Asset   @relation("AssetVersionAsset", fields: [assetId], references: [id], onDelete: Cascade)
+  currentVersionOfAssets Asset[] @relation("AssetCurrentVersion")
+
+  @@unique([assetId, versionNumber])
+  @@map("asset_versions")
+}

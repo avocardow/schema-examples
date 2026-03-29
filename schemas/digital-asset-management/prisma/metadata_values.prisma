@@ -1,0 +1,18 @@
+// metadata_values: Stores actual metadata field values for individual assets.
+// See README.md for full design rationale.
+
+model MetadataValue {
+  id        String   @id @default(uuid())
+  assetId   String   @map("asset_id")
+  schemaId  String   @map("schema_id")
+  value     String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  asset  Asset          @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  schema MetadataSchema @relation(fields: [schemaId], references: [id], onDelete: Cascade)
+
+  @@unique([assetId, schemaId])
+  @@index([schemaId])
+  @@map("metadata_values")
+}

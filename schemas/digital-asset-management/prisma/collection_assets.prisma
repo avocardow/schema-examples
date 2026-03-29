@@ -1,0 +1,18 @@
+// collection_assets: Junction table linking assets to collections with ordering support.
+// See README.md for full design rationale.
+
+model CollectionAsset {
+  id           String   @id @default(uuid())
+  collectionId String   @map("collection_id")
+  assetId      String   @map("asset_id")
+  position     Int      @default(0)
+  addedBy      String   @map("added_by")
+  addedAt      DateTime @default(now()) @map("added_at")
+
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  asset        Asset      @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@unique([collectionId, assetId])
+  @@index([assetId])
+  @@map("collection_assets")
+}

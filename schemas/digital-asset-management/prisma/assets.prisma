@@ -1,0 +1,67 @@
+// assets: Core entity representing a digital file with metadata, versioning, and classification.
+// See README.md for full design rationale.
+
+enum AssetType {
+  image
+  video
+  audio
+  document
+  font
+  archive
+  other
+}
+
+enum AssetStatus {
+  draft
+  active
+  archived
+  expired
+}
+
+model Asset {
+  id               String       @id @default(uuid())
+  workspaceId      String       @map("workspace_id")
+  folderId         String?      @map("folder_id")
+  name             String
+  originalFilename String       @map("original_filename")
+  description      String?
+  storageKey       String       @unique @map("storage_key")
+  mimeType         String       @map("mime_type")
+  fileSize         BigInt       @map("file_size")
+  fileExtension    String       @map("file_extension")
+  assetType        AssetType    @map("asset_type")
+  status           AssetStatus  @default(draft)
+  currentVersionId String?      @map("current_version_id")
+  versionCount     Int          @default(1) @map("version_count")
+  width            Int?
+  height           Int?
+  durationSeconds  Decimal?     @map("duration_seconds")
+  colorSpace       String?      @map("color_space")
+  dpi              Int?
+  uploadedBy       String       @map("uploaded_by")
+  checksumSha256   String?      @map("checksum_sha256")
+  createdAt        DateTime     @default(now()) @map("created_at")
+  updatedAt        DateTime     @default(now()) @map("updated_at")
+
+  workspace        Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  folder           Folder?       @relation("AssetFolder", fields: [folderId], references: [id], onDelete: SetNull)
+  currentVersion   AssetVersion? @relation("AssetCurrentVersion", fields: [currentVersionId], references: [id], onDelete: SetNull)
+  versions         AssetVersion[] @relation("AssetVersionAsset")
+  renditions       Rendition[]
+  collectionAssets CollectionAsset[]
+  assetTags        AssetTag[]
+  metadataValues   MetadataValue[]
+  assetLicenses    AssetLicense[]
+  comments         Comment[]
+  shareLinks       ShareLink[]   @relation("ShareLinkAsset")
+  assetDownloads   AssetDownload[]
+  assetActivities  AssetActivity[] @relation("AssetActivityAsset")
+  coverCollections Collection[]  @relation("CollectionCover")
+
+  @@index([workspaceId, folderId])
+  @@index([workspaceId, assetType])
+  @@index([workspaceId, status])
+  @@index([uploadedBy])
+  @@index([mimeType])
+  @@map("assets")
+}

@@ -1,0 +1,20 @@
+// renditions: Pre-generated derivative formats of an asset for various display and download needs.
+// See README.md for full design rationale.
+
+model Rendition {
+  id         String   @id @default(uuid())
+  assetId    String   @map("asset_id")
+  presetName String   @map("preset_name")
+  storageKey String   @map("storage_key")
+  mimeType   String   @map("mime_type")
+  fileSize   BigInt   @map("file_size")
+  width      Int?
+  height     Int?
+  format     String
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  asset      Asset    @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@unique([assetId, presetName])
+  @@map("renditions")
+}

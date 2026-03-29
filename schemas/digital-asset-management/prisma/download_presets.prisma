@@ -1,0 +1,22 @@
+// download_presets: Configurable output settings for asset downloads such as format and dimensions.
+// See README.md for full design rationale.
+
+model DownloadPreset {
+  id           String   @id @default(uuid())
+  workspaceId  String   @map("workspace_id")
+  name         String
+  outputFormat String?  @map("output_format")
+  maxWidth     Int?     @map("max_width")
+  maxHeight    Int?     @map("max_height")
+  quality      Int?
+  dpi          Int?
+  createdBy    String   @map("created_by")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @default(now()) @map("updated_at")
+
+  workspace      Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  assetDownloads AssetDownload[]
+
+  @@index([workspaceId])
+  @@map("download_presets")
+}

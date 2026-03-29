@@ -1,0 +1,24 @@
+// asset_downloads: Audit log of asset download events with user, preset, and source tracking.
+// See README.md for full design rationale.
+
+model AssetDownload {
+  id           String   @id @default(uuid())
+  assetId      String   @map("asset_id")
+  downloadedBy String?  @map("downloaded_by")
+  shareLinkId  String?  @map("share_link_id")
+  presetId     String?  @map("preset_id")
+  format       String
+  fileSize     BigInt   @map("file_size")
+  ipAddress    String?  @map("ip_address")
+  userAgent    String?  @map("user_agent")
+  downloadedAt DateTime @default(now()) @map("downloaded_at")
+
+  asset        Asset           @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  shareLink    ShareLink?      @relation(fields: [shareLinkId], references: [id], onDelete: SetNull)
+  preset       DownloadPreset? @relation(fields: [presetId], references: [id], onDelete: SetNull)
+
+  @@index([assetId])
+  @@index([downloadedBy])
+  @@index([downloadedAt])
+  @@map("asset_downloads")
+}

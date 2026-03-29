@@ -1,0 +1,36 @@
+// asset_activities: Chronological event log capturing all significant actions on assets within a workspace.
+// See README.md for full design rationale.
+
+enum AssetActivityAction {
+  uploaded
+  updated
+  downloaded
+  shared
+  commented
+  tagged
+  moved
+  versioned
+  archived
+  restored
+  deleted
+}
+
+model AssetActivity {
+  id          String              @id @default(uuid())
+  workspaceId String              @map("workspace_id")
+  assetId     String?             @map("asset_id")
+  actorId     String              @map("actor_id")
+  action      AssetActivityAction
+  details     Json?
+  occurredAt  DateTime            @default(now()) @map("occurred_at")
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  asset       Asset?    @relation("AssetActivityAsset", fields: [assetId], references: [id], onDelete: SetNull)
+
+  @@index([workspaceId])
+  @@index([assetId])
+  @@index([actorId])
+  @@index([action])
+  @@index([occurredAt])
+  @@map("asset_activities")
+}
