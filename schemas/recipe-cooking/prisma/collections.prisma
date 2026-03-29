@@ -1,0 +1,20 @@
+// collections: User-curated groups of recipes with visibility and cover image.
+// See README.md for full design rationale.
+
+model Collection {
+  id            String   @id @default(uuid())
+  name          String
+  description   String?
+  coverImageUrl String?  @map("cover_image_url")
+  isPublic      Boolean  @default(false) @map("is_public")
+  recipeCount   Int      @default(0) @map("recipe_count")
+  createdBy     String   @map("created_by")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @default(now()) @map("updated_at")
+
+  creator           User               @relation("CollectionCreator", fields: [createdBy], references: [id], onDelete: Cascade)
+  collectionRecipes CollectionRecipe[]
+
+  @@index([createdBy])
+  @@map("collections")
+}

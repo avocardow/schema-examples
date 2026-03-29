@@ -1,0 +1,20 @@
+// units: Measurement units (metric, imperial, universal) for ingredient quantities.
+// See README.md for full design rationale.
+
+enum UnitSystem {
+  metric
+  imperial
+  universal
+}
+
+model Unit {
+  id           String      @id @default(uuid())
+  name         String      @unique
+  abbreviation String?
+  system       UnitSystem?
+
+  recipeIngredients RecipeIngredient[] @relation("RecipeIngredientUnit")
+  shoppingListItems ShoppingListItem[] @relation("ShoppingListItemUnit")
+
+  @@map("units")
+}

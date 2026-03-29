@@ -1,0 +1,16 @@
+// recipe_instructions: Ordered preparation steps for a recipe with optional timing.
+// See README.md for full design rationale.
+
+model RecipeInstruction {
+  id           String  @id @default(uuid())
+  recipeId     String  @map("recipe_id")
+  stepNumber   Int     @map("step_number")
+  instruction  String
+  sectionLabel String? @map("section_label")
+  timeMinutes  Int?    @map("time_minutes")
+
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@unique([recipeId, stepNumber])
+  @@map("recipe_instructions")
+}

@@ -1,0 +1,17 @@
+// collection_recipes: Junction linking collections to recipes with ordering.
+// See README.md for full design rationale.
+
+model CollectionRecipe {
+  id           String   @id @default(uuid())
+  collectionId String   @map("collection_id")
+  recipeId     String   @map("recipe_id")
+  position     Int      @default(0)
+  addedAt      DateTime @default(now()) @map("added_at")
+
+  collection Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  recipe     Recipe     @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@unique([collectionId, recipeId])
+  @@index([recipeId])
+  @@map("collection_recipes")
+}

@@ -1,0 +1,26 @@
+// meal_plan_entries: Individual recipe slots within a meal plan by date and meal type.
+// See README.md for full design rationale.
+
+enum MealType {
+  breakfast
+  lunch
+  dinner
+  snack
+}
+
+model MealPlanEntry {
+  id         String   @id @default(uuid())
+  mealPlanId String   @map("meal_plan_id")
+  recipeId   String   @map("recipe_id")
+  planDate   String   @map("plan_date")
+  mealType   MealType @map("meal_type")
+  servings   Int?
+  note       String?
+
+  mealPlan MealPlan @relation(fields: [mealPlanId], references: [id], onDelete: Cascade)
+  recipe   Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@index([mealPlanId, planDate])
+  @@index([recipeId])
+  @@map("meal_plan_entries")
+}

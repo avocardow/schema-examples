@@ -1,0 +1,51 @@
+// recipes: Core entity representing a cooking recipe with metadata, timing, and difficulty.
+// See README.md for full design rationale.
+
+enum RecipeDifficulty {
+  easy
+  medium
+  hard
+}
+
+enum RecipeStatus {
+  draft
+  published
+  archived
+}
+
+model Recipe {
+  id               String            @id @default(uuid())
+  title            String
+  slug             String            @unique
+  description      String?
+  sourceUrl        String?           @map("source_url")
+  sourceName       String?           @map("source_name")
+  servings         String?
+  prepTimeMinutes  Int?              @map("prep_time_minutes")
+  cookTimeMinutes  Int?              @map("cook_time_minutes")
+  totalTimeMinutes Int?              @map("total_time_minutes")
+  difficulty       RecipeDifficulty?
+  status           RecipeStatus      @default(draft)
+  language         String?
+  createdBy        String            @map("created_by")
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @default(now()) @map("updated_at")
+
+  creator            User              @relation("RecipeCreator", fields: [createdBy], references: [id], onDelete: Cascade)
+  recipeIngredients  RecipeIngredient[]
+  recipeInstructions RecipeInstruction[]
+  recipeImages       RecipeImage[]
+  nutrition          RecipeNutrition?
+  recipeTags         RecipeTag[]
+  collectionRecipes  CollectionRecipe[]
+  ratings            Rating[]
+  recipeFavorites    RecipeFavorite[]
+  mealPlanEntries    MealPlanEntry[]
+  shoppingListItems  ShoppingListItem[] @relation("ShoppingListItemRecipe")
+  recipeActivities   RecipeActivity[]   @relation("RecipeActivityRecipe")
+
+  @@index([createdBy])
+  @@index([status])
+  @@index([difficulty])
+  @@map("recipes")
+}

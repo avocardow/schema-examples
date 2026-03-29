@@ -1,0 +1,19 @@
+// meal_plans: Weekly or custom-range meal planning containers owned by a user.
+// See README.md for full design rationale.
+
+model MealPlan {
+  id        String   @id @default(uuid())
+  name      String
+  startDate String   @map("start_date")
+  endDate   String   @map("end_date")
+  createdBy String   @map("created_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  creator        User            @relation("MealPlanCreator", fields: [createdBy], references: [id], onDelete: Cascade)
+  mealPlanEntries MealPlanEntry[]
+  shoppingLists  ShoppingList[]
+
+  @@index([createdBy])
+  @@map("meal_plans")
+}

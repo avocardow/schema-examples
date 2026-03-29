@@ -1,0 +1,19 @@
+// ratings: User-submitted scores and optional reviews for recipes.
+// See README.md for full design rationale.
+
+model Rating {
+  id        String   @id @default(uuid())
+  recipeId  String   @map("recipe_id")
+  userId    String   @map("user_id")
+  score     Int
+  review    String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  user   User   @relation("RatingUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([recipeId, userId])
+  @@index([userId])
+  @@map("ratings")
+}

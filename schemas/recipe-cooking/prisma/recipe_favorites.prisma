@@ -1,0 +1,16 @@
+// recipe_favorites: Tracks which users have bookmarked which recipes.
+// See README.md for full design rationale.
+
+model RecipeFavorite {
+  id        String   @id @default(uuid())
+  recipeId  String   @map("recipe_id")
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  user   User   @relation("RecipeFavoriteUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([recipeId, userId])
+  @@index([userId])
+  @@map("recipe_favorites")
+}

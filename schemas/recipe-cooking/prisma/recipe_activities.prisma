@@ -1,0 +1,31 @@
+// recipe_activities: Audit log tracking actions performed on recipes by users.
+// See README.md for full design rationale.
+
+enum RecipeAction {
+  created
+  updated
+  published
+  archived
+  rated
+  favorited
+  added_to_collection
+  added_to_meal_plan
+}
+
+model RecipeActivity {
+  id         String       @id @default(uuid())
+  recipeId   String?      @map("recipe_id")
+  actorId    String       @map("actor_id")
+  action     RecipeAction
+  details    Json?
+  occurredAt DateTime     @default(now()) @map("occurred_at")
+
+  recipe Recipe? @relation("RecipeActivityRecipe", fields: [recipeId], references: [id], onDelete: SetNull)
+  actor  User    @relation("RecipeActivityActor", fields: [actorId], references: [id], onDelete: Restrict)
+
+  @@index([recipeId])
+  @@index([actorId])
+  @@index([action])
+  @@index([occurredAt])
+  @@map("recipe_activities")
+}

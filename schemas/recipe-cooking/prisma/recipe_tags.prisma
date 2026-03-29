@@ -1,0 +1,15 @@
+// recipe_tags: Many-to-many junction linking recipes to tags.
+// See README.md for full design rationale.
+
+model RecipeTag {
+  id       String @id @default(uuid())
+  recipeId String @map("recipe_id")
+  tagId    String @map("tag_id")
+
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([recipeId, tagId])
+  @@index([tagId])
+  @@map("recipe_tags")
+}

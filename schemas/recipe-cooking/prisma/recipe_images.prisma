@@ -1,0 +1,17 @@
+// recipe_images: Photos associated with a recipe, with ordering and primary flag.
+// See README.md for full design rationale.
+
+model RecipeImage {
+  id        String   @id @default(uuid())
+  recipeId  String   @map("recipe_id")
+  imageUrl  String   @map("image_url")
+  caption   String?
+  isPrimary Boolean  @default(false) @map("is_primary")
+  position  Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@index([recipeId, position])
+  @@map("recipe_images")
+}

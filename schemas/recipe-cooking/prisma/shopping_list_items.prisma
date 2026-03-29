@@ -1,0 +1,23 @@
+// shopping_list_items: Individual items on a shopping list with optional food/recipe linkage.
+// See README.md for full design rationale.
+
+model ShoppingListItem {
+  id             String   @id @default(uuid())
+  shoppingListId String   @map("shopping_list_id")
+  foodId         String?  @map("food_id")
+  recipeId       String?  @map("recipe_id")
+  quantity       Decimal?
+  unitId         String?  @map("unit_id")
+  customLabel    String?  @map("custom_label")
+  checked        Boolean  @default(false)
+  position       Int      @default(0)
+
+  shoppingList ShoppingList @relation(fields: [shoppingListId], references: [id], onDelete: Cascade)
+  food         Food?        @relation("ShoppingListItemFood", fields: [foodId], references: [id], onDelete: SetNull)
+  recipe       Recipe?      @relation("ShoppingListItemRecipe", fields: [recipeId], references: [id], onDelete: SetNull)
+  unit         Unit?        @relation("ShoppingListItemUnit", fields: [unitId], references: [id], onDelete: SetNull)
+
+  @@index([shoppingListId, checked])
+  @@index([foodId])
+  @@map("shopping_list_items")
+}

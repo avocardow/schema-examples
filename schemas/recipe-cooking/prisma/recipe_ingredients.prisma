@@ -1,0 +1,22 @@
+// recipe_ingredients: Junction linking recipes to foods with quantity, unit, and ordering.
+// See README.md for full design rationale.
+
+model RecipeIngredient {
+  id           String   @id @default(uuid())
+  recipeId     String   @map("recipe_id")
+  foodId       String   @map("food_id")
+  unitId       String?  @map("unit_id")
+  quantity     Decimal?
+  note         String?
+  sectionLabel String?  @map("section_label")
+  position     Int      @default(0)
+  optional     Boolean  @default(false)
+
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  food   Food   @relation(fields: [foodId], references: [id], onDelete: Restrict)
+  unit   Unit?  @relation("RecipeIngredientUnit", fields: [unitId], references: [id], onDelete: SetNull)
+
+  @@index([recipeId, position])
+  @@index([foodId])
+  @@map("recipe_ingredients")
+}

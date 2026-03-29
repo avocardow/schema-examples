@@ -1,6 +1,6 @@
 # Schema Examples
 
-A growing collection of production-ready database schema examples across multiple formats — with explanations and best practices. Twenty-eight domains complete (auth, notifications, file management, i18n, analytics, content moderation, e-commerce, marketplace, auction, CMS/blog, messaging/chat, social media, video conferencing, booking/scheduling, project management, CRM, helpdesk/customer support, SaaS/multi-tenant, subscription/membership, HR/payroll, compliance/GRC, event management/ticketing, affiliate/referral program, loyalty/rewards program, email/campaign marketing, media streaming, podcast platform, digital asset management), with 29 more planned.
+A growing collection of production-ready database schema examples across multiple formats — with explanations and best practices. Twenty-nine domains complete (auth, notifications, file management, i18n, analytics, content moderation, e-commerce, marketplace, auction, CMS/blog, messaging/chat, social media, video conferencing, booking/scheduling, project management, CRM, helpdesk/customer support, SaaS/multi-tenant, subscription/membership, HR/payroll, compliance/GRC, event management/ticketing, affiliate/referral program, loyalty/rewards program, email/campaign marketing, media streaming, podcast platform, digital asset management, recipe/cooking), with 28 more planned.
 
 **Copy. Learn. Contribute. Ship.**
 
@@ -69,7 +69,7 @@ See each domain's **Dependencies** section for details.
 | [Media Streaming](./schemas/media-streaming)                         |     20 | ✅     |
 | [Podcast Platform](./schemas/podcast-platform)                       |     25 | ✅     |
 | [Digital Asset Management (DAM)](./schemas/digital-asset-management) |     18 | ✅     |
-| [Recipe / Cooking](./schemas/recipe-cooking)                         |        | 🔲     |
+| [Recipe / Cooking](./schemas/recipe-cooking)                         |     18 | ✅     |
 
 ### Business & Enterprise
 

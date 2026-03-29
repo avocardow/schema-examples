@@ -1,0 +1,21 @@
+// recipe_nutrition: Per-recipe nutritional breakdown (calories, macros, micronutrients).
+// See README.md for full design rationale.
+
+model RecipeNutrition {
+  id                String   @id @default(uuid())
+  recipeId          String   @unique @map("recipe_id")
+  calories          Decimal?
+  totalFatGrams     Decimal? @map("total_fat_grams")
+  saturatedFatGrams Decimal? @map("saturated_fat_grams")
+  carbohydratesGrams Decimal? @map("carbohydrates_grams")
+  fiberGrams        Decimal? @map("fiber_grams")
+  sugarGrams        Decimal? @map("sugar_grams")
+  proteinGrams      Decimal? @map("protein_grams")
+  sodiumMg          Decimal? @map("sodium_mg")
+  cholesterolMg     Decimal? @map("cholesterol_mg")
+  updatedAt         DateTime @default(now()) @map("updated_at")
+
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@map("recipe_nutrition")
+}

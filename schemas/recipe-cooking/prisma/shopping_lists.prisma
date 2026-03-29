@@ -1,0 +1,19 @@
+// shopping_lists: Grocery lists optionally linked to a meal plan.
+// See README.md for full design rationale.
+
+model ShoppingList {
+  id         String   @id @default(uuid())
+  name       String
+  mealPlanId String?  @map("meal_plan_id")
+  createdBy  String   @map("created_by")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @default(now()) @map("updated_at")
+
+  mealPlan          MealPlan?          @relation(fields: [mealPlanId], references: [id], onDelete: SetNull)
+  creator           User               @relation("ShoppingListCreator", fields: [createdBy], references: [id], onDelete: Cascade)
+  shoppingListItems ShoppingListItem[]
+
+  @@index([createdBy])
+  @@index([mealPlanId])
+  @@map("shopping_lists")
+}

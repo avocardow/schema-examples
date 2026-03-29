@@ -1,0 +1,15 @@
+// foods: Canonical ingredient catalogue used across recipes and shopping lists.
+// See README.md for full design rationale.
+
+model Food {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  category  String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  recipeIngredients RecipeIngredient[]
+  shoppingListItems ShoppingListItem[] @relation("ShoppingListItemFood")
+
+  @@index([category])
+  @@map("foods")
+}
